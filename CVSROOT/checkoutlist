@@ -1,4 +1,4 @@
-# The "checkoutlist" file is used to support additional version controlled
+#  The "checkoutlist" file is used to support additional version controlled
 # administrative files in $CVSROOT/CVSROOT, such as template files.
 #
 # The first entry on a line is a filename which will be checked out from
