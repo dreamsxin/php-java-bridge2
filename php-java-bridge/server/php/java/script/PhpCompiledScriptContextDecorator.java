@@ -1,5 +1,15 @@
 /*-*- mode: Java; tab-width:8 -*-*/
-package php.java.bridge.http;
+
+package php.java.script;
+
+import java.io.OutputStream;
+import java.io.Reader;
+import java.util.Map;
+
+import javax.script.ScriptContext;
+
+import php.java.bridge.ILogger;
+import php.java.bridge.Util.HeaderParser;
 
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier
@@ -23,13 +33,27 @@ package php.java.bridge.http;
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import java.io.OutputStream;
 
-final class BufferedOutputStream extends java.io.BufferedOutputStream {
-    public BufferedOutputStream(OutputStream out) {
-        super(out);
+/**
+ * This class implements a simple script context for PHP. It starts a standalone 
+ * <code>JavaBridgeRunner</code> which listens for requests from php instances.<p>
+ * 
+ * In a servlet environment please use a <code>php.java.script.PhpSimpleHttpScriptContext</code> instead.
+ * @see php.java.script.PhpScriptContext
+ * @see php.java.bridge.JavaBridgeRunner
+ * @author jostb
+ *
+ */
+public class PhpCompiledScriptContextDecorator extends PhpScriptContextDecorator {
+
+    public PhpCompiledScriptContextDecorator(IPhpScriptContext ctx) {
+	super(ctx);
     }
-    public byte[] getBuffer() {
-        return buf;
+
+    /**{@inheritDoc}*/
+    public Continuation createContinuation(Reader reader, Map env,
+            OutputStream out, OutputStream err, HeaderParser headerParser, ResultProxy result,
+            ILogger logger) {
+    		return new FastCGIProxy(reader, env, out,  err, headerParser, result, logger); 
     }
 }
