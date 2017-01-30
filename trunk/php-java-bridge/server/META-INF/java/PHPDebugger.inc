@@ -77,7 +77,7 @@ if (!class_exists("pdb_Parser")) {
 	 * @param string the script content
 	 * @access private
 	 */
-	public function pdb_Parser($scriptName, $content) {
+	public function __construct($scriptName, $content) {
 	  $this->scriptName = $scriptName;
 	  $this->content = $content;
 	  $this->code = token_get_all($content);
@@ -527,7 +527,7 @@ class pdb_Environment {
   public $vars, $line, $firstLine;
   public $parent;
 
-  public function pdb_Environment($parent, $filename, $stepNext, $firstLine) {
+  public function __construct($parent, $filename, $stepNext, $firstLine) {
 	$this->parent = $parent;
     $this->filename = $filename;
     $this->stepNext = $stepNext;
@@ -552,7 +552,7 @@ abstract class pdb_Message {
 
   public abstract function getType();
 
-  public function pdb_Message($session) {
+  public function __construct($session) {
     $this->session = $session;
   }
 
@@ -761,8 +761,8 @@ class pdb_DebugSessionStart extends pdb_Message {
   public function getType() {
     return self::TYPE;
   }
-  public function pdb_DebugSessionStart($options) {
-    parent::pdb_Message($this);
+  public function __construct($options) {
+    parent::__construct($this);
 	$this->end = true;
 	if (isset($_SERVER["PATH_INFO"]) && isset($_SERVER["QUERY_STRING"])&&!extension_loaded("Zend Debugger")) {
 	  $filename = $uri = $_SERVER["PATH_INFO"];
@@ -1041,8 +1041,8 @@ class pdb_SetProtocolResponse extends pdb_Message {
   const TYPE = 11000;
   private $req;
   
-  public function pdb_SetProtocolResponse ($req) {
-    parent::pdb_Message($req->session);
+  public function __construct ($req) {
+    parent::__construct($req->session);
     $this->req = $req;
   }
 
@@ -1098,8 +1098,8 @@ class pdb_StartResponse extends pdb_Message {
   const TYPE = 1001;
   private $req;
   
-  public function pdb_StartResponse ($req) {
-    parent::pdb_Message($req->session);
+  public function __construct ($req) {
+    parent::__construct($req->session);
     $this->req = $req;
   }
 
@@ -1123,8 +1123,8 @@ class pdb_StartResponse extends pdb_Message {
  */
 class pdb_StartProcessFileNotification extends pdb_Message {
   const TYPE = 2009;
-  public function pdb_StartProcessFileNotification ($session) {
-    parent::pdb_Message($session);
+  public function __construct ($session) {
+    parent::__construct($session);
   }
   protected function handleContinueProcessFile($message) {
     return true; // next
@@ -1167,7 +1167,7 @@ class pdb_Breakpoint {
   public $type, $lifeTime, $file, $line, $condition;
   private $id;
 
-  public function pdb_Breakpoint($type, $lifeTime, $file, $line, $condition, $id) {
+  public function __construct($type, $lifeTime, $file, $line, $condition, $id) {
     $this->type = $type;
     $this->lifeTime = $lifeTime;
     $this->file = $file;
@@ -1192,8 +1192,8 @@ class pdb_AddBreakpointResponse extends pdb_Message {
     return ++$id;
   }
 
-  public function pdb_AddBreakpointResponse($req) {
-    parent::pdb_Message($req->session);
+  public function __construct($req) {
+    parent::__construct($req->session);
     $this->req = $req;
     $this->id = self::getId();
     $this->session->breakpoints[$this->id] = new pdb_Breakpoint($req->type, $req->lifeTime, $req->file, $req->line, $req->condition, $this->id);
@@ -1225,8 +1225,8 @@ class pdb_RemoveBreakpointResponse extends pdb_Message {
   private $id;
   private $failure;
 
-  public function pdb_RemoveBreakpointResponse($req) {
-    parent::pdb_Message($req->session);
+  public function __construct($req) {
+    parent::__construct($req->session);
     $this->req = $req;
 
 	$this->remove();
@@ -1261,8 +1261,8 @@ class pdb_RemoveBreakpointResponse extends pdb_Message {
  */
 class pdb_RemoveAllBreakpointsResponse extends pdb_RemoveBreakpointResponse {
   const TYPE = 1023;
-  public function pdb_RemoveAllBreakpointsResponse($req) {
-    parent::pdb_RemoveBreakpointResponse($req);
+  public function __construct($req) {
+    parent::__construct($req);
   }
 
   protected function remove() {
@@ -1384,8 +1384,8 @@ class pdb_GetCallStackResponse extends pdb_Message {
   const TYPE = 1034;
   private $req;
 
-  public function pdb_GetCallStackResponse($req) {
-    parent::pdb_Message($req->session);
+  public function __construct($req) {
+    parent::__construct($req->session);
     $this->req = $req;
   }
 
@@ -1460,8 +1460,8 @@ class pdb_GetCWDResponse extends pdb_Message {
   const TYPE = 1036;
   private $req;
 
-  public function pdb_GetCWDResponse ($req) {
-    parent::pdb_Message($req->session);
+  public function __construct ($req) {
+    parent::__construct($req->session);
     $this->req = $req;
   }
 
@@ -1513,8 +1513,8 @@ class pdb_GetVariableValueResponse extends pdb_Message {
   const TYPE = 1032;
   private $req;
 
-  public function pdb_GetVariableValueResponse ($req) {
-    parent::pdb_Message($req->session);
+  public function __construct ($req) {
+    parent::__construct($req->session);
     $this->req = $req;
   }
 
@@ -1613,8 +1613,8 @@ class pdb_StepOverResponse extends pdb_Message {
   const TYPE = 1012;
   private $req;
 
-  public function pdb_StepOverResponse($req) {
-    parent::pdb_Message($req->session);
+  public function __construct($req) {
+    parent::__construct($req->session);
     $this->req = $req;
   }
 
@@ -1725,8 +1725,8 @@ class pdb_GoResponse extends pdb_Message {
   const TYPE = 1014;
   private $req;
 
-  public function pdb_GoResponse ($req) {
-    parent::pdb_Message($req->session);
+  public function __construct ($req) {
+    parent::__construct($req->session);
     $this->req = $req;
   }
 
@@ -1795,7 +1795,7 @@ class pdb_In {
   private $len;
   private $session;
 
-  public function pdb_In($in, $session) {
+  public function __construct($in, $session) {
     $this->in = $in;
     $this->len = 0;
 	$this->session = $session;
@@ -1854,7 +1854,7 @@ class pdb_Out {
   private $buf;
   private $session;
   
-  public function pdb_Out($out, $session) {
+  public function __construct($out, $session) {
     $this->out = $out;
     $this->buf = "";
 	$this->session = $session;

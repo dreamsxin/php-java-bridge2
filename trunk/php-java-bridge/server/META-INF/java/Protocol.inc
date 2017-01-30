@@ -90,7 +90,7 @@ class java_EmptyChannel {
   protected $handler;
   private $res;
 
-  function java_EmptyChannel($handler) {
+  function __construct($handler) {
     $this->handler = $handler;
   }
   function shutdownBrokenConnection () {}
@@ -158,7 +158,7 @@ class java_EmptyChannel {
 abstract class java_SocketChannel extends java_EmptyChannel {
   public $peer, $host;
 
-  function java_SocketChannel($peer, $host) {
+  function __construct($peer, $host) {
 	$this->peer = $peer;
 	$this->host = $host;
   }
@@ -218,7 +218,7 @@ class java_ChunkedSocketChannel extends java_SocketChannel {
 class java_SocketHandler {
   public $protocol, $channel;
 
-  function java_SocketHandler($protocol, $channel) {
+  function __construct($protocol, $channel) {
 	$this->protocol = $protocol;
 	$this->channel = $channel;
   }
@@ -293,7 +293,7 @@ class java_SimpleHttpHandler extends java_SocketHandler {
 		or $this->protocol->handler->shutdownBrokenConnection("Broken local connection handle");
   }
 
-  function java_SimpleHttpHandler($protocol, $ssl, $host, $port) {
+  function __construct($protocol, $ssl, $host, $port) {
 	$this->cookies = array();
 	$this->protocol = $protocol;
 	$this->ssl = $ssl;
@@ -453,8 +453,8 @@ class java_SimpleHttpTunnelHandler extends java_SimpleHttpHandler  {
 	fgets($this->socket, 3); // \r\n
     fclose($this->socket);
   }
-  function java_SimpleHttpTunnelHandler($protocol, $ssl, $host, $port) {
-	parent::java_SimpleHttpHandler($protocol, $ssl, $host, $port);
+  function __construct($protocol, $ssl, $host, $port) {
+	parent::__construct($protocol, $ssl, $host, $port);
 	$this->open();
   }
   function read($size) {
@@ -738,7 +738,7 @@ class java_Protocol {
       return $this->createHttpHandler();
     }
   }
-  function java_Protocol ($client) {
+  function __construct ($client) {
     $this->client = $client;
 	$this->handler = $this->createHandler();
   }
