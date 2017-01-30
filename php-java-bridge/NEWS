@@ -3,6 +3,10 @@ php-java-bridge NEWS -- history of user-visible changes.
 Please send bug reports, questions and suggestions to
 <php-java-bridge-users@lists.sourceforge.net>.
 
+Version 6.2.2
+
+* Changed old constructor to __construct
+
 Version 6.2.1
 
 * java_session(null, false) now returns false if a session does not exist.
