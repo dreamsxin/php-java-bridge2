@@ -885,7 +885,7 @@ class Java extends java_AbstractJava {
    * @see function Java
    * @see function java_values
    */
-  function Java() {
+  function __construct() {
 	$client = $this->__client = __javaproxy_Client_getClient();
 	
 	$args = func_get_args();
