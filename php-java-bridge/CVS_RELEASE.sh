@@ -2,8 +2,10 @@
 set -x
 LANG=C
 
+echo "ssh -t jost_boekemeier,php-java-bridge@shell.sourceforge.net create -- port?"
+read port
 rm -rf [^C][^V][^S]* .??* *~
-cvs -z9 -Q update -APd 
+cvs -Q update -APd 
 find . -print0 | xargs -0 touch
 dirs=`ls -l | grep '^d' | fgrep -v CVS | awk '{print $9}'`
 find $dirs -name "CVS" -print | xargs rm -rf
@@ -53,9 +55,11 @@ chmod +x JavaBridge.war
 zip -q -r php-java-bridge_${version}_documentation.zip $list
 mv JavaBridgeTemplate.war "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war"
 rm -rf $dirs
-cvs -z9 -Q update -APd 
+cvs -Q update -APd 
 
-scp "php-java-bridge_`cat VERSION`_documentation.zip" "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war" jost_boekemeier,php-java-bridge@web.sf.net:"/home/pfs/project/p/ph/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/"
-scp dist/Java.inc dist/php-script.jar dist/JavaBridge.jar dist/php-servlet.jar dist/script-api.jar jost_boekemeier,php-java-bridge@web.sf.net:"/home/pfs/project/p/ph/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/exploded/"
+ssh -p $port "jost_boekemeier@shell4.sourceforge.net" mkdir "/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/exploded/"
+scp -P $port  "php-java-bridge_`cat VERSION`_documentation.zip" "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war" "jost_boekemeier@shell4.sourceforge.net:/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/"
 
-# scp "php-java-bridge_`cat VERSION`.tar.gz" jost_boekemeier,php-java-bridge@web.sf.net:"/home/pfs/project/p/ph/php-java-bridge/RHEL_FC\ SecurityEnhancedLinux/php-java-bridge_`cat VERSION`/"
+scp -P $port  dist/Java.inc dist/php-script.jar dist/JavaBridge.jar dist/php-servlet.jar dist/script-api.jar "jost_boekemeier@shell4.sourceforge.net:/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/exploded/"
+
+#scp "php-java-bridge_`cat VERSION`.tar.gz" jost_boekemeier,php-java-bridge@web.sf.net:"/home/pfs/project/p/ph/php-java-bridge/RHEL_FC\ SecurityEnhancedLinux/php-java-bridge_`cat VERSION`/"
