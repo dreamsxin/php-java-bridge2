@@ -3,6 +3,11 @@ php-java-bridge NEWS -- history of user-visible changes.
 Please send bug reports, questions and suggestions to
 <php-java-bridge-users@lists.sourceforge.net>.
 
+Version 6.2.3
+
+* Fixed a bug in WriterOutputStream.
+
+
 Version 6.2.2
 
 * Changed old constructor to __construct
