@@ -9,10 +9,11 @@
 %define have_policy_modules %(if test -f /etc/selinux/config && test -d /etc/selinux/%{__policy_tree}/modules; then echo 1; else echo 0; fi)
 %define have_policy_devel %(if test -f %{_datadir}/selinux/devel/Makefile; then echo 1; else echo 0; fi)
 
-%define tomcat_name			tomcat6
+%define tomcat_name			tomcat
 %define tomcat_webapps		%{_localstatedir}/lib/%{tomcat_name}/webapps
 %define shared_java			%{_datadir}/java
 %define shared_pear			%{_datadir}/pear
+%global debug_package %{nil}
 
 Name: php-java-bridge
 Summary: PHP Hypertext Preprocessor to Java Bridge
@@ -21,8 +22,7 @@ Version: %{version}
 Release: %{release}
 License: LGPL
 URL: http://www.sourceforge.net/projects/php-java-bridge
-Source0: http://osdn.dl.sourceforge.net/sourceforge/php-java-bridge/php-java-bridge_%{version}.tar.gz
-
+Source0: https://downloads.sourceforge.net/project/php-java-bridge/src/php-java-bridge_%{version}/php-java-bridge_%{version}.tar.gz
 
 BuildRequires: httpd
 BuildRequires: phpdoc >= 1.4.2
@@ -157,7 +157,6 @@ mkdir -p $RPM_BUILD_ROOT/%{tomcat_webapps}
 for i in $files; 
   do cp $mod_dir/$i $RPM_BUILD_ROOT/%{tomcat_webapps}
   rm -f $mod_dir/$i; 
-#  echo %{tomcat_webapps}/$i >>filelist
 done
 
 # server also contains the server documentation
