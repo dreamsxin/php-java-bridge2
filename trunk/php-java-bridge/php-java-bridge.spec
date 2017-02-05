@@ -27,6 +27,7 @@ Source0: https://downloads.sourceforge.net/project/php-java-bridge/src/php-java-
 BuildRequires: httpd
 BuildRequires: phpdoc >= 1.4.2
 BuildRequires: ant >= 1.7.1
+BuildRequires: ed
 
 %if %{have_j3} == 1
 BuildRequires: jdk >= 1.4.2
@@ -189,14 +190,22 @@ if test -f /etc/selinux/config; then
 	echo "					/etc/selinux/%{__policy_tree}/src/policy"
 	echo "Please see README document for more information."
 	echo
+	echo "Or type: setenforce 0  to disable SEL temporarily."
+	echo
   fi
 fi
 if test -d /var/www/html &&  ! test -e /var/www/html/JavaBridge; then
-  ln -fs %{tomcat_webapps}/JavaBridge /var/www/html/;
+  cp -r %{tomcat_webapps}/JavaBridge /var/www/html/;
+  ed /var/www/html/JavaBridge/java/Java.inc <<\EOF
+1,11s/# define ("JAVA_HOSTS", "127.0.0.1:8787");/define ("JAVA_HOSTS", "127.0.0.1:8080");/
+w
+q
+EOF
 fi
 echo "PHP/Java Bridge installed. Start with:"
 echo "service %{tomcat_name} restart"
 echo "service httpd restart"
+echo "Then visit: http://localhost/JavaBridge or http://localhost:8080/JavaBridge"
 echo
 exit 0
 
