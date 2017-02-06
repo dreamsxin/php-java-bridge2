@@ -1,4 +1,4 @@
-policy_module(javabridge_tomcat,3.1.7)
+policy_module(php-java-bridge-tomcat,6.2.3)
 
 ########################################
 #
@@ -10,8 +10,9 @@ policy_module(javabridge_tomcat,3.1.7)
 # javabridge local policy
 #
 gen_require(`
-	type httpd_t, http_cache_port_t;
+	type httpd_t, http_cache_port_t, unreserved_port_t;
 ')
 
 allow httpd_t http_cache_port_t:tcp_socket name_connect;
+allow httpd_t unreserved_port_t:tcp_socket name_connect;
 

@@ -6,7 +6,7 @@
 %define PHP_RELEASE_VERSION %(((LANG=C rpm -q --queryformat "%{VERSION}" php) || echo "4.0.0") | tail -1 | LANG=C cut -d. -f3)
 %define have_j2 %((rpm -q --whatprovides j2sdk) >/dev/null && echo 1 || echo 0)
 %define have_j3 %((rpm -q --whatprovides jdk) >/dev/null && echo 1 || echo 0)
-%define have_policy_modules %(if test -f /etc/selinux/config && test -d /etc/selinux/%{__policy_tree}/modules; then echo 1; else echo 0; fi)
+%define have_policy_modules %(if test -f /etc/selinux/config && ( test -d /etc/selinux/%{__policy_tree}/modules || test 2 -lt `echo %{_selinux_policy_version} | awk -F. '{print $1}'` ); then echo 1; else echo 0; fi)
 %define have_policy_devel %(if test -f %{_datadir}/selinux/devel/Makefile; then echo 1; else echo 0; fi)
 
 %define tomcat_name			tomcat
@@ -172,11 +172,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 if test -f /etc/selinux/config; then
-  if test -d /etc/selinux/%{__policy_tree}/modules; then 
+  if test %{have_policy_modules} -eq 1; then 
 	/sbin/service httpd stop > /dev/null 2>&1
 	/sbin/service %{tomcat_name} stop > /dev/null 2>&1
-	%{_sbindir}/semodule -i %{_docdir}/%{name}-%{version}/security/module/php-java-bridge.pp
-	%{_sbindir}/semodule -i %{_docdir}/%{name}-%{version}/security/module/php-java-bridge-tomcat.pp
+	%{_sbindir}/semodule -i %{_docdir}/%{name}/security/module/php-java-bridge.pp
+	%{_sbindir}/semodule -i %{_docdir}/%{name}/security/module/php-java-bridge-tomcat.pp
 	/sbin/service httpd start > /dev/null 2>&1
 	/sbin/service %{tomcat_name} start > /dev/null 2>&1
   else
@@ -215,9 +215,9 @@ exit 0
 %preun
 if [ $1 = 0 ]; then
 	/sbin/service httpd stop > /dev/null 2>&1
-	if test -d /etc/selinux/%{__policy_tree}/modules; then 
-		%{_sbindir}/semodule -r javabridge
-		%{_sbindir}/semodule -r javabridge_tomcat
+	if test %{have_policy_modules} -eq 1; then 
+		%{_sbindir}/semodule -r php-java-bridge
+		%{_sbindir}/semodule -r php-java-bridge-tomcat
 	fi
 	if test -e /var/www/html/JavaBridge && test -e %{tomcat_webapps}/JavaBridge && test %{tomcat_webapps}/JavaBridge -ef /var/www/html/JavaBridge; then
 		rm -f /var/www/html/JavaBridge;
