@@ -1,4 +1,4 @@
-policy_module(javabridge,5.5.1)
+policy_module(php-java-bridge,6.2.3)
 
 ########################################
 #
