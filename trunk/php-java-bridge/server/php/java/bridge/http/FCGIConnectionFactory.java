@@ -81,11 +81,11 @@ public abstract class FCGIConnectionFactory {
     public abstract void test() throws FCGIConnectException;
     
     protected abstract void waitForDaemon() throws UnknownHostException, InterruptedException;
-    protected final void runFcgi(Map env, String php, boolean includeJava) {
+    protected final void runFcgi(Map env, String php, boolean includeJava, boolean includeDebugger) {
 	int c;
 	byte buf[] = new byte[Util.BUF_SIZE];
 	try {
-	    Process proc = doBind(env, php, includeJava);
+	    Process proc = doBind(env, php, includeJava, includeDebugger);
 	    if(proc==null || proc.getInputStream() == null) return;
 	    /// make sure that the wrapper script launcher.sh does not output to stdout
 	    proc.getInputStream().close();
@@ -99,14 +99,14 @@ public abstract class FCGIConnectionFactory {
 	};
     }
 
-    protected abstract Process doBind(Map env, String php, boolean includeJava) throws IOException;
+    protected abstract Process doBind(Map env, String php, boolean includeJava, boolean includeDebugger) throws IOException;
     protected void bind(final ILogger logger) throws InterruptedException, IOException {
 	Thread t = (new Util.Thread("JavaBridgeFastCGIRunner") {
 		public void run() {
 		    Map env = (Map) processFactory.getEnvironment().clone();
 		    env.put("PHP_FCGI_CHILDREN", processFactory.getPhpConnectionPoolSize());
 		    env.put("PHP_FCGI_MAX_REQUESTS", processFactory.getPhpMaxRequests());
-		    runFcgi(env, processFactory.getPhp(), processFactory.getPhpIncludeJava());
+		    runFcgi(env, processFactory.getPhp(), processFactory.getPhpIncludeJava(), processFactory.getPhpIncludeDebugger());
 		}
 	    });
 	t.start();

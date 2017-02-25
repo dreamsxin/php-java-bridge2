@@ -218,7 +218,6 @@
 	<include name="META-INF/java/Protocol.inc" />
 	<include name="META-INF/java/SimpleParser.inc" />
 	<include name="META-INF/java/JavaProxy.inc" />
-	<include name="META-INF/java/PHPDebugger.inc" />
 	<include name="META-INF/java/PHPDebugger.php" />
       </fileset>
     </apply>

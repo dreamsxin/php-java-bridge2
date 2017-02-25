@@ -87,6 +87,7 @@ public class ContextLoaderListener implements javax.servlet.ServletContextListen
     protected String php_fcgi_connection_pool_size = FCGIUtil.PHP_FCGI_CONNECTION_POOL_SIZE;
     protected String php_fcgi_connection_pool_timeout = FCGIUtil.PHP_FCGI_CONNECTION_POOL_TIMEOUT;
     protected boolean php_include_java;
+    protected boolean php_include_debugger;
     protected int php_fcgi_connection_pool_size_number = Integer.parseInt(FCGIUtil.PHP_FCGI_CONNECTION_POOL_SIZE);
     protected long php_fcgi_connection_pool_timeout_number = Long.parseLong(FCGIUtil.PHP_FCGI_CONNECTION_POOL_TIMEOUT);
     protected String php_fcgi_max_requests = FCGIUtil.PHP_FCGI_MAX_REQUESTS;
@@ -227,6 +228,16 @@ public class ContextLoaderListener implements javax.servlet.ServletContextListen
 	} catch (Throwable t) {/*ignore*/}
 
 	val = null;
+	php_include_debugger = true;
+	try {
+	    val  = context.getInitParameter("php_include_debugger");
+	    if(val==null) val = context.getInitParameter("PHP_INCLUDE_DEBUGGER");
+	    if(val==null) val = System.getProperty("php.java.bridge.php_include_debugger");
+	    if(val!=null && (val.equalsIgnoreCase("off") ||  val.equalsIgnoreCase("false")))
+		php_include_debugger = false;
+	} catch (Throwable t) {/*ignore*/}
+
+	val = null;
 	try {
 	    val = context.getInitParameter("php_fcgi_max_requests");
 	    if(val==null) val = System.getProperty("php.java.bridge.php_fcgi_max_requests");
@@ -327,7 +338,6 @@ public class ContextLoaderListener implements javax.servlet.ServletContextListen
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }
-/* no longer part of the PHP/Java Bridge
 	    File phpDebuggerFile = new File (javaDir, "PHPDebugger.php");
 	    try {
 		if (!phpDebuggerFile.exists()) {
@@ -340,7 +350,6 @@ public class ContextLoaderListener implements javax.servlet.ServletContextListen
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }
-*/	    
 	    File javaProxyFile = new File (javaDir, "JavaProxy.php");
 	    try {
 		if (!javaProxyFile.exists()) {
@@ -569,9 +578,9 @@ public class ContextLoaderListener implements javax.servlet.ServletContextListen
     protected boolean preferSystemPhp = false; // prefer /usr/bin/php-cgi over WEB-INF/cgi/php-cgi?
     protected boolean phpTryOtherLocations = false;
     /** {@inheritDoc} */
-    public IFCGIProcess createFCGIProcess(String[] args, boolean includeJava, File home, Map env)
+    public IFCGIProcess createFCGIProcess(String[] args, boolean includeJava, boolean includeDebugger, File home, Map env)
             throws IOException {
-	return new FCGIProcess(args, includeJava, getCgiDir(), getPearDir(), getWebInfDir(), home, env, getCgiDir(), phpTryOtherLocations, preferSystemPhp);
+	return new FCGIProcess(args, includeJava, includeDebugger, getCgiDir(), getPearDir(), getWebInfDir(), home, env, getCgiDir(), phpTryOtherLocations, preferSystemPhp);
     }
     /** {@inheritDoc} */
     public String getPhpConnectionPoolSize() {
@@ -588,6 +597,10 @@ public class ContextLoaderListener implements javax.servlet.ServletContextListen
     /** {@inheritDoc} */
     public boolean getPhpIncludeJava() {
 	return php_include_java;
+    }
+    /** {@inheritDoc} */
+    public boolean getPhpIncludeDebugger() {
+	return php_include_debugger;
     }
     /** {@inheritDoc} */
     public HashMap getEnvironment () {

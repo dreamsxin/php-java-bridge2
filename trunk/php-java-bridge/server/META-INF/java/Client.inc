@@ -261,7 +261,7 @@ class java_Client /* implements IDocHandler */ {
 	$arrayProxyFactory, $exceptionProxyFactory, $throwExceptionProxyFactory;
   
   public $arg;
-  public $asyncCtx, $cancelProxyCreationCounter;
+  public $asyncCtx, $cancelProxyCreationTag;
   public $globalRef;
 
   public $stack;
@@ -299,7 +299,7 @@ class java_Client /* implements IDocHandler */ {
 
 	$this->globalRef = new java_GlobalRef();
 
-	$this->asyncCtx = $this->cancelProxyCreationCounter = 0;
+	$this->asyncCtx = $this->cancelProxyCreationTag = 0;
 	
 	$this->methodCache = $this->defaultCache;
 	

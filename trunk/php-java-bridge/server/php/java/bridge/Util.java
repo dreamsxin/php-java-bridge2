@@ -913,6 +913,7 @@ public final class Util {
 	private boolean preferSystemPhp;
 	private boolean isOldPhpVersion = false; // php < 5.3
 	private boolean includeJava;
+	private boolean includeDebugger;
 	private String cgiDir;
 	private String pearDir;
 	private String webInfDir;
@@ -929,13 +930,14 @@ public final class Util {
 	     * Return args + PHP_ARGS
 	     * @param args The prefix
 	     * @param includeJava The option php_include_java
+	     * @param includeDebugger The option php_include_debugger
 	     * @param cgiDir The WEB-INF/cgi directory
 	     * @param pearDir The WEB-INF/pear directory
 	     * @param webInfDir The WEB-INF directory
 	     * @return args with PHP_ARGS appended
 	     */
-	    private String[] getPhpArgs(String[] args, boolean includeJava, String cgiDir, String pearDir, String webInfDir) {
-		String[] allArgs = new String[args.length+PHP_ARGS.length+((sessionSavePath!=null)?2:0)+(includeJava?1:0)+(cgiDir!=null?2:0)+(pearDir!=null?2:0)+(webInfDir!=null?2:0)];
+	    private String[] getPhpArgs(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir) {
+		String[] allArgs = new String[args.length+PHP_ARGS.length+((sessionSavePath!=null)?2:0)+(includeJava?1:0)+(includeDebugger?1:0)+(cgiDir!=null?2:0)+(pearDir!=null?2:0)+(webInfDir!=null?2:0)];
 		int i=0;
 		for(i=0; i<args.length; i++) {
 		    allArgs[i]=args[i];
@@ -963,7 +965,7 @@ public final class Util {
 		    allArgs[i++] = "-d";	    
 		    allArgs[i++] = getQuoted("java.web_inf_dir=",webInfDir);	    
 		}
-		if (includeJava) allArgs[i++] = "-C"; // don't chdir, we'll do it
+		if (includeJava || includeDebugger) allArgs[i++] = "-C"; // don't chdir, we'll do it
 		for(int j=0; j<PHP_ARGS.length; j++) {
 		    allArgs[i++]=PHP_ARGS[j];
 		}
@@ -1140,17 +1142,18 @@ public final class Util {
             if(homeDir!=null &&!homeDir.exists()) homeDir = null;
             
             if (testPhp(php, args)) 
-        	runPhp(php, getPhpArgs(args, includeJava, cgiDir, pearDir, webInfDir));
+        	runPhp(php, getPhpArgs(args, includeJava, includeDebugger, cgiDir, pearDir, webInfDir));
             else 
         	throw new IOException("PHP not found. Please install php-cgi. PHP test command was: " + java.util.Arrays.asList(getTestArgumentArray(php, args)) + " ");
         }
-	protected Process(String[] args, boolean includeJava, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp) {
+	protected Process(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp) {
 	    this.args = args;
 	    this.homeDir = homeDir;
 	    this.env = env;
 	    this.tryOtherLocations = tryOtherLocations;
 	    this.preferSystemPhp = preferSystemPhp;
 	    this.includeJava = includeJava;
+	    this.includeJava = includeDebugger;
 	    this.cgiDir = cgiDir;
 	    this.pearDir = pearDir;
 	    this.webInfDir = webInfDir;
@@ -1169,8 +1172,8 @@ public final class Util {
 	 * @throws IOException
 	 * @see Util#checkCgiBinary(String)
 	 */	  
-        public static Process start(String[] args, boolean includeJava, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
-            Process proc = new Process(args, includeJava, cgiDir, pearDir, webInfDir, homeDir, env, tryOtherLocations, preferSystemPhp);
+        public static Process start(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
+            Process proc = new Process(args, includeJava, includeDebugger, cgiDir, pearDir, webInfDir, homeDir, env, tryOtherLocations, preferSystemPhp);
             proc.start();
             return proc;
         }
@@ -1242,8 +1245,8 @@ public final class Util {
 	InputStream in = null;
 	OutputStream err = null;
 
-	protected ProcessWithErrorHandler(String[] args, boolean includeJava, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
-	    super(args, includeJava, cgiDir, pearDir, webInfDir,  homeDir, env, tryOtherLocations, preferSystemPhp);
+	protected ProcessWithErrorHandler(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
+	    super(args, includeJava, includeDebugger, cgiDir, pearDir, webInfDir,  homeDir, env, tryOtherLocations, preferSystemPhp);
 	    this.err = err;
 	}
 	protected void start() throws IOException {
@@ -1296,8 +1299,8 @@ public final class Util {
          * @throws IOException
          * @see Util#checkCgiBinary(String)
          */
-        public static Process start(String[] args, boolean includeJava, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
-            Process proc = new ProcessWithErrorHandler(args, includeJava, cgiDir, pearDir, webInfDir, homeDir, env, tryOtherLocations, preferSystemPhp, err);
+        public static Process start(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
+            Process proc = new ProcessWithErrorHandler(args, includeJava, includeDebugger, cgiDir, pearDir, webInfDir, homeDir, env, tryOtherLocations, preferSystemPhp, err);
             proc.start();
             return proc;
         }

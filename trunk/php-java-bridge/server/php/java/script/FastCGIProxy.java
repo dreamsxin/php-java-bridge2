@@ -62,6 +62,7 @@ public class FastCGIProxy extends Continuation implements IFCGIProcessFactory {
     private static final String MAX_REQUESTS = FCGIUtil.PHP_FCGI_MAX_REQUESTS;
     private static final String CGI_DIR = Util.TMPDIR.getAbsolutePath();
     private static final boolean PHP_INCLUDE_JAVA = false; // servlet option
+    private static final boolean PHP_INCLUDE_DEBUGGER = true; // servlet option
     
     public FastCGIProxy(Reader reader, Map env, OutputStream out,
             OutputStream err, HeaderParser headerParser,
@@ -181,8 +182,8 @@ public class FastCGIProxy extends Continuation implements IFCGIProcessFactory {
     }
     /** required by IFCGIProcessFactory */
     /** {@inheritDoc} */
-    public IFCGIProcess createFCGIProcess(String[] args, boolean includeJava, File home, Map env) throws IOException {
-	return new FCGIProcess(args, includeJava, getCgiDir(), getPearDir(), getWebInfDir(), home, env,
+    public IFCGIProcess createFCGIProcess(String[] args, boolean includeJava, boolean includeDebugger, File home, Map env) throws IOException {
+	return new FCGIProcess(args, includeJava, includeDebugger, getCgiDir(), getPearDir(), getWebInfDir(), home, env,
 		getCgiDir(), true, true);
     }
 
@@ -227,6 +228,11 @@ public class FastCGIProxy extends Continuation implements IFCGIProcessFactory {
     /** {@inheritDoc} */
     public boolean getPhpIncludeJava() {
 	return PHP_INCLUDE_JAVA;
+    }
+
+    /** {@inheritDoc} */
+    public boolean getPhpIncludeDebugger() {
+	return PHP_INCLUDE_DEBUGGER;
     }
 
 

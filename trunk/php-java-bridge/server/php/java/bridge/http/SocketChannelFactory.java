@@ -108,7 +108,7 @@ class SocketChannelFactory extends FCGIConnectionFactory {
     }
 	    
     /* Start a fast CGI Server process on this computer. Switched off per default. */
-    protected Process doBind(Map env, String php, boolean includeJava) throws IOException {
+    protected Process doBind(Map env, String php, boolean includeJava, boolean includeDebugger) throws IOException {
 	if(proc!=null) return null;
 	StringBuffer buf = new StringBuffer((Util.JAVABRIDGE_PROMISCUOUS || promiscuous) ? "" : LOCAL_HOST); // bind to all available or loopback only
 	buf.append(':');
@@ -121,7 +121,7 @@ class SocketChannelFactory extends FCGIConnectionFactory {
 	// later.
 	File home = null;
 	if(php!=null) try { home = ((new File(php)).getParentFile()); } catch (Exception e) {Util.printStackTrace(e);}
-	proc = processFactory.createFCGIProcess(new String[]{php, "-b", port}, includeJava, home, env);
+	proc = processFactory.createFCGIProcess(new String[]{php, "-b", port}, includeJava, includeDebugger, home, env);
 	proc.start();
 	return (Process)proc;
     }
