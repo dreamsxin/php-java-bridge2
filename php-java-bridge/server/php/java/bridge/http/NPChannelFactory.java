@@ -81,7 +81,7 @@ public class NPChannelFactory extends FCGIConnectionFactory {
 	return doConnect();
     }
 
-    protected Process doBind(Map env, String php, boolean includeJava) throws IOException {
+    protected Process doBind(Map env, String php, boolean includeJava, boolean includeDebugger) throws IOException {
         if(proc!=null) return null;
 	if(raPath==null) throw new IOException("No pipe name available.");
 	// Set override hosts so that php does not try to start a VM.
@@ -90,7 +90,7 @@ public class NPChannelFactory extends FCGIConnectionFactory {
 	// later.
 	File home = null;
 	if(php!=null) try { home = ((new File(php)).getParentFile()); } catch (Exception e) {Util.printStackTrace(e);}
-	proc = processFactory.createFCGIProcess(new String[]{php, raPath}, includeJava, home, env);
+	proc = processFactory.createFCGIProcess(new String[]{php, raPath}, includeJava, includeDebugger, home, env);
 	proc.start();
 	return (Process)proc;
     }

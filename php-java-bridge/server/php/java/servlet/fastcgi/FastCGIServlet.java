@@ -86,6 +86,7 @@ public class FastCGIServlet extends HttpServlet {
 	public String requestUri;
 	public HashMap environment;
 	public boolean includedJava;
+	public boolean includedDebugger;
 	public ArrayList allHeaders;
     }
     
@@ -147,6 +148,7 @@ public class FastCGIServlet extends HttpServlet {
     protected void setupRequestVariables(HttpServletRequest req, Environment env) {
 	env.allHeaders = new ArrayList();
 	env.includedJava = contextLoaderListener.getPhpIncludeJava() && PhpJavaServlet.getHeader(Util.X_JAVABRIDGE_INCLUDE, req) == null;
+	env.includedDebugger = contextLoaderListener.getPhpIncludeDebugger() && PhpJavaServlet.getHeader(Util.X_JAVABRIDGE_INCLUDE, req) == null;
 
 	env.contextPath = (String) req.getAttribute("javax.servlet.include.context_path");
 	if (env.contextPath == null) env.contextPath = req.getContextPath();
@@ -177,7 +179,9 @@ public class FastCGIServlet extends HttpServlet {
 	    envp.put("PATH_TRANSLATED", documentRoot+pathInfo);
 	}
 
-        if (env.includedJava)
+        if (env.includedDebugger)
+	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
+	else if (env.includedJava)
 	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/JavaProxy.php"));
 	else
 	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, env.servletPath));
@@ -241,8 +245,8 @@ public class FastCGIServlet extends HttpServlet {
 
 	env.environment = envp;
 
-	if (env.includedJava) {
-	    env.environment.put("X_JAVABRIDGE_INCLUDE_ONLY", "1");
+	if (env.includedJava || env.includedDebugger) {
+	    env.environment.put("X_JAVABRIDGE_INCLUDE_ONLY", String.valueOf((env.includedJava?10:0)+(env.includedDebugger?1:0)));
 	    env.environment.put("X_JAVABRIDGE_INCLUDE", ServletUtil.getRealPath(getServletContext(), env.servletPath));
 	}
 	env.environment.put("REDIRECT_STATUS", "200");

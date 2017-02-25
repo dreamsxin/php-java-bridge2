@@ -47,12 +47,13 @@ public interface IFCGIProcessFactory {
      * @param pearDir The bear dir
      * @param cgiDir The cgi dir
      * @param includeJava automatically include Java.inc in each script
+     * @param includeDebugger automatically include PHPDebugger.php in each script
      * @param home The PHP home dir or null
      * @param env The process environment
      * @return a FastCGI process object
      * @throws IOException
      */
-    public IFCGIProcess createFCGIProcess(String[] args, boolean includeJava, File home, Map env) throws IOException;
+    public IFCGIProcess createFCGIProcess(String[] args, boolean includeJava, boolean includeDebugger, File home, Map env) throws IOException;
 
     /**
      * Get the connection pool size, usually FCGIUtil#PHP_FCGI_CONNECTION_POOL_SIZE
@@ -77,6 +78,12 @@ public interface IFCGIProcessFactory {
      * @return the php_include_java option
      */
     public boolean getPhpIncludeJava();
+
+    /**
+     * Get the value of the php_include_debugger option from the WEB-INF/web.xml. Should return true in most cases.
+     * @return the php_include_debugger option
+     */
+    public boolean getPhpIncludeDebugger();
 
     /**
      * Get the process environment map used for PHP.
