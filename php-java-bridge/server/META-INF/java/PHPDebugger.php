@@ -78,10 +78,6 @@ if(!function_exists("token_get_all")) {
 if ($pdb_script_orig = $pdb_script = pdb_getDebugHeader("X_JAVABRIDGE_INCLUDE", $_SERVER)) {
 	if ($pdb_script!="@") {
 		if (($_SERVER['REMOTE_ADDR']=='127.0.0.1') || (($pdb_script = realpath($pdb_script)) && (!strncmp($_SERVER['DOCUMENT_ROOT'], $pdb_script, strlen($_SERVER['DOCUMENT_ROOT']))))) {
-			if(pdb_getDebugHeader("X_JAVABRIDGE_INCLUDE", $_SERVER)>=10) { // include Java.inc as well
-				require_once("Java.inc");
-			}
-			chdir (dirname ($pdb_script));
 			$_SERVER['SCRIPT_FILENAME'] = $pdb_script; // set to the original script filename
 		} else {
 			trigger_error("illegal access: ".$pdb_script_orig, E_USER_ERROR);
@@ -814,8 +810,12 @@ class pdb_DebugSessionStart extends pdb_Message {
 	if (isset($_SERVER["SCRIPT_FILENAME"]) && isset($_SERVER["QUERY_STRING"])&&!extension_loaded("Zend Debugger")) {
 	  $filename = $uri = $_SERVER["SCRIPT_FILENAME"];
 	  $queryStr = $_SERVER["QUERY_STRING"];
-	} else {
+	} else { // PHPDebugger disabled
+	  global $pdb_script;
 	  $this->enable = false;
+	  if (isset($pdb_script) && $pdb_script!="@") {
+	  	require_once($pdb_script);
+	  }
 	  return;
 	}
 
@@ -840,7 +840,15 @@ class pdb_DebugSessionStart extends pdb_Message {
 	$this->includedScripts = array();
 
     $errno = 0; $errstr = "";
-    $io = fsockopen($args["debug_host"], $args['debug_port'], $errno, $errstr, 5) or trigger_error("fsockopen", E_USER_ERROR);
+    $io = null;
+    foreach(explode(",", $args["debug_host"]) as $host) {
+        if ($io = fsockopen($host, $args['debug_port'], $errno, $errstr, 5)) {
+            break;
+        }
+    }
+    if ($io==null) {
+        trigger_error("fsockopen", E_USER_ERROR);
+    }
 	$this->end = false;
 
     $this->in =new pdb_In($io, $this);
@@ -2280,9 +2288,9 @@ function pdb_getDebugHeader($name,$array) {
 }
 
 
-if (isset($pdb_script) && pdb_script!="@") {
+if (!isset($java_include_only) && isset($pdb_script) && $pdb_script!="@") { // not called from JavaProxy.php and pdb_script is set
+	chdir (dirname ($pdb_script));
 	$pdb_dbg->handleRequests();
-	require_once($pdb_script);
 }
 
 ?>

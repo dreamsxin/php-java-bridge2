@@ -40,6 +40,7 @@ import javax.servlet.http.HttpSession;
 import php.java.bridge.ISession;
 import php.java.bridge.JavaBridgeFactory;
 import php.java.bridge.Request;
+import php.java.bridge.SimpleJavaBridgeClassLoader;
 import php.java.bridge.http.ContextFactory;
 import php.java.bridge.http.IContext;
 import php.java.bridge.http.IContextFactory;
@@ -161,6 +162,10 @@ public class RemoteHttpServletContextFactory extends JavaBridgeFactory implement
 
     /**{@inheritDoc}*/
     public void waitFor(long timeout) throws InterruptedException {}
+
+    public SimpleJavaBridgeClassLoader getJavaBridgeClassLoader() {
+	return javaBridgeClassLoader;
+    }
 
     /**
      * {@inheritDoc}

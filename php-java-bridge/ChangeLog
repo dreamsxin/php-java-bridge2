@@ -1,5 +1,19 @@
 2017-02-25  <jostb@intern>
 
+    * PhpDebugger.php: Rewritten to be called by JavaProxy.php
+
+	* JavaProxy.inc, Protocol.inc: htmlspecialchars use ISO-8859-1 for backward compatibility
+
+	* buildJavaProxy.php: Rewritten to include PHPDebugger.php
+
+	* DynamicClassLoader.java, DynamicHttpURLConnection.java, DynamicJarURLConnection.java, DynamicJavaBridgeClassLoader.java, JarLibraryPath.java, JavaBridgeClassLoader.java, SimpleJavaBridgeClassLoader.java, StandaloneJavaBridgeClassLoader.java: Back from the attic, for internal tests only.
+
+	* IJavaBridgeFactory.java, JavaBridge.java, JavaBridgeFactory.java, SessionFactory.java, Util.java, SimpleContextFactory.java, RemoteHttpServletContextFactory.java, FastCGIServlet.java: Make use of the classloader.
+
+	* TestGetResult.java, TestInvocable.java, TestInvocablePhpScriptEngine.java: Type cast needed for Java 8
+
+2017-02-25  <jostb@intern>
+
     * PhpDebugger.inc: Removed
 
 	* Client.inc: Warning fixed.

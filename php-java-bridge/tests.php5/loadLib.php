@@ -18,6 +18,7 @@ if(file_exists("$ext/lib/array")) {
 mkdir("$ext/lib/array");
 copy("$here/array.jar", "$ext/lib/array/array.jar");
 try {
+  java_require("array/array.jar");
   $testvar = new Java('Array');
   echo "Test okay\n";
   exit(0);

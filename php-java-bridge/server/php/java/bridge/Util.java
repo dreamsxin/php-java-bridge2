@@ -306,6 +306,9 @@ public final class Util {
     
     /** The base directory of the PHP/Java Bridge. Usually /usr/php/modules/ or $HOME  */
     public static String JAVABRIDGE_BASE;
+
+    /** The library directory of the PHP/Java Bridge. Usually /usr/php/modules/lib or $HOME/lib */
+    public static String JAVABRIDGE_LIB;
     
     private static String getProperty(Properties p, String key, String defaultValue) {
 	String s = null;
@@ -395,8 +398,10 @@ public final class Util {
 	}
 	try {
 	    JAVABRIDGE_BASE = getProperty(p, "php.java.bridge.base",  System.getProperty("user.home"));
+	    JAVABRIDGE_LIB =  JAVABRIDGE_BASE + File.separator +"lib";
 	} catch (Exception e) {
 	    JAVABRIDGE_BASE=".";
+	    JAVABRIDGE_LIB=".";
 	}
 	try {
     	    VM_NAME = "unknown";

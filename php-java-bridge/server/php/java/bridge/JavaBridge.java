@@ -495,6 +495,7 @@ public class JavaBridge implements Runnable {
 		throw (OutOfMemoryError)e1; // abort
 	    }
 	    if(e1 instanceof NoClassDefFoundError) {
+		getClassLoader().reset();
 		e = getUnresolvedExternalReferenceException(e1, "call constructor");
 	    }
 	    setException(response, e, createInstance?"CreateInstance":"ReferenceClass", null, name, args, params, hasDeclaredExceptions);
@@ -1052,6 +1053,7 @@ public class JavaBridge implements Runnable {
 		throw (OutOfMemoryError)e1; // abort
 	    }
 	    if(e1 instanceof NoClassDefFoundError) {
+		getClassLoader().reset();
 		e = getUnresolvedExternalReferenceException(e1, "call the method");
 	    }
 	    
@@ -1262,6 +1264,7 @@ public class JavaBridge implements Runnable {
 		throw (OutOfMemoryError)e1; // abort
 	    }
 	    if(e1 instanceof NoClassDefFoundError) {
+		getClassLoader().reset();
 		e = getUnresolvedExternalReferenceException(e1, "invoke a property");
 	    }
 	    setException(response, e, set?"SetProperty":"GetProperty", object, prop, args, params, hasDeclaredExceptions);
@@ -1381,6 +1384,33 @@ public class JavaBridge implements Runnable {
      */
     public PhpMap getPhpMap(Object value) {
 	return PhpMap.getPhpMap(value, this);
+    }
+
+    /**
+     * Append the path to the current library path<br>
+     * Examples:<br>
+     * setJarLibPath(";file:///tmp/test.jar;file:///tmp/my.jar");<br>
+     * setJarLibPath("|file:c:/t.jar|http://.../a.jar|jar:file:///tmp/x.jar!/");<br>
+     * @param path A file or url list, usually separated by ';'
+     * @param extensionDir The php extension directory. 
+     * @throws IOException 
+     */
+    public void updateJarLibraryPath(String path, String extensionDir) throws IOException {
+    	updateJarLibraryPath(path, extensionDir, null, null);
+    }
+    /**
+     * Append the path to the current library path<br>
+     * Examples:<br>
+     * setJarLibPath(";file:///tmp/test.jar;file:///tmp/my.jar");<br>
+     * setJarLibPath("|file:c:/t.jar|http://.../a.jar|jar:file:///tmp/x.jar!/");<br>
+     * @param path A file or url list, usually separated by ';'
+     * @param extensionDir The php extension directory. 
+     * @param cwd The current working dir
+     * @param searchpath The search path
+     * @throws IOException 
+     */
+    public void updateJarLibraryPath(String path, String extensionDir, String cwd, String searchpath) throws IOException {
+    	getClassLoader().updateJarLibraryPath(path, extensionDir.intern(), cwd, searchpath);   	
     }
 
     /**
@@ -1630,6 +1660,16 @@ public class JavaBridge implements Runnable {
     	return PhpProcedure.createProxy(getFactory(), null, emptyMap, Util.ZERO_PARAM, object);
     }
     /**
+     * Reset the global caches of the bridge.  Currently this is the
+     * classloader. This is a no-op when the backend
+     * is running in a servlet engine or application server.
+     * @see php.java.bridge.Session#reset()
+     */
+    public void reset() {
+	if(logLevel>3) warn("Your PHP script has called the privileged procedure \"reset()\", which resets the backend to its initial state. Therefore all session variables and all caches are now gone.");
+	getClassLoader().reset();
+    }
+    /**
      * This method sets a new session factory. Used by the servlet to
      * implement session sharing.
      * @param sessionFactory The sessionFactory to set.
@@ -1674,6 +1714,13 @@ public class JavaBridge implements Runnable {
     	String id = Integer.toHexString(getSerialID());
     	session.put(id, obj);
     	return (String)castToString(id);
+    }
+    /**
+     * Return the current ClassLoader
+     * @return The ClassLoader.
+     */
+    public SimpleJavaBridgeClassLoader getClassLoader() {
+	return getFactory().getJavaBridgeClassLoader();
     }
     /**
      * Checks if a given position exists.

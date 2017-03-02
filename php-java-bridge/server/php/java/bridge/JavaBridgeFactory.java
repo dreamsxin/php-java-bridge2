@@ -44,6 +44,7 @@ import php.java.bridge.http.IContext;
 public abstract class JavaBridgeFactory implements IJavaBridgeFactory {
     
     protected JavaBridge bridge = null;
+    protected SimpleJavaBridgeClassLoader javaBridgeClassLoader;
 
     /**
      * Return a session for the JavaBridge

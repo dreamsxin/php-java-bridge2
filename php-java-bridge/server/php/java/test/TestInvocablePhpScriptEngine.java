@@ -107,7 +107,7 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 	try {
 	    ScriptEngine e = m.getEngineByName("php-invocable");
 	    e.eval(invocableScript);
-	    assertTrue(6==(Integer)((Invocable)e).invokeFunction("f",new Object[]{"5"}));
+	    assertTrue(6==((Integer)((Invocable)e).invokeFunction("f",new Object[]{"5"})).intValue());
 	    ((Closeable)e).close();
 	} catch (Exception e) {
             fail(String.valueOf(e));
@@ -119,9 +119,9 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 	    ((java.io.FileFilter)e).accept(new File(System.getProperty("java.io.tmpdir", "/tmp")+File.separator+"test.php"));
 	    CompiledScript c = ((Compilable)e).compile(invocableScript);
 	    c.eval();
-	    assertTrue(6==(Integer)((Invocable)e).invokeFunction("f",new Object[]{"5"}));
+	    assertTrue(6==((Integer)((Invocable)e).invokeFunction("f",new Object[]{"5"})).intValue());
 	    c.eval();
-	    assertTrue(6==(Integer)((Invocable)e).invokeFunction("f",new Object[]{"5"}));
+	    assertTrue(6==((Integer)((Invocable)e).invokeFunction("f",new Object[]{"5"})).intValue());
 	    ((Closeable)e).close();
 	} catch (Exception e) {
             fail(String.valueOf(e));

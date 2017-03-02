@@ -31,7 +31,7 @@ public class TestInvocable extends TestCase {
 
 	Invocable i = (Invocable)e;
 	Object f = e.getContext().getAttribute("f", 100);
-	assertTrue(2==(Integer)i.invokeMethod(f, "a", new Object[] {new Integer(1)}));
+	assertTrue(2==((Integer)i.invokeMethod(f, "a", new Object[] {new Integer(1)})).intValue());
 
 	e.eval((Reader)null);
     }

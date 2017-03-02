@@ -5,6 +5,7 @@ include_once ("java/Java.inc");
 
 $here=realpath(dirname($_SERVER["SCRIPT_FILENAME"]));
 if(!$here) $here=getcwd();
+java_require("$here/array6.jar");
 
 $testvar = new Java('Array6');
 $testobj = $testvar->test();
