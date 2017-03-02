@@ -3,6 +3,18 @@ php-java-bridge NEWS -- history of user-visible changes.
 Please send bug reports, questions and suggestions to
 <php-java-bridge-users@lists.sourceforge.net>.
 
+Version 7.0.1
+
+* PhpDebugger.php can now connect back to latest Eclipse or Zend Studio.
+
+* A bug has been fixed in the htmlspecialchars() call in
+  JavaProxy.inc, Protocol.inc and Java.inc, which works differently in
+  PHP 7.
+
+* java_require() and java_reset() are back. But only for internal
+  tests. Please do not use them in your applications.
+
+
 Version 7.0.0
 
 * Fixed a bug in Java.inc and Client.inc

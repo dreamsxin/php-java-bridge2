@@ -3,7 +3,8 @@ include_once("java/Java.inc");
 
 $passwd="hello";
 try {
-  java_require("mail.jar"); // mail.jar is not part of the standard jdk
+  $here=realpath(dirname($_SERVER["SCRIPT_FILENAME"]));
+  java_require("$here/mail.jar"); // mail.jar is not part of the standard jdk
 
   $password=new java("java.lang.String", "$passwd");
   $algorithm=java("java.security.MessageDigest")->getInstance("md5");

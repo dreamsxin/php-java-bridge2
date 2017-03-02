@@ -10,6 +10,7 @@ include_once ("java/Java.inc");
 
 $here=realpath(dirname($_SERVER["SCRIPT_FILENAME"]));
 if(!$here) $here=getcwd();
+java_require("$here/arrayToString.jar");
 $ArrayToString = new JavaClass("ArrayToString");
 $ar=array("Cześć!", " שלום", " Grüß Gott", " Dobrý deň", " Dobrý den", " こんにちは, ｺﾝﾆﾁﾊ");
 print java_values($ArrayToString->arrayToString($ar)) . "\n";

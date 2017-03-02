@@ -30,6 +30,7 @@ import java.io.InputStream;
 import php.java.bridge.ISession;
 import php.java.bridge.JavaBridge;
 import php.java.bridge.Request;
+import php.java.bridge.SimpleJavaBridgeClassLoader;
 import php.java.bridge.Util;
 
 
@@ -61,11 +62,13 @@ public class SimpleContextFactory implements IContextFactoryVisitor {
     private boolean isContextRunnerRunning = false;
     private boolean isValid = true;
     private boolean isManaged;
+    private ClassLoader loader;
     
     protected SimpleContextFactory(String webContext, boolean isManaged) {
 	this.isManaged = isManaged;
   	ContextFactory visited = new ContextFactory(webContext, isManaged);
   	visited.accept(this);
+    	setClassLoader(Util.getContextClassLoader());
     	this.visited = visited;
     }
     
@@ -125,7 +128,7 @@ public class SimpleContextFactory implements IContextFactoryVisitor {
     }
     /**{@inheritDoc}*/
     public String toString() {
-	return "ContextFactory: " + visited + ", SimpleContextFactory: " +getClass();
+	return "ContextFactory: " + visited + ", SimpleContextFactory: " +getClass() + ", current loader: " + loader;
     }
     /**
      * Create a new context. The default implementation
@@ -192,5 +195,22 @@ public class SimpleContextFactory implements IContextFactoryVisitor {
    public void parseHeader(Request req, InputStream in)
             throws IOException {
 	visited.parseHeader(req, in);
+    }
+    /**
+     * Return the JavaBridgeClassLoader, which wraps the
+     * DynamicJavaBridgeClassLoader
+     * @return The class loader
+     */
+    public SimpleJavaBridgeClassLoader getJavaBridgeClassLoader() {
+	return visited.getJavaBridgeClassLoader();
+    }
+    /**
+     * Set the current class loader
+     * @param loader The DynamicJavaBridgeClassLoader
+     */
+    private void setClassLoader(ClassLoader loader) {
+	if(loader==null) 
+	    throw new NullPointerException("loader");
+	this.loader = loader;
     }
 }

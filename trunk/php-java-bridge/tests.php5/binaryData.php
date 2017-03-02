@@ -1,10 +1,11 @@
 <?php
 
-include_once ("java/Java.inc");
+require_once("/home/jbk/PHP-JAVA-BRIDGE/SRC/php-java-bridge/tests.php5/java/Java.inc");
 ini_set("max_execution_time", 0);
 
 $here=realpath(dirname($_SERVER["SCRIPT_FILENAME"]));
 if(!$here) $here=getcwd();
+java_require("$here/binaryData.jar");
 
 $binaryData = new java("BinaryData");
 $data = java_values($binaryData->getData(700*1024));

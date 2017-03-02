@@ -58,7 +58,18 @@ public class SessionFactory extends JavaBridgeFactory {
 	  return null;
       }
   }
-    
+  /**{@inheritDoc}*/
+  public SimpleJavaBridgeClassLoader getJavaBridgeClassLoader() {
+      if (javaBridgeClassLoader!=null) return javaBridgeClassLoader;
+      return javaBridgeClassLoader=new StandaloneJavaBridgeClassLoader(getClassLoader());
+  }
+  /**
+   * Return the context loader
+   * @return The context class loader
+   */
+  private ClassLoader getClassLoader() {
+      return Util.getContextClassLoader();
+  }
   private ISession session(String name, short clientIsNew, int timeout) {
 	synchronized(JavaBridge.sessionHash) {
 	    Session ref = null;
