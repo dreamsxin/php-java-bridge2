@@ -96,7 +96,7 @@ public final class Util {
     /** The launcher.sh code */
     public static Class LAUNCHER_UNIX;
     /** The launcher.exe code */
-    public static Class LAUNCHER_WINDOWS, LAUNCHER_WINDOWS2, LAUNCHER_WINDOWS3, LAUNCHER_WINDOWS4;
+    public static Class LAUNCHER_WINDOWS, LAUNCHER_WINDOWS2, LAUNCHER_WINDOWS3, LAUNCHER_WINDOWS4, LAUNCHER_WINDOWS5, LAUNCHER_WINDOWS6, LAUNCHER_WINDOWS7;
     /** Only for internal use */
     public static final byte HEX_DIGITS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -349,6 +349,9 @@ public final class Util {
 	    LAUNCHER_WINDOWS2 = Class.forName("php.java.bridge.LauncherWindows2");
 	    LAUNCHER_WINDOWS3 = Class.forName("php.java.bridge.LauncherWindows3");
 	    LAUNCHER_WINDOWS4 = Class.forName("php.java.bridge.LauncherWindows4");
+	    LAUNCHER_WINDOWS5 = Class.forName("php.java.bridge.LauncherWindows5");
+	    LAUNCHER_WINDOWS6 = Class.forName("php.java.bridge.LauncherWindows6");
+	    LAUNCHER_WINDOWS7 = Class.forName("php.java.bridge.LauncherWindows7");
 	} catch (Exception e) {/*ignore*/}
 	    
     	Properties p = new Properties();

@@ -34,6 +34,9 @@
     <delete file="server/php/java/bridge/LauncherWindows2.java" />
     <delete file="server/php/java/bridge/LauncherWindows3.java" />
     <delete file="server/php/java/bridge/LauncherWindows4.java" />
+    <delete file="server/php/java/bridge/LauncherWindows5.java" />
+    <delete file="server/php/java/bridge/LauncherWindows6.java" />
+    <delete file="server/php/java/bridge/LauncherWindows7.java" />
   </target>
 
   <target name="compile" depends="init,JavaIncJava,JavaProxyPhpJava,PhpDebuggerPHPJava,LauncherUnix,LauncherWindows">

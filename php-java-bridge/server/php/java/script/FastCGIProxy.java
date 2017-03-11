@@ -110,15 +110,24 @@ public class FastCGIProxy extends Continuation implements IFCGIProcessFactory {
 		    Field f2 = Util.LAUNCHER_WINDOWS2.getField("bytes");
 		    Field f3 = Util.LAUNCHER_WINDOWS3.getField("bytes");
 		    Field f4 = Util.LAUNCHER_WINDOWS4.getField("bytes");
+		    Field f5 = Util.LAUNCHER_WINDOWS5.getField("bytes");
+		    Field f6 = Util.LAUNCHER_WINDOWS6.getField("bytes");
+		    Field f7 = Util.LAUNCHER_WINDOWS7.getField("bytes");
 		    byte[] buf =  (byte[]) f.get(Util.LAUNCHER_WINDOWS);
 		    byte[] buf2 = (byte[]) f2.get(Util.LAUNCHER_WINDOWS2);
 		    byte[] buf3 = (byte[]) f3.get(Util.LAUNCHER_WINDOWS3);
 		    byte[] buf4 = (byte[]) f4.get(Util.LAUNCHER_WINDOWS4);
+		    byte[] buf5 = (byte[]) f5.get(Util.LAUNCHER_WINDOWS5);
+		    byte[] buf6 = (byte[]) f6.get(Util.LAUNCHER_WINDOWS6);
+		    byte[] buf7 = (byte[]) f7.get(Util.LAUNCHER_WINDOWS7);
 		    OutputStream out = new FileOutputStream (javaProxyFile);
 		    out.write(buf);
 		    out.write(buf2);
 		    out.write(buf3);
 		    out.write(buf4);
+		    out.write(buf5);
+		    out.write(buf6);
+		    out.write(buf7);
 		    out.close();
 		}
 	    } catch (Exception e) {
