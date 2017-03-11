@@ -59,7 +59,7 @@ void usage() {
   puts("This is free software; see the source for copying conditions.  There is NO");
   puts("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
   puts("Usage: launcher.exe php-cgi.exe channelName php-options");
-  puts("Influential environment variables: PHP_FCGI_MAX_REQUESTS, PHP_FCGI_CHILDREN");
+  puts("Influential environment variables: PHP_FCGI_MAX_REQUESTS, PHP_JAVA_BRIDGE_FCGI_CHILDREN");
   puts("Example: launcher.exe php-cgi \\\\.\\pipe\\JavaBridge@9667 -d allow_url_include=On");
   exit(1);
 }
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
 
 								/* how many processes? */
   for(php_fcgi_children=0,envp=environ; *envp; envp++)
-	if(!strncmp("PHP_FCGI_CHILDREN", *envp, 17)) {
+	if(!strncmp("PHP_JAVA_BRIDGE_FCGI_CHILDREN", *envp, 17)) {
 	  php_fcgi_children = strchr(*envp, '=')+1;
 	  break;
 	}

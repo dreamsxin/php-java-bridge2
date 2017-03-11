@@ -104,7 +104,7 @@ public abstract class FCGIConnectionFactory {
 	Thread t = (new Util.Thread("JavaBridgeFastCGIRunner") {
 		public void run() {
 		    Map env = (Map) processFactory.getEnvironment().clone();
-		    env.put("PHP_FCGI_CHILDREN", processFactory.getPhpConnectionPoolSize());
+		    env.put("PHP_JAVA_BRIDGE_FCGI_CHILDREN", processFactory.getPhpConnectionPoolSize());
 		    env.put("PHP_FCGI_MAX_REQUESTS", processFactory.getPhpMaxRequests());
 		    runFcgi(env, processFactory.getPhp(), processFactory.getPhpIncludeJava(), processFactory.getPhpIncludeDebugger());
 		}
