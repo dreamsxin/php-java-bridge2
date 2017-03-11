@@ -128,7 +128,7 @@ public class FastCGIProxy extends Continuation implements IFCGIProcessFactory {
 
 	// Start the launcher.exe or launcher.sh
 	Map map = (Map) PROCESS_ENVIRONMENT.clone();
-	map.put("PHP_FCGI_CHILDREN", PROCESSES);
+	map.put("PHP_JAVA_BRIDGE_FCGI_CHILDREN", PROCESSES);
 	map.put("PHP_FCGI_MAX_REQUESTS", MAX_REQUESTS);
 	channelName.startServer(Util.getLogger());
 		

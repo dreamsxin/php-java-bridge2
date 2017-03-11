@@ -107,7 +107,7 @@ public class NPChannelFactory extends FCGIConnectionFactory {
 	    "cd \"" + base + File.separator + Util.osArch + "-" + Util.osName+ "\"\n" + 
 	    "set %REDIRECT_STATUS%=200\n"+ 
 	    "set %X_JAVABRIDGE_OVERRIDE_HOSTS%=/\n"+ 
-	    "set %PHP_FCGI_CHILDREN%=5\n"+ 
+	    "set %PHP_JAVA_BRIDGE_FCGI_CHILDREN%=5\n"+ 
 	    "set %PHP_FCGI_MAX_REQUESTS%=\""+php_fcgi_max_requests+"\"\n"+
 	    "\"c:\\Program Files\\PHP\\php-cgi.exe\" -v\n"+
 	    ".\\launcher.exe \"c:\\Program Files\\PHP\\php-cgi.exe\" \"" + getPath() +"\"\n\n";
