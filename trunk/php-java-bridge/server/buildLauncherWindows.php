@@ -23,7 +23,9 @@ TAIL_OUTFILE;
 
 define ("FILE_LENGTH", 8192);
 $names = array("LauncherWindows", "LauncherWindows2",
-	       "LauncherWindows3","LauncherWindows4");
+	       "LauncherWindows3","LauncherWindows4",
+	       "LauncherWindows5","LauncherWindows6",
+	       "LauncherWindows7","LauncherWindows8");
 $counter = 0;
 $linectr = 1;
 
