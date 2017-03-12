@@ -38,7 +38,7 @@ public class ResultProxy extends Number {
     private static final long serialVersionUID = 9126953496638654790L;
     private int result;
     private IPhpScriptEngine engine;
-    ResultProxy(IPhpScriptEngine engine) {
+    public ResultProxy(IPhpScriptEngine engine) {
 	this.engine = engine;
     }
     void setResult(int result) {
