@@ -3,7 +3,7 @@
 package php.java.fastcgi;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General
@@ -49,7 +49,7 @@ class PipeConnection extends Connection {
 
     private RandomAccessFile raFile;
 
-    public PipeConnection(FCGIConnectionPool fcgiConnectionPool, int maxRequests, RandomAccessFile raFile) {
+    public PipeConnection(CloseableConnection fcgiConnectionPool, int maxRequests, RandomAccessFile raFile) {
         super(fcgiConnectionPool, maxRequests);
 	this.raFile = raFile;
     }
@@ -62,9 +62,9 @@ class PipeConnection extends Connection {
 	}
     }
     public InputStream getInputStream() throws IOException {
-        return new FCGIConnectionInputStream(this, new RandomAccessFileInputStream(this, raFile));
+	return super.getInputStream(new RandomAccessFileInputStream(this, raFile));
     }
     public OutputStream getOutputStream() throws IOException {
-	return new FCGIConnectionOutputStream(this, new RandomAccessFileOutputStream(this, raFile));
+	return super.getOutputStream(new RandomAccessFileOutputStream(this, raFile));
     }
 }

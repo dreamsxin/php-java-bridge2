@@ -3,7 +3,7 @@
 package php.java.fastcgi;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General
@@ -42,18 +42,16 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import php.java.bridge.Util;
+public class FCGIConnectionPool implements CloseableConnection {
 
-public class FCGIConnectionPool {
-
-    private int limit;
+    private final static int PHP_FCGI_MAX_REQUESTS = Integer.parseInt(FCGIUtil.PHP_FCGI_MAX_REQUESTS);
     private long timeout;
     private int connections = 0;
     private List freeList = new LinkedList();
     private List connectionList = new LinkedList();
-    private FCGIConnectionFactory factory;
-    private int maxRequests;
+    private FCGIFactory factory;
  
     /**
      * Create a new connection pool.
@@ -65,13 +63,8 @@ public class FCGIConnectionPool {
      * @throws ConnectException 
      * @see FCGIIOFactory
      */
-    private FCGIConnectionPool(FCGIConnectionFactory factory, int limit, int maxRequests) throws ConnectException {
-	if(Util.logLevel>3) Util.logDebug("Creating new connection pool for: " +factory);
-        this.factory = factory;
-        this.limit = limit;
-        this.maxRequests = maxRequests;
+    private FCGIConnectionPool() throws ConnectException {
         this.timeout = -1;
-        factory.test();
     }
     /**
      * Create a new connection pool.
@@ -84,8 +77,8 @@ public class FCGIConnectionPool {
      * @throws ConnectException 
      * @see FCGIIOFactory
      */
-    public FCGIConnectionPool(FCGIConnectionFactory factory, int limit, int maxRequests, long timeout) throws ConnectException {
-	this(factory, limit, maxRequests);
+    public FCGIConnectionPool(long timeout) throws ConnectException {
+	this();
 	this.timeout = timeout;
     }
     /* helper for openConnection() */
@@ -103,7 +96,7 @@ public class FCGIConnectionPool {
      */
     public synchronized Connection openConnection() throws InterruptedException, ConnectException {
         Connection connection;
-      	if(freeList.isEmpty() && connections<limit) {
+      	if(freeList.isEmpty() && connections<PHP_FCGI_MAX_REQUESTS) {
       	    connection = createNewConnection();
       	} else {
       	    while(freeList.isEmpty()) {
@@ -126,7 +119,7 @@ public class FCGIConnectionPool {
 	if(connection.isClosed()) connection = factory.connect();
 	return connection;
     }
-    synchronized void closeConnection(Connection connection) {
+    public synchronized void closeConnection(Connection connection) {
         freeList.add(connection);
         notify();
     }
@@ -145,4 +138,12 @@ public class FCGIConnectionPool {
     	if(factory!=null) 
     	    factory.destroy();
     }
+    
+    public static FCGIConnectionPool createConnectionPool(String[] args, Map env) throws ConnectException {
+	FCGIConnectionPool pool = new FCGIConnectionPool(-1L);//FIXME timeout
+	pool.factory = FCGIFactory.createConnectionFactory(args, env, pool, PHP_FCGI_MAX_REQUESTS, false); //FIXME promiscuous;
+	pool.factory.startFCGIServer();
+	return pool;
+    }
+
 }

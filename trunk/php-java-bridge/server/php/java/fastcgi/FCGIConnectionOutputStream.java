@@ -5,10 +5,10 @@ package php.java.fastcgi;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import php.java.bridge.NotImplementedException;
+import php.java.bridge.util.NotImplementedException;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General
@@ -43,7 +43,7 @@ import php.java.bridge.NotImplementedException;
  * exception statement from your version.
  */
 
-public class FCGIConnectionOutputStream extends OutputStream {
+public abstract class FCGIConnectionOutputStream extends OutputStream {
     protected Connection connection;
     private OutputStream out;
     

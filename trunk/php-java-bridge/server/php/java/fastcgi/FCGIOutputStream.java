@@ -3,7 +3,7 @@
 package php.java.fastcgi;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General
@@ -44,9 +44,8 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
 
-import php.java.bridge.NotImplementedException;
 import php.java.bridge.Util;
-import php.java.bridge.http.FCGIUtil;
+import php.java.bridge.util.NotImplementedException;
 
 public class FCGIOutputStream extends FCGIConnectionOutputStream {
     public FCGIOutputStream(Connection connection, OutputStream out) {

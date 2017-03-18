@@ -3,7 +3,7 @@
 package php.java.fastcgi;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General
@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 
-import php.java.bridge.NotImplementedException;
+import php.java.bridge.util.NotImplementedException;
 
 class RandomAccessFileOutputStream extends OutputStream {
     private final PipeConnection channel;
