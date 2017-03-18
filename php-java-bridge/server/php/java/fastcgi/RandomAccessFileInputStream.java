@@ -3,7 +3,7 @@
 package php.java.fastcgi;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General

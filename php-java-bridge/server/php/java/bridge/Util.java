@@ -2,6 +2,30 @@
 
 package php.java.bridge;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.text.DateFormat;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
+import java.util.Vector;
+
+import php.java.bridge.util.Logger;
+
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier
  *
@@ -24,62 +48,11 @@ package php.java.bridge;
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.UnknownHostException;
-import java.text.DateFormat;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.TimeZone;
-import java.util.Vector;
-import java.util.Map.Entry;
-
-import php.java.bridge.http.FCGIConnectionPool;
-
-
-
-/**
- * Miscellaneous functions.
- * @author jostb
- *
- */
 public final class Util {
 
     static {
         initGlobals();
     }
-
-    /** 
-     * Script engines are started from this pool.
-     * Use pool.destroy() to destroy the thread pool upon JVM or servlet shutdown
-     */
-    public static final ThreadPool PHP_SCRIPT_ENGINE_THREAD_POOL = new ThreadPool("JavaBridgeStandaloneScriptEngineProxy", Integer.parseInt(Util.THREAD_POOL_MAX_SIZE)) {
-	    protected Delegate createDelegate(String name) {
-		Delegate d = super.createDelegate(name);
-		d.setDaemon(true);
-		return d;
-	    }
-	};
-
-    /** 
-     * Only for internal use. The library standalone ScriptEngine FastCGI connection pool, if any 
-     */
-    public static FCGIConnectionPool fcgiConnectionPool;
 
 
     /** Used by the watchdog. After MAX_WAIT (default 1500ms) the ContextRunner times out. Raise this value if you want to debug the bridge.
@@ -122,84 +95,11 @@ public final class Util {
     
     private Util() {}
     
-    /**
-     * Only for internal use. Use Util.getLogger() instread.
-     * 
-     * A bridge which uses log4j or the default logger.
-     *
-     */
-    public static class Logger implements ILogger {
-        protected ChainsawLogger clogger = null;
-        protected ILogger logger;
-        /**
-         * Use chainsaw, if available or a default logger.
-         *
-         */
-        public Logger() {
-            logger = new FileLogger(); // log to logStream        
-        }
-        /**
-         * Use chainsaw, if available.
-         * @param logger The specified logger.
-         */
-        public Logger(ILogger logger) {
-            this(!DEFAULT_LOG_FILE_SET, logger);
-        }
-        public Logger(boolean useChainsaw, ILogger logger) {
-            if (useChainsaw) 
-              try {this.clogger = ChainsawLogger.createChainsawLogger();} catch (Throwable t) {
-        	if(Util.logLevel>5) t.printStackTrace();
-                this.logger = logger;
-            } else {
-                this.logger = logger;
-            }
-        }
-        private ILogger getLogger() {
-            if(logger==null) return logger=new FileLogger();
-            return logger;
-        }
-        /**{@inheritDoc}*/
-	public void printStackTrace(Throwable t) {
-	    if (clogger==null) logger.printStackTrace(t);
-	    else
-		try {
-		    clogger.printStackTrace(t);
-		} catch (Exception e) {
-		    clogger=null;
-		    getLogger().printStackTrace(t);
-		}
-	}
-
-        /**{@inheritDoc}*/
-	public void log(int level, String msg) {
-	    if(clogger==null) logger.log(level, msg);
-	    else
-		try {
-		    clogger.log(level, msg);
-		} catch (Exception e) {
-		    clogger=null;
-		    getLogger().log(level, msg);
-		}
-	}
-
-        /**{@inheritDoc}*/
-	public void warn(String msg) {
-	    if(clogger==null) logger.warn(msg);
-	    else
-		try {
-		    clogger.warn(msg);
-		} catch (Exception e) {
-		    clogger=null;
-		    getLogger().warn(msg);
-		}
-	}
-    }
-
     /** 
      * The default PHP arguments. Can be passed via -Dphp.java.bridge.php_exec_args=list of urlencoded strings separated by space
      * Default: "-d display_errors=Off -d log_errors=On -d java.persistent_servlet_connections=On"
      */
-    private static String[] PHP_ARGS;
+    public static String[] PHP_ARGS;
     private static String DEFAULT_PHP_ARGS;
     
     /**
@@ -302,7 +202,7 @@ public final class Util {
      */
     public static String DEFAULT_LOG_FILE;
 
-    private static boolean DEFAULT_LOG_FILE_SET;
+    static boolean DEFAULT_LOG_FILE_SET;
     
     /** The base directory of the PHP/Java Bridge. Usually /usr/php/modules/ or $HOME  */
     public static String JAVABRIDGE_BASE;
@@ -328,7 +228,7 @@ public final class Util {
     /** Only for internal use */
     public static File HOME_DIR;
 
-    private static String sessionSavePath;
+    public static String sessionSavePath;
 
     private static void initGlobals() {
 
@@ -461,7 +361,7 @@ public final class Util {
 	try {
 	    String s = getProperty(p, "DEFAULT_LOG_LEVEL", "3");
 	    DEFAULT_LOG_LEVEL = Integer.parseInt(s);
-	    Util.logLevel=Util.DEFAULT_LOG_LEVEL; /* java.log_level in php.ini overrides */
+	    Logger.logLevel=Util.DEFAULT_LOG_LEVEL; /* java.log_level in php.ini overrides */
 	} catch (Throwable t) {/*ignore*/}
 	try {
 	    DEFAULT_LOG_FILE_SET = false;
@@ -482,81 +382,6 @@ public final class Util {
 	    osName = t.nextToken();
 	} catch (Throwable t) {/*ignore*/}
 	if(osName==null) osName="unknown";
-    }
-    /**
-     * The logStream, defaults to System.err
-     */
-    static PrintStream logStream;
-    
-    private static ILogger defaultLogger =  new Logger(new FileLogger());
-    
-    /**
-     * The loglevel:<br>
-     * 0: log off <br>
-     * 1: log fatal <br>
-     * 2: log messages/exceptions <br>
-     * 3: log verbose <br>
-     * 4: log debug <br>
-     * 5: log method invocations
-     */
-    public static int logLevel;
-
-
-    /**
-     * print a message on a given log level
-     * @param level The log level
-     * @param msg The message
-     */
-    public static void println(int level, String msg) {
-	getLogger().log(level, msg);
-    }
-    
-    /**
-     * Display a warning if logLevel &gt;= 1
-     * @param msg The warn message
-     */
-    public static void warn(String msg) {
-	if(logLevel<=0) return;
-	getLogger().warn(msg);
-    }
-    
-    /**
-     * Display a stack trace if logLevel >= 1
-     * @param t The Throwable
-     */
-    public static void printStackTrace(Throwable t) {
-        getLogger().printStackTrace(t);
-    }
-    /**
-     * Display a debug message
-     * @param msg The message
-     */
-    public static void logDebug(String msg) {
-        if(logLevel>3) println(4, msg);
-    }
-    
-    /**
-     * Display a fatal error
-     * @param msg The error
-     */
-    public static void logFatal(String msg) {
-	if(logLevel>0) println(1, msg);
-    }
-    
-    /**
-     * Display an error or an exception
-     * @param msg The error or the exception
-     */
-    public static void logError(String msg) {
-	if(logLevel>1) println(2, msg);
-    }
-    
-    /**
-     * Display a message
-     * @param msg The message
-     */
-    public static void logMessage(String msg) {
-	if(logLevel>2) println(3, msg);
     }
     
     /**
@@ -767,20 +592,6 @@ public final class Util {
 	return strArr;
     }
 
-    /**
-     * Sets the fall back logger, used when no thread-local logger exists. The default logger is initialized with: <code>new Logger(new FileLogger())</code>. 
-     * @param logger the logger
-     * @see #logDebug
-     */
-    public static synchronized void setDefaultLogger(ILogger logger) {
-	Util.defaultLogger = logger;
-    }
-    /**
-     * @return Returns the logger.
-     */
-    public static ILogger getLogger() {
-	return defaultLogger;
-    }
 
     /**
      * Returns the string "127.0.0.1". If the system property "php.java.bridge.promiscuous" is "true", 
@@ -820,16 +631,16 @@ public final class Util {
 	
 	if (USE_SH_WRAPPER) {
 	    location = new File(buf.toString() + ".sh");
-	    if(Util.logLevel>3) Util.logDebug("trying: " + location);
+	    if(Logger.logLevel>3) Logger.logDebug("trying: " + location);
 	    if(location.exists()) return new String[] {"/bin/sh", location.getAbsolutePath()};
 	} else {
 	    location = new File(buf.toString() + ".exe");
-	    if(Util.logLevel>3) Util.logDebug("trying: " + location);
+	    if(Logger.logLevel>3) Logger.logDebug("trying: " + location);
 	    if(location.exists()) return new String[] {location.getAbsolutePath()};
 	}
 	
 	location = new File(buf.toString());
-	if(Util.logLevel>3) Util.logDebug("trying: " + location);
+	if(Logger.logLevel>3) Logger.logDebug("trying: " + location);
 	if(location.exists()) return new String[] {location.getAbsolutePath()};
 	
 	return null;
@@ -843,495 +654,6 @@ public final class Util {
     public static String checkError(String s) {
         // Is there a better way to check for a fatal error?
         return (s.startsWith("PHP") && (s.indexOf("error:")>-1)) ? s : null;
-    }
-
-    /** 
-     * Convenience daemon thread class
-      */
-    public static class Thread extends java.lang.Thread {
-	/**Create a new thread */
-	public Thread() {
-	    super();
-	    initThread();
-	}
-	/**Create a new thread 
-	 * @param name */
-	public Thread(String name) {
-	    super(name);
-	    initThread();
-	}
-	/**Create a new thread 
-	 * @param target */
-	public Thread(Runnable target) {
-	    super(target);
-	    initThread();
-	}
-	/**Create a new thread 
-	 * @param group 
-	 * @param target */
-	public Thread(ThreadGroup group, Runnable target) {
-	    super(group, target);
-	    initThread();
-	}
-	/**Create a new thread 
-	 * @param group 
-	 * @param name */
-	public Thread(ThreadGroup group, String name) {
-	    super(group, name);
-	    initThread();
-	}
-	/**Create a new thread 
-	 * @param target 
-	 * @param name */
-	public Thread(Runnable target, String name) {
-	    super(target, name);
-	    initThread();
-	}
-	/**Create a new thread 
-	 * @param group 
-	 * @param target 
-	 * @param name */
-	public Thread(ThreadGroup group, Runnable target, String name) {
-	    super(group, target, name);
-	    initThread();
-	}
-	/**Create a new thread 
-	 * @param group 
-	 * @param target 
-	 * @param name 
-	 * @param stackSize */
-	public Thread(ThreadGroup group, Runnable target, String name, long stackSize) {
-	    super(group, target, name, stackSize);
-	    initThread();
-	}
-	private void initThread() {
-	    setDaemon(true);
-	}
-    }
-    /**
-     * Starts a CGI process and returns the process handle.
-     */
-    public static class Process extends java.lang.Process {
-
-        protected java.lang.Process proc;
-	private String[] args;
-	private File homeDir;
-	private Map env;
-	private boolean tryOtherLocations;
-	private boolean preferSystemPhp;
-	private boolean isOldPhpVersion = false; // php < 5.3
-	private boolean includeJava;
-	private boolean includeDebugger;
-	private String cgiDir;
-	private String pearDir;
-	private String webInfDir;
-
-	private String getQuoted(String key, String val) {
-	    if (isOldPhpVersion) return key+val;
-	    StringBuffer buf = new StringBuffer(key);
-	    buf.append("'");
-	    buf.append(val);
-	    buf.append("'");
-	    return buf.toString();
-	}
-	     /**
-	     * Return args + PHP_ARGS
-	     * @param args The prefix
-	     * @param includeJava The option php_include_java
-	     * @param includeDebugger The option php_include_debugger
-	     * @param cgiDir The WEB-INF/cgi directory
-	     * @param pearDir The WEB-INF/pear directory
-	     * @param webInfDir The WEB-INF directory
-	     * @return args with PHP_ARGS appended
-	     */
-	    private String[] getPhpArgs(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir) {
-		String[] allArgs = new String[args.length+PHP_ARGS.length+((sessionSavePath!=null)?2:0)+(includeJava?1:0)+(includeDebugger?1:0)+(cgiDir!=null?2:0)+(pearDir!=null?2:0)+(webInfDir!=null?2:0)];
-		int i=0;
-		for(i=0; i<args.length; i++) {
-		    allArgs[i]=args[i];
-		}
-		if (sessionSavePath!=null) {
-		    allArgs[i++] = "-d";
-		    allArgs[i++] = getQuoted("session.save_path=", sessionSavePath);
-		}
-		if (cgiDir!=null) {
-		    File extDir = new File(cgiDir, Util.osArch+"-"+Util.osName);
-		    try {
-			cgiDir = extDir.getCanonicalPath();
-		    } catch (IOException e) {
-			Util.printStackTrace(e);
-			cgiDir = extDir.getAbsolutePath();
-		    }
-		    allArgs[i++] = "-d";	    
-		    allArgs[i++] = getQuoted("java.os_arch_dir=",cgiDir);	    
-		}
-		if (pearDir!=null) {
-		    allArgs[i++] = "-d";	    
-		    allArgs[i++] = getQuoted("java.pear_dir=",pearDir);	    
-		}
-		if (webInfDir!=null) {
-		    allArgs[i++] = "-d";	    
-		    allArgs[i++] = getQuoted("java.web_inf_dir=",webInfDir);	    
-		}
-		if (includeJava || includeDebugger) allArgs[i++] = "-C"; // don't chdir, we'll do it
-		for(int j=0; j<PHP_ARGS.length; j++) {
-		    allArgs[i++]=PHP_ARGS[j];
-		}
-		
-		return allArgs;
-	    }
-	
-	protected String[] quoteArgs(String[] s) {
-	    // quote all args for windows
-	    if (!USE_SH_WRAPPER)
-		for(int j=0; j<s.length; j++) 
-		    if(s[j]!=null) s[j] = "\""+s[j]+"\"";
-	    return s;
-	}
-	protected boolean testPhp(String[] php, String[] args) {
-	    Runtime rt = Runtime.getRuntime();
-	    String[] s = quoteArgs(getTestArgumentArray(php, args));
-	    byte[] buf = new byte[BUF_SIZE];
-	    int c, result, errCode;
-	    InputStream in = null;
-	    OutputStream out = null;
-	    InputStream err = null;
-	    
-	    try {
-	        proc = rt.exec(s, hashToStringArray(env), homeDir);
-	        in = proc.getInputStream();
-	        err = proc.getErrorStream();
-	        out = proc.getOutputStream();
-	            
-	        out.close();
-	        out = null;
-	        
-	        while((c=err.read(buf))>0) 
-	            Util.logError(new String(buf, 0, c, ASCII));
-	        err.close();
-	        err = null;
-	        
-	        ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
-	        while((c=in.read(buf))>0)
-	            outBuf.write(buf, 0, c);
-	        in.close();
-	        in = null;
-	        
-	        errCode = proc.waitFor();
-	        result = proc.exitValue();
-	        
-	        if (errCode != 0 || result != 0) 
-	            throw new IOException("php could not be run, returned error code: " + errCode + ", result: " + result);
-	        
-	        try {
-	            checkOldPhpVersion(outBuf);
-	        } catch (Throwable t) {
-	            Util.printStackTrace(t);
-	        } finally {
-    	        outBuf.close();
-	        }
-	        
-            } catch (IOException e) {
-        	Util.logFatal("Fatal Error: Failed to start PHP "+java.util.Arrays.asList(s)+", reason: " + e);
-        	return false;
-            } catch (InterruptedException e) {
-        	return false;
-            } finally {
-        	try {if (in!=null) in.close(); } catch (Exception e) {/*ignore*/}
-        	try {if (out!=null) out.close(); } catch (Exception e) {/*ignore*/}
-        	try {if (err!=null) err.close(); } catch (Exception e) {/*ignore*/}
-            }
-	    return true;
-	}
-	private void checkOldPhpVersion(ByteArrayOutputStream outBuf) {
-	    String ver = outBuf.toString();
-	    
-	    StringTokenizer tok = new StringTokenizer(ver);
-	    int n = tok.countTokens();
-	    if (n < 2) return;
-	    
-	    String[] str = new String[n];
-	    for (int i=0; tok.hasMoreTokens(); i++) {
-		str[i] = tok.nextToken();
-	    }
-	    
-	    tok = new StringTokenizer(str[1], ".");
-	    n = tok.countTokens();
-	    if (n < 1) return;
-	    
-	    str = new String[n];
-	    for (int i=0; tok.hasMoreTokens(); i++) {
-		str[i] = tok.nextToken();
-	    }
-
-	    int major = Integer.parseInt(str[0]);
-	    if ((major > 5)) return;
-	    if (major == 5) {
-		 if(n < 2) return;
-		 int minor = Integer.parseInt(str[1]);
-		 if (minor > 2) return;
-	    }
-	    isOldPhpVersion = true;
-	}
-	protected void runPhp(String[] php, String[] args) throws IOException {
-	    Runtime rt = Runtime.getRuntime();
-	    String[] s = quoteArgs(getArgumentArray(php, args));
-
-	    proc = rt.exec(s, hashToStringArray(env), homeDir);
-	    if(Util.logLevel>3) Util.logDebug("Started "+ java.util.Arrays.asList(s));
-	}
-	protected String[] getTestArgumentArray(String[] php, String[] args) {
-	    LinkedList buf = new LinkedList();
-	    buf.addAll(java.util.Arrays.asList(php));
-	    buf.add("-v");
-	    
-	    return  (String[]) buf.toArray(new String[buf.size()]);
-	}
-	protected String[] getArgumentArray(String[] php, String[] args) {
-	    LinkedList buf = new LinkedList();
-	    buf.addAll(java.util.Arrays.asList(php));
-	    buf.addAll(java.util.Arrays.asList(ALLOW_URL_INCLUDE));
-	    for(int i=1; i<args.length; i++) {
-		buf.add(args[i]);
-	    }
-	    
-	    return  (String[]) buf.toArray(new String[buf.size()]);
-	}
-	protected void start() throws NullPointerException, IOException {
-	    File location;
-	    /*
-	     * Extract the php executable from args[0] ...
-	     */
-	    String[] php = new String[] {null};
-	    if(args==null) args=new String[]{null};
-	    String phpExec = args[0];
-	    String[] cgiBinary = null;
-	    if(PHP_EXEC==null) {
-	      if(!preferSystemPhp) {
-		if(phpExec != null && 
-				((cgiBinary=checkCgiBinary(phpExec)) != null)) php = cgiBinary;
-		/*
-		 * ... resolve it ..
-		 */            
-		if(tryOtherLocations && php[0]==null) {
-		    for(int i=0; i<DEFAULT_CGI_LOCATIONS.length; i++) {
-			location = new File(DEFAULT_CGI_LOCATIONS[i]);
-			if(location.exists()) {php[0] = location.getAbsolutePath(); break;}
-		    }
-		}
-	      } else {
-		/*
-		 * ... resolve it ..
-		 */            
-		if(tryOtherLocations && php[0]==null) {
-		    for(int i=0; i<DEFAULT_CGI_LOCATIONS.length; i++) {
-			location = new File(DEFAULT_CGI_LOCATIONS[i]);
-			if(location.exists()) {
-			    php[0] = location.getAbsolutePath(); 
-			    break;
-			}
-		    }
-		}
-		if(phpExec != null && 
-				(php[0]==null &&  (cgiBinary=checkCgiBinary(phpExec)) != null)) php = cgiBinary;
-	      }
-	    }
-            if(php[0]==null && tryOtherLocations) php[0]=PHP_EXEC;
-            if(php[0]==null && phpExec!=null && (new File(phpExec).exists())) php[0]=phpExec;
-            if(php[0]==null) php[0]="php-cgi";
-            if(Util.logLevel>3) Util.logDebug("Using php binary: " + java.util.Arrays.asList(php));
-
-            /*
-             * ... and construct a new argument array for this specific process.
-             */
-            if(homeDir!=null && cgiBinary ==null)
-        	homeDir = HOME_DIR; // system PHP executables are always executed in the user's HOME dir
-            
-            if(homeDir!=null &&!homeDir.exists()) homeDir = null;
-            
-            if (testPhp(php, args)) 
-        	runPhp(php, getPhpArgs(args, includeJava, includeDebugger, cgiDir, pearDir, webInfDir));
-            else 
-        	throw new IOException("PHP not found. Please install php-cgi. PHP test command was: " + java.util.Arrays.asList(getTestArgumentArray(php, args)) + " ");
-        }
-	protected Process(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp) {
-	    this.args = args;
-	    this.homeDir = homeDir;
-	    this.env = env;
-	    this.tryOtherLocations = tryOtherLocations;
-	    this.preferSystemPhp = preferSystemPhp;
-	    this.includeJava = includeJava;
-	    this.includeJava = includeDebugger;
-	    this.cgiDir = cgiDir;
-	    this.pearDir = pearDir;
-	    this.webInfDir = webInfDir;
-	}
-        /**
-	 * Starts a CGI process and returns the process handle.
-	 * @param args The args array, e.g.: new String[]{null, "-b", ...};. If args is null or if args[0] is null, the function looks for the system property "php.java.bridge.php_exec".
-	 * @param homeDir The home directory. If null, the current working directory is used.
-	 * @param env The CGI environment. If null, Util.DEFAULT_CGI_ENVIRONMENT is used.
-         * @param tryOtherLocations true if we should check the DEFAULT_CGI_LOCATIONS first
-         * @param preferSystemPhp 
-         * @param err 
-	 * @return The process handle.
-         * @throws IOException 
-         * @throws NullPointerException 
-	 * @throws IOException
-	 * @see Util#checkCgiBinary(String)
-	 */	  
-        public static Process start(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
-            Process proc = new Process(args, includeJava, includeDebugger, cgiDir, pearDir, webInfDir, homeDir, env, tryOtherLocations, preferSystemPhp);
-            proc.start();
-            return proc;
-        }
-
-        /** A generic PHP exception */
-        public static class PhpException extends Exception {
-	    private static final long serialVersionUID = 767047598257671018L;
-	    private String errorString;
-	    /** 
-	     * Create a PHP exception 
-	     * @param errorString the PHP error string 
-	     */
-	    public PhpException(String errorString) {
-		super(errorString);
-		this.errorString = errorString;
-	    }
-	    /** 
-	     * Return the error string
-	     * @return the PHP error string
-	     */
-	    public String getError() {
-		return errorString;
-	    }
-	};
-
-	/**
-	 * Check for a PHP fatal error and throw a PHP exception if necessary.
-	 * @throws PhpException
-	 */
-	public void checkError() throws PhpException {}
-
-	/**{@inheritDoc}*/
-        public OutputStream getOutputStream() {
-            return proc.getOutputStream();
-        }
-
-	/**{@inheritDoc}*/
-        public InputStream getInputStream() {
-            return proc.getInputStream();
-        }
-
-	/**{@inheritDoc}*/
-        public InputStream getErrorStream() {
-            return proc.getErrorStream();
-        }
-
-	/**{@inheritDoc}*/
-        public int waitFor() throws InterruptedException {
-            return proc.waitFor();
-        }
-
-	/**{@inheritDoc}*/
-        public int exitValue() {
-            return proc.exitValue();
-        }
-
-	/**{@inheritDoc}*/
-        public void destroy() {
-            proc.destroy();
-        }
-        
-    }
-
-    /**
-     * Starts a CGI process with an error handler attached and returns the process handle.
-     */
-    public static class ProcessWithErrorHandler extends Process {
-	StringBuffer error = null;
-	InputStream in = null;
-	OutputStream err = null;
-
-	protected ProcessWithErrorHandler(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
-	    super(args, includeJava, includeDebugger, cgiDir, pearDir, webInfDir,  homeDir, env, tryOtherLocations, preferSystemPhp);
-	    this.err = err;
-	}
-	protected void start() throws IOException {
-	    super.start();
-	    (new Util.Thread("CGIErrorReader") {public void run() {readErrorStream();}}).start();
-	}
-	/**{@inheritDoc}*/
-	public void checkError() throws PhpException {
-	    String errorString = error==null?null:Util.checkError(error.toString());
-	    if(errorString!=null) throw new PhpException(errorString);
-	}
-	private synchronized void readErrorStream() {
-	    byte[] buf = new byte[BUF_SIZE];
-	    int c;
-	    try { 
-		in =  proc.getErrorStream();
-		while((c=in.read(buf))!=-1) {
-			err.write(buf, 0, c);
-			String s = new String(buf, 0, c, ASCII); 
-			if(Util.logLevel>4) Util.logError(s);
-			if(error==null) error = new StringBuffer(s);
-			else error.append(s);
-		}
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
-	    finally {
-		if(in!=null) 
-		    try { in.close();} catch (IOException e1) {
-			e1.printStackTrace();
-		    }
-		notify();
-	    }
-	}
-	/**{@inheritDoc}*/
-	public synchronized int waitFor() throws InterruptedException {
-	    if(in==null) wait();
-	    return super.waitFor();
-	}
-
-	/**
-         * Starts a CGI process and returns the process handle.
-         * @param args The args array, e.g.: new String[]{null, "-b", ...};. If args is null or if args[0] is null, the function looks for the system property "php.java.bridge.php_exec".
-         * @param homeDir The home directory. If null, the current working directory is used.
-         * @param env The CGI environment. If null, Util.DEFAULT_CGI_ENVIRONMENT is used.
-	 * @param tryOtherLocations true if the should check DEFAULT_CGI_LOCATIONS 
-	 * @param preferSystemPhp true if the should check DEFAULT_CGI_LOCATIONS first
-	 * @param err The error stream
-         * @return The process handle.
-         * @throws IOException
-         * @see Util#checkCgiBinary(String)
-         */
-        public static Process start(String[] args, boolean includeJava, boolean includeDebugger, String cgiDir, String pearDir, String webInfDir, File homeDir, Map env, boolean tryOtherLocations, boolean preferSystemPhp, OutputStream err) throws IOException {
-            Process proc = new ProcessWithErrorHandler(args, includeJava, includeDebugger, cgiDir, pearDir, webInfDir, homeDir, env, tryOtherLocations, preferSystemPhp, err);
-            proc.start();
-            return proc;
-        }
-    }
-
-    /** Redirect System.out and System.err to the configured logFile or System.err.
-     * System.out is always redirected, either to the logFile or to System.err.
-     * This is because System.out is reserved to report the status back to the 
-     * container (IIS, Apache, ...) running the JavaBridge back-end.
-     * @param redirectOutput this flag is set, if natcJavaBridge has already redirected stdin, stdout, stderr
-     * @param logFile the log file
-     */
-    static void redirectOutput(String logFile) {
-	redirectJavaOutput(logFile);
-    }
-    static void redirectJavaOutput(String logFile) {
-        Util.logStream = System.err;
-        if(logFile != null && logFile.length()>0) 
-            try {
-        	Util.logStream=new java.io.PrintStream(new java.io.FileOutputStream(logFile));
-            } catch (Exception e) {e.printStackTrace();}
-            try { System.setErr(logStream); } catch (Exception e) {e.printStackTrace(); }
-	try { System.setOut(logStream); } catch (Exception e) {e.printStackTrace(); System.exit(9); }
     }
 
     private static List getEnvironmentBlacklist(Properties p) {
@@ -1417,84 +739,6 @@ public final class Util {
         return s;
     }
 
-    /**
-     * Create a new AppThreadPool.
-     * @param name The pool name
-     * @return A new AppThreadPool for up to {@link #THREAD_POOL_MAX_SIZE} runnables
-     */
-    public static AppThreadPool createThreadPool(String name) {
-        AppThreadPool pool = null;
-        int maxSize = 20;
-        try {
-        	maxSize = Integer.parseInt(Util.THREAD_POOL_MAX_SIZE);
-        } catch (Throwable t) {
-        	Util.printStackTrace(t);
-        }
-        if(maxSize>0) {
-            pool = new AppThreadPool(name, maxSize);
-	}
-        return pool;
-    }
-    
-    
-    /**
-     * parse java.log_file=@HOST:PORT
-     * @param logFile The log file from the PHP .ini file
-     * @return true, if we can use the log4j logger, false otherwise.
-     */
-    static boolean setConfiguredLogger(String logFile) {
-        try {
-	  return tryConfiguredChainsawLogger(logFile);
-	} catch (Exception e) {
-	  printStackTrace(e);
-	  Util.setDefaultLogger(new FileLogger());
-	}
-	return true;
-    }
-    private static final class ConfiguredChainsawLogger extends ChainsawLogger {
-        private String host;
-	private int port;
-	private ConfiguredChainsawLogger(String host, int port) {
-	    super();
-	    this.host=host;
-	    this.port=port;
-        }
-        public static ConfiguredChainsawLogger createLogger(String host, int port) throws Exception {
-            ConfiguredChainsawLogger logger = new ConfiguredChainsawLogger(host, port);
-            logger.init();
-	    return logger;
-        }
-        public void configure(String host, int port) throws Exception {
-            host = this.host!=null ? this.host : host;
-            port = this.port > 0 ? this.port : port;
-            super.configure(host, port);
-        }
-    }
-    /**
-     * parse java.log_file=@HOST:PORT
-     * @param logFile The log file from the PHP .ini file
-     * @return true, if we can use the log4j logger, false otherwise.
-     * @throws Exception
-     */
-    private static boolean tryConfiguredChainsawLogger(String logFile) throws Exception {
-	if(logFile!=null && logFile.length()>0 && logFile.charAt(0)=='@') {
-	    logFile=logFile.substring(1, logFile.length());
-	    int idx = logFile.indexOf(':');
-	    int port = -1;
-	    String host = null;
-	    if(idx!=-1) {
-		String p = logFile.substring(idx+1, logFile.length());
-		if(p.length()>0) port = Integer.parseInt(p);
-		host = logFile.substring(0, idx);
-	    } else {
-		if(logFile.length()>0) host = logFile;
-	    }
-	    ILogger logger = ConfiguredChainsawLogger.createLogger(host, port);
-	    Util.setDefaultLogger(logger);
-	    return true;
-	}
-	return false;
-    }
 
     /**
      * Return the time in GMT
@@ -1522,7 +766,7 @@ public final class Util {
     public static final ClassLoader getContextClassLoader() {
         ClassLoader loader = null;
         try {loader = Thread.currentThread().getContextClassLoader();} catch (SecurityException ex) {/*ignore*/}
-	if(loader==null) loader = JavaBridge.class.getClassLoader();
+	if(loader==null) loader = Util.class.getClassLoader();
         return loader;
     }
     public static final Class classForName(String name) throws ClassNotFoundException {
@@ -1538,7 +782,7 @@ public final class Util {
 	    URI uri = new URI(isSecure?"s:127.0.0.1":"h:127.0.0.1", buf.toString(), null);
 	    return (uri.toASCIIString()+".phpjavabridge");
 	} catch (URISyntaxException e) {
-	    Util.printStackTrace(e);
+	    Logger.printStackTrace(e);
 	}
 	StringBuffer buf = new StringBuffer(isSecure?"s:127.0.0.1":"h:127.0.0.1:");
 	buf.append(socketName); 
@@ -1551,20 +795,20 @@ public final class Util {
      * Destroy the thread associated with util.
      */
     public static void destroy () {
-	try {
-	    PHP_SCRIPT_ENGINE_THREAD_POOL.destroy();
-	} catch (Exception e) {
-	    Util.printStackTrace(e);
-	}
-	try {
-	    if (fcgiConnectionPool!=null) fcgiConnectionPool.destroy();
-	} catch (Exception e) {
-	    Util.printStackTrace(e);
-	}
-	try {
-	    JavaBridgeRunner.destroyRunner();
-	} catch (Exception e) {
-	    Util.printStackTrace(e);
-	}
+//	try {
+//	    PHP_SCRIPT_ENGINE_THREAD_POOL.destroy();
+//	} catch (Exception e) {
+//	    Util.printStackTrace(e);
+//	}
+//	try {
+//	    if (fcgiConnectionPool!=null) fcgiConnectionPool.destroy();
+//	} catch (Exception e) {
+//	    Util.printStackTrace(e);
+//	}
+//	try {
+//	    JavaBridgeRunner.destroyRunner();
+//	} catch (Exception e) {
+//	    Util.printStackTrace(e);
+//	}
     }
 }

@@ -3,7 +3,7 @@
 package php.java.fastcgi;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General
@@ -45,7 +45,7 @@ import java.net.Socket;
 
 class SocketConnection extends Connection {
     public Socket socket;
-    public SocketConnection(FCGIConnectionPool fcgiConnectionPool, int maxRequests, Socket socket) {
+    public SocketConnection(CloseableConnection fcgiConnectionPool, int maxRequests, Socket socket) {
         super(fcgiConnectionPool, maxRequests);
 	this.socket = socket;
     }
@@ -58,9 +58,9 @@ class SocketConnection extends Connection {
 	}
     }
     public InputStream getInputStream() throws IOException {
-        return new FCGIConnectionInputStream(this, socket.getInputStream());
+        return super.getInputStream(socket.getInputStream());
     }
     public OutputStream getOutputStream() throws IOException {
-        return new FCGIConnectionOutputStream(this, socket.getOutputStream());
+        return super.getOutputStream(socket.getOutputStream());
     }
 }

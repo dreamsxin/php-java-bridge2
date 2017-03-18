@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General
@@ -45,7 +45,7 @@ public abstract class Connection {
     private boolean isClosed;
     private int maxRequests;
     private int counter;
-    private FCGIConnectionPool fcgiConnectionPool;
+    private CloseableConnection fcgiConnectionPool;
     
     protected void reset() {
         this.state = this.ostate = 0;
@@ -54,7 +54,7 @@ public abstract class Connection {
         counter = maxRequests; 
         reset();
     }
-    protected Connection(FCGIConnectionPool fcgiConnectionPool, int maxRequests) {
+    protected Connection(CloseableConnection fcgiConnectionPool, int maxRequests) {
         this.fcgiConnectionPool = fcgiConnectionPool;
 	this.isClosed = true;
         this.maxRequests = maxRequests;
@@ -81,5 +81,13 @@ public abstract class Connection {
     
     public abstract OutputStream getOutputStream() throws IOException;
     public abstract void close();
+    protected InputStream getInputStream(
+            InputStream in) {
+	return new FCGIInputStream(this, in);
+    }
+    protected OutputStream getOutputStream(
+            OutputStream out) {
+	return new FCGIOutputStream(this, out);
+    }
 
 }
