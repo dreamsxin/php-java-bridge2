@@ -77,8 +77,7 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	setBindings(n, ScriptContext.ENGINE_SCOPE);
     }
 	
-    protected Reader getLocalReader(String[] args,boolean embedJavaInc) throws IOException {
-	Reader reader = null; //FIXME
+    protected Reader getLocalReader(Reader reader,boolean embedJavaInc) throws IOException {
         /* header: <? require_once("http://localhost:<ourPort>/JavaBridge/java/Java.inc"); ?> */
 	ByteArrayOutputStream out = new ByteArrayOutputStream();
 	Writer w = new OutputStreamWriter(out);
@@ -104,16 +103,16 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	}
     }
 
-    protected Object doEvalPhp(String[] args, ScriptContext context) throws ScriptException {
-        if((continuation != null) || (args == null) ) release();
-  	if(args==null) return null;
+    protected Object doEvalPhp(Reader reader, ScriptContext context) throws ScriptException {
+        if((continuation != null) || (reader == null) ) release();
+  	if(reader==null) return null;
   	
   	setNewContextFactory();
         Reader localReader = null;
-        
+
         try {
-            localReader = getLocalReader(args, false);
-            this.script = doEval(args, context);
+            localReader = getLocalReader(reader, false);
+            this.script = doEval(getArgs(localReader), context);
         } catch (Exception e) {
             Logger.printStackTrace(e);
             if (e instanceof RuntimeException) throw (RuntimeException)e;
@@ -128,13 +127,13 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
         
        return null; //FIXME resultProxy;
     }
-    protected Object doEvalCompiledPhp(String[] args, ScriptContext context) throws ScriptException {
-        if((continuation != null) || (args == null) ) release();
-  	if(args==null) return null;
+    protected Object doEvalCompiledPhp(Reader reader, ScriptContext context) throws ScriptException {
+        if((continuation != null) || (reader == null) ) release();
+  	if(reader==null) return null;
   	
   	setNewContextFactory();
         try {
-            this.script = doEval(args, context);
+            this.script = doEval(getArgs(reader), context);
         } catch (Exception e) {
             Logger.printStackTrace(e);
             if (e instanceof RuntimeException) throw (RuntimeException)e;

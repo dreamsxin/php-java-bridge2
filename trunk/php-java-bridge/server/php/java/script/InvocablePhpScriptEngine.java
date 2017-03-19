@@ -179,8 +179,7 @@ public class InvocablePhpScriptEngine extends AbstractPhpScriptEngine implements
 	Class[] interfaces = clasz==null?Util.ZERO_PARAM:new Class[]{clasz};
 	return PhpProcedure.createProxy(interfaces, (PhpProcedure)Proxy.getInvocationHandler(thiz));
     }
-    protected Reader getLocalReader(String[] args, boolean embedJavaInc) throws IOException {
-	Reader reader = null; //FIXME
+    protected Reader getLocalReader(Reader reader, boolean embedJavaInc) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Writer w = new OutputStreamWriter(out);
 
@@ -211,16 +210,16 @@ public class InvocablePhpScriptEngine extends AbstractPhpScriptEngine implements
         }
     }
     
-    protected Object doEvalPhp(String[]args, ScriptContext context) throws ScriptException {
-        if((continuation != null) || (args == null) ) release();
-  	if(args==null) return null;
+    protected Object doEvalPhp(Reader reader, ScriptContext context) throws ScriptException {
+        if((continuation != null) || (reader == null) ) release();
+  	if(reader==null) return null;
   	
   	setNewContextFactory();
 	env.put(X_JAVABRIDGE_INCLUDE, EMPTY_INCLUDE);
 	Reader localReader = null;
         try {
-            localReader = getLocalReader(args, false);
-            this.script = doEval(args, context);
+            localReader = getLocalReader(reader, false);
+            this.script = doEval(getArgs(localReader), context);
             if (this.script!=null) {
         	/* get the proxy, either the one from the user script or our default proxy */
         	this.scriptClosure = script;
@@ -236,14 +235,14 @@ public class InvocablePhpScriptEngine extends AbstractPhpScriptEngine implements
         }
        return null; //FIXME resultProxy;
     }
-    protected Object doEvalCompiledPhp(String[] args, ScriptContext context) throws ScriptException {
-        if((continuation != null) || (args == null) ) release();
-  	if(args==null) return null;
+    protected Object doEvalCompiledPhp(Reader reader, ScriptContext context) throws ScriptException {
+        if((continuation != null) || (reader == null) ) release();
+  	if(reader==null) return null;
   	
   	setNewContextFactory();
 	env.put(X_JAVABRIDGE_INCLUDE, EMPTY_INCLUDE);
         try {
-            this.script = doEval(args, context);
+            this.script = doEval(getArgs(reader), context);
             if (this.script!=null) {
         	/* get the proxy, either the one from the user script or our default proxy */
         	this.scriptClosure = script;
@@ -259,9 +258,9 @@ public class InvocablePhpScriptEngine extends AbstractPhpScriptEngine implements
        return null; //FIXME resultProxy;
     }
 
-    protected Object eval(String[]args, ScriptContext context) throws ScriptException {
-        if((continuation != null) ||args==null) release();
-  	if (args==null) return null;
+    public Object eval(Reader reader, ScriptContext context) throws ScriptException {
+        if((continuation != null) ||reader==null) release();
+  	if (reader==null) return null;
         
   	setNewContextFactory();
 	env.put(X_JAVABRIDGE_INCLUDE, EMPTY_INCLUDE);
@@ -269,7 +268,7 @@ public class InvocablePhpScriptEngine extends AbstractPhpScriptEngine implements
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Writer w = new OutputStreamWriter(out);
         try {
-            this.script = doEval(args, context);
+            this.script = doEval(getArgs(reader), context);
             if (this.script!=null) {
         	/* get the proxy, either the one from the user script or our default proxy */
         	this.scriptClosure = script;
