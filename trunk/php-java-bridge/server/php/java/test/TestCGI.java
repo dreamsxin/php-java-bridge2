@@ -11,6 +11,7 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 
+import php.java.bridge.Util;
 import php.java.fastcgi.FCGIHeaderParser;
 import php.java.fastcgi.FCGIProxy;
 
@@ -20,7 +21,7 @@ public class TestCGI {
     private HashMap env;
     @Before
     public void setup() throws IOException {
-	args = new String[]{new File("server/WEB-INF/cgi/php-cgi").getAbsolutePath()};
+	args = new String[]{new File(new File("server/WEB-INF/cgi"), "php-cgi").getAbsolutePath()};
 	env = new HashMap();
 	env.put("REDIRECT_STATUS","200");
 	File scriptFile = File.createTempFile("tmp", "php").getAbsoluteFile();
@@ -34,12 +35,7 @@ public class TestCGI {
     @Test
     public void testFastCGIRunner() throws Exception {
 	ByteArrayOutputStream out = new ByteArrayOutputStream();
-	
-	
-	// Start the launcher.exe or launcher.sh
 
-	
-	// TODO: reader is ignored
 	FCGIProxy fastCGIProxy = new FCGIProxy(args, env, 
 		out,  System.err, FCGIHeaderParser.DEFAULT_HEADER_PARSER);
 	
