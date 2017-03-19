@@ -1,5 +1,5 @@
  
-<%@page import="javax.script.*" %>
+<%-- <%@page import="javax.script.*" %>
 <%@page import="java.net.*" %>
 <%@page import="php.java.script.URLReader"%>
  
@@ -21,4 +21,4 @@ private static final ScriptEngineManager scriptManager = new ScriptEngineManager
   	((java.io.Closeable)instance).close();
   }
 %>
- 
+ --%> 
