@@ -1,6 +1,7 @@
 package php.java.test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -27,6 +28,9 @@ public class TestScript extends TestCase {
     }
     public void test() throws IOException, ScriptException {
 	      ScriptEngine eng = (new ScriptEngineManager()).getEngineByName("php");
+	      String[] args = new String[]{new File(new File("server/WEB-INF/cgi"), "php-cgi").getAbsolutePath()};
+	      eng.put(ScriptEngine.ARGV, args);
+	      
 	      OutputStream out = new ByteArrayOutputStream();
 	      Writer w = new OutputStreamWriter(out); 
 	      eng.getContext().setWriter(w);
