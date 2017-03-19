@@ -55,7 +55,7 @@ public final class AppThreadPool extends ThreadPool {
      * and interrupts application threads when end() or terminate()
      * is called.
      */
-    final class Delegate extends ThreadPool.Delegate {
+    public final class Delegate extends ThreadPool.Delegate {
 	protected ThreadGroup appGroup = null;
 	/** 
 	 * Create a new delegate. The thread runs until
