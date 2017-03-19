@@ -15,7 +15,6 @@ import java.util.Vector;
 import php.java.bridge.Util;
 import php.java.bridge.util.Logger;
 
-
 /*
  * Copyright (C) 2017 Jost Bökemeier
  *

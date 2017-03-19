@@ -86,7 +86,6 @@ public abstract class FCGIFactory {
 
 	findFreePort(true); // FIXME
 	initialize();
-	test();
 
 	File cgiOsDir = Util.TMPDIR;
 	File javaIncFile = new File(cgiOsDir, "launcher.sh");
@@ -122,7 +121,9 @@ public abstract class FCGIFactory {
 		e.printStackTrace();
 	    }
 	}
+
 	startServer();
+	test();
 
     }
 
