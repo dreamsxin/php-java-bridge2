@@ -41,6 +41,7 @@ import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
@@ -179,7 +180,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
 	writer.close();
 	env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
 
-	return Util.PHP_ARGS;
+	return (String[])get(ScriptEngine.ARGV);
     }
 
     protected Object evalPhp(Reader reader, ScriptContext context)
