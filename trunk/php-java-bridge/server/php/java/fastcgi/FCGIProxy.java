@@ -49,10 +49,10 @@ public class FCGIProxy extends Continuation {
 //    private static final String MAX_REQUESTS = FCGIUtil.PHP_FCGI_MAX_REQUESTS;
     
     private String[] args;
-    private Map env;
-    private OutputStream out;
+    protected Map env;
+    protected OutputStream out;
     private OutputStream err;
-    private FCGIHeaderParser headerParser;
+    protected FCGIHeaderParser headerParser;
     public FCGIProxy(String[] args, Map env, OutputStream out,
             OutputStream err, FCGIHeaderParser headerParser) {
 	super();

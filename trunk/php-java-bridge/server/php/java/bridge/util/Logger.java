@@ -117,10 +117,10 @@ public class Logger {
      * @param redirectOutput this flag is set, if natcJavaBridge has already redirected stdin, stdout, stderr
      * @param logFile the log file
      */
-    static void redirectOutput(String logFile) {
+    public static void redirectOutput(String logFile) {
 	redirectJavaOutput(logFile);
     }
-    static void redirectJavaOutput(String logFile) {
+    public static void redirectJavaOutput(String logFile) {
 	Logger.logStream = System.err;
         if(logFile != null && logFile.length()>0) 
             try {
@@ -128,5 +128,8 @@ public class Logger {
             } catch (Exception e) {e.printStackTrace();}
             try { System.setErr(logStream); } catch (Exception e) {e.printStackTrace(); }
 	try { System.setOut(logStream); } catch (Exception e) {e.printStackTrace(); System.exit(9); }
+    }
+    public static void setDefaultLogger(String logFile) {
+	  setDefaultLogger(new FileLogger());
     }
 }
