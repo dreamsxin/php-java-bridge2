@@ -233,16 +233,16 @@ public final class Util {
     private static void initGlobals() {
 
 	try {
-	    JAVA_INC = Class.forName("php.java.bridge.JavaInc");
+	    JAVA_INC = Class.forName("php.java.bridge.generated.JavaInc");
 	} catch (Exception e) {/*ignore*/}
 	try {
-	    PHPDEBUGGER_PHP = Class.forName("php.java.bridge.PhpDebuggerPHP");
+	    PHPDEBUGGER_PHP = Class.forName("php.java.bridge.generated.PhpDebuggerPHP");
 	} catch (Exception e) {/*ignore*/}
 	try {
-	    JAVA_PROXY = Class.forName("php.java.bridge.JavaProxy");
+	    JAVA_PROXY = Class.forName("php.java.bridge.generated.JavaProxy");
 	} catch (Exception e) {/*ignore*/}
 	try {
-	    LAUNCHER_UNIX = Class.forName("php.java.bridge.LauncherUnix");
+	    LAUNCHER_UNIX = Class.forName("php.java.bridge.generated.LauncherUnix");
 	} catch (Exception e) {/*ignore*/}
 	try {
 	    LAUNCHER_WINDOWS = Class.forName("php.java.bridge.LauncherWindows");

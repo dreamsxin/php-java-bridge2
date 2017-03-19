@@ -1,9 +1,9 @@
 <?php
  
 function createOutfile($name) {
-  $file = fopen("php/java/bridge/${name}.java", "wb") or die("fopen");
+  $file = fopen("php/java/bridge/generated/${name}.java", "wb") or die("fopen");
   $str =<<<HEAD_OUTFILE
-package php.java.bridge;
+package php.java.bridge.generated;
 public class ${name} {
   public static final byte[] bytes = new byte[]{
 
