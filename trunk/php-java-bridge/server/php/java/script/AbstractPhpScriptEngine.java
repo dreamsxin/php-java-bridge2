@@ -223,7 +223,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
 	}
 	FileWriter writer = new FileWriter(compilerOutputFile);
 	char[] buf = new char[Util.BUF_SIZE];
-	Reader localReader = getLocalReader(null, true);// FIXME
+	Reader localReader = getLocalReader(reader, true);
 	try {
 	    int c;
 	    while ((c = localReader.read(buf)) > 0)
