@@ -111,9 +111,11 @@ public abstract class FCGIFactory {
 		            Util.LAUNCHER_WINDOWS2, Util.LAUNCHER_WINDOWS3,
 		            Util.LAUNCHER_WINDOWS4, Util.LAUNCHER_WINDOWS5,
 		            Util.LAUNCHER_WINDOWS6, Util.LAUNCHER_WINDOWS7 }) {
-			Field f = c.getField("bytes");
-			byte[] buf = (byte[]) f.get(c);
-			out.write(buf);
+			if (c != null) {
+			    Field f = c.getField("bytes");
+			    byte[] buf = (byte[]) f.get(c);
+			    out.write(buf);
+			}
 		    }
 		    out.close();
 		}
