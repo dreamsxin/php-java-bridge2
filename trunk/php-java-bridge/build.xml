@@ -26,17 +26,17 @@
     <delete dir="bin" />
     <delete file="server/META-INF/java/Java.inc" />
     <delete file="server/META-INF/java/JavaProxy.php" />
-    <delete file="server/php/java/bridge/JavaInc.java" />
-    <delete file="server/php/java/bridge/JavaProxy.java" />
-    <delete file="server/php/java/bridge/PhpDebuggerPHP.java" />
-    <delete file="server/php/java/bridge/LauncherUnix.java" />
-    <delete file="server/php/java/bridge/LauncherWindows.java" />
-    <delete file="server/php/java/bridge/LauncherWindows2.java" />
-    <delete file="server/php/java/bridge/LauncherWindows3.java" />
-    <delete file="server/php/java/bridge/LauncherWindows4.java" />
-    <delete file="server/php/java/bridge/LauncherWindows5.java" />
-    <delete file="server/php/java/bridge/LauncherWindows6.java" />
-    <delete file="server/php/java/bridge/LauncherWindows7.java" />
+    <delete file="server/php/java/bridge/generated/JavaInc.java" />
+    <delete file="server/php/java/bridge/generated/JavaProxy.java" />
+    <delete file="server/php/java/bridge/generated/PhpDebuggerPHP.java" />
+    <delete file="server/php/java/bridge/generated/LauncherUnix.java" />
+    <delete file="server/php/java/bridge/generated/LauncherWindows.java" />
+    <delete file="server/php/java/bridge/generated/LauncherWindows2.java" />
+    <delete file="server/php/java/bridge/generated/LauncherWindows3.java" />
+    <delete file="server/php/java/bridge/generated/LauncherWindows4.java" />
+    <delete file="server/php/java/bridge/generated/LauncherWindows5.java" />
+    <delete file="server/php/java/bridge/generated/LauncherWindows6.java" />
+    <delete file="server/php/java/bridge/generated/LauncherWindows7.java" />
   </target>
 
   <target name="compile" depends="init,JavaIncJava,JavaProxyPhpJava,PhpDebuggerPHPJava,LauncherUnix,LauncherWindows">
@@ -70,8 +70,12 @@
       <fileset dir="${javaClassDir}">
 	<include name="php/java/bridge/*.class" />
 	<include name="php/java/bridge/global.properties" />
+	<include name="php/java/bridge/classloader/*.class" />
+	<include name="php/java/bridge/generated/*.class" />
 	<include name="php/java/bridge/http/*.class" />
-      </fileset>
+ 	<include name="php/java/bridge/parser/*.class" />
+ 	<include name="php/java/bridge/util/*.class" />
+	</fileset>
       <metainf dir="${javaBaseDir}/META-INF">
 	<include name="java/*.inc" />
 	<include name="java/*.php" />
@@ -126,7 +130,7 @@
   <target name="JavaIncJava" depends="JavaInc,init">
     <apply executable = "php" failonerror = "true" dir="${javaBaseDir}" parallel="true">
       <arg value="${javaBaseDir}/buildClassFromTextFile.php" />
-      <arg value="${javaBaseDir}/php/java/bridge/JavaInc.java" />
+      <arg value="${javaBaseDir}/php/java/bridge/generated/JavaInc.java" />
       <arg value="JavaInc" />
       <fileset dir="${javaBaseDir}" >
 	<include name="META-INF/java/Java.inc" />
@@ -145,7 +149,7 @@
   <target name="JavaProxyPhpJava" depends="JavaProxyPhp,init">
     <apply executable = "php" failonerror = "true" dir="${javaBaseDir}" parallel="true">
       <arg value="${javaBaseDir}/buildClassFromTextFile.php" />
-      <arg value="${javaBaseDir}/php/java/bridge/JavaProxy.java" />
+      <arg value="${javaBaseDir}/php/java/bridge/generated/JavaProxy.java" />
       <arg value="JavaProxy" />
       <fileset dir="${javaBaseDir}" >
 	<include name="META-INF/java/JavaProxy.php" />
@@ -155,7 +159,7 @@
   <target name="PhpDebuggerPHPJava" depends="init">
     <apply executable = "php" failonerror = "true" dir="${javaBaseDir}" parallel="true">
       <arg value="${javaBaseDir}/buildClassFromTextFile.php" />
-      <arg value="${javaBaseDir}/php/java/bridge/PhpDebuggerPHP.java" />
+      <arg value="${javaBaseDir}/php/java/bridge/generated/PhpDebuggerPHP.java" />
       <arg value="PhpDebuggerPHP" />
       <fileset dir="${javaBaseDir}" >
 	<include name="META-INF/java/PHPDebugger.php" />
@@ -165,7 +169,7 @@
   <target name="LauncherUnix" depends="init">
     <apply executable = "php" failonerror = "true" dir="${javaBaseDir}" parallel="true">
       <arg value="${javaBaseDir}/buildClassFromTextFile.php" />
-      <arg value="${javaBaseDir}/php/java/bridge/LauncherUnix.java" />
+      <arg value="${javaBaseDir}/php/java/bridge/generated/LauncherUnix.java" />
       <arg value="LauncherUnix" />
       <fileset dir="${javaBaseDir}" >
 	<include name="WEB-INF/cgi/launcher.sh" />
