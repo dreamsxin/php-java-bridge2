@@ -26,20 +26,24 @@ public class TestScript extends TestCase {
     protected void tearDown() throws Exception {
 	super.tearDown();
     }
+
     public void test() throws IOException, ScriptException {
-	      ScriptEngine eng = (new ScriptEngineManager()).getEngineByName("php");
-	      String[] args = new String[]{new File(new File("server/WEB-INF/cgi"), "php-cgi").getAbsolutePath()};
-	      eng.put(ScriptEngine.ARGV, args);
-	      
-	      OutputStream out = new ByteArrayOutputStream();
-	      Writer w = new OutputStreamWriter(out); 
-	      eng.getContext().setWriter(w);
-	      eng.getContext().setErrorWriter(w);
-	      
-	      eng.eval("<?php if(java_is_true(java_context()->call(java_closure()))) print('test okay'); ?>");
-	      eng.eval((String)null);
-	      
-	      assertTrue("test okay".equals(String.valueOf(out)));
+	ScriptEngine eng = (new ScriptEngineManager()).getEngineByName("php");
+	String[] args = new String[] {
+	        new File(new File("server/WEB-INF/cgi"), "php-cgi")
+	                .getAbsolutePath() };
+	eng.put(ScriptEngine.ARGV, args);
+
+	OutputStream out = new ByteArrayOutputStream();
+	Writer w = new OutputStreamWriter(out);
+	eng.getContext().setWriter(w);
+	eng.getContext().setErrorWriter(w);
+
+	eng.eval(
+	        "<?php if(java_is_true(java_context()->call(java_closure()))) print('test okay'); ?>");
+	eng.eval((String) null);
+
+	assertTrue("test okay".equals(String.valueOf(out)));
     }
 
 }

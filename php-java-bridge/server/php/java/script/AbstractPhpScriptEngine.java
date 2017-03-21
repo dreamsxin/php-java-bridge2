@@ -2,6 +2,8 @@
 
 package php.java.script;
 
+import java.io.ByteArrayInputStream;
+
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier
  *
@@ -28,10 +30,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.Writer;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,8 +68,9 @@ import php.java.fastcgi.FCGIHeaderParser;
  * @see php.java.script.InvocablePhpScriptEngine
  * @see php.java.script.PhpScriptEngine
  */
-abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
-        IPhpScriptEngine, Compilable, java.io.FileFilter, CloneableScript {
+abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
+        implements IPhpScriptEngine, Compilable, java.io.FileFilter,
+        CloneableScript, java.io.Closeable {
 
     /**
      * The allocated script
@@ -86,6 +91,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
 
     private boolean isCompiled;
     private File scriptFile;
+    protected Reader localReader;
 
     static HashMap getProcessEnvironment() {
 	return Util.COMMON_ENVIRONMENT;
@@ -180,7 +186,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
 	writer.close();
 	env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
 
-	return (String[])get(ScriptEngine.ARGV);
+	return (String[]) get(ScriptEngine.ARGV);
     }
 
     protected Object evalPhp(Reader reader, ScriptContext context)
@@ -189,6 +195,12 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
 	    throw new IllegalStateException("already compiled");
 
 	ScriptContext current = getContext();
+	if (reader != null)
+	    try {
+		reader = getLocalReader(reader, true);
+	    } catch (IOException e) {
+		throw new ScriptException(e);
+	    }
 	if (current != context)
 	    try {
 		setContext(context);
@@ -200,38 +212,9 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
 	    return doEvalPhp(reader, current);
     }
 
-    protected Object evalCompiledPhp(Reader reader, ScriptContext context)
-            throws ScriptException {
-
-	ScriptContext current = getContext();
-	if (current != context)
-	    try {
-		setContext(context);
-		return doEvalCompiledPhp(reader, context);
-	    } finally {
-		setContext(current);
-	    }
-	else
-	    return doEvalCompiledPhp(reader, current);
-    }
-
     protected void compilePhp(Reader reader) throws IOException {
 	this.isCompiled = true;
-
-	if (compilerOutputFile == null) {
-	    compilerOutputFile = File.createTempFile("compiled-", ".php", null);
-	}
-	FileWriter writer = new FileWriter(compilerOutputFile);
-	char[] buf = new char[Util.BUF_SIZE];
-	Reader localReader = getLocalReader(reader, true);
-	try {
-	    int c;
-	    while ((c = localReader.read(buf)) > 0)
-		writer.write(buf, 0, c);
-	    writer.close();
-	} finally {
-	    localReader.close();
-	}
+	getLocalReader(reader, true);
     }
 
     private void updateGlobalEnvironment(ScriptContext context)
@@ -309,11 +292,50 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
     protected abstract Object doEvalPhp(Reader reader, ScriptContext context)
             throws ScriptException;
 
-    protected abstract Object doEvalCompiledPhp(Reader reader,
-            ScriptContext context) throws ScriptException;
+    protected Reader getLocalReader(Reader reader, boolean embedJavaInc)
+            throws IOException {
+	/*
+	 * header: <?
+	 * require_once("http://localhost:<ourPort>/JavaBridge/java/Java.inc");
+	 * ?>
+	 */
+	ByteArrayOutputStream out = new ByteArrayOutputStream();
+	Writer w = new OutputStreamWriter(out);
+	try {
+	    localReader = null;
+	    char[] buf = new char[Util.BUF_SIZE];
+	    int c;
+	    String stdHeader = embedJavaInc ? null
+	            : ((IContext) getContext()).getRedirectURL("/JavaBridge");
+	    localReader = new StringReader(getStandardHeader(stdHeader));
 
-    protected abstract Reader getLocalReader(Reader reader,
-            boolean embedJavaInc) throws IOException;
+	    while ((c = localReader.read(buf)) > 0)
+		w.write(buf, 0, c);
+	    localReader.close();
+	    localReader = null;
+
+	    /* the script: */
+	    while ((c = reader.read(buf)) > 0)
+		w.write(buf, 0, c);
+	    w.close();
+	    w = null;
+
+	    /* now evaluate our script */
+	    localReader = new InputStreamReader(
+	            new ByteArrayInputStream(out.toByteArray()));
+	    return localReader;
+	} finally {
+	    if (w != null)
+		try {
+		    w.close();
+		} catch (IOException e) {
+		    /* ignore */}
+	}
+    }
+
+    protected Reader getLocalReader() {
+	return localReader;
+    }
 
     /*
      * Obtain a PHP instance for url.
@@ -549,4 +571,5 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine implements
 	other.compilerOutputFile = compilerOutputFile;
 	return other;
     }
+
 }

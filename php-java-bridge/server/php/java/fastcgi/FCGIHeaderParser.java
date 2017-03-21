@@ -80,7 +80,7 @@ public abstract class FCGIHeaderParser {
 
 	// the header and content
 	while((n = natIn.read(buf)) !=-1 ) {
-	    //System.err.println("HEADER:::"+new String(buf, 0, n, "ASCII"));
+	    System.err.println("HEADER:::"+new String(buf, 0, n, "ASCII"));
 	    int N = i + n;
 	    // header
 	    while(!eoh && i<N) {
@@ -112,7 +112,7 @@ public abstract class FCGIHeaderParser {
 	    // body
 	    if(eoh) {
 		if(i<N) {
-		    //System.err.println("BODY:::"+new String(buf, i, N-i, "ASCII")); 
+		    System.err.println("BODY:::"+new String(buf, i, N-i, "ASCII")); 
 		    out.write(buf, i, N-i);
 		}
 	    }  else { 

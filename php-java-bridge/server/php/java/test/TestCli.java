@@ -2,6 +2,7 @@ package php.java.test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
@@ -23,11 +24,18 @@ public class TestCli extends TestCase {
     protected void tearDown() throws Exception {
 	super.tearDown();
     }
+
     public void testSimple() {
 	try {
 	    ByteArrayOutputStream errOut = new ByteArrayOutputStream();
 	    Writer err = new OutputStreamWriter(errOut);
-	    ScriptEngine eng = (new ScriptEngineManager()).getEngineByName("php-interactive");
+	    ScriptEngine eng = (new ScriptEngineManager())
+	            .getEngineByName("php-interactive");
+	    String[] args = new String[] {
+	            new File(new File("server/WEB-INF/cgi"), "php-cgi")
+	                    .getAbsolutePath() };
+	    eng.put(ScriptEngine.ARGV, args);
+
 	    eng.getContext().setErrorWriter(err);
 	    eng.eval("$a=new java('java.util.Vector');");
 	    eng.eval("$a->add(1);");
@@ -41,27 +49,32 @@ public class TestCli extends TestCase {
 	    eng.eval("$b->add(3);");
 	    assertTrue("[1, 2, 3]".equals(eng.eval("echo $b")));
 	    assertTrue("[1, 2, 3, foo]".equals(eng.eval("echo $a")));
-	    ((Closeable)eng).close();
+	    ((Closeable) eng).close();
 	} catch (Exception e) {
-	    fail (String.valueOf(e));
+	    fail(String.valueOf(e));
 	}
     }
+
     public void testClosure() {
 	try {
 	    ByteArrayOutputStream errOut = new ByteArrayOutputStream();
 	    Writer err = new OutputStreamWriter(errOut);
-	    ScriptEngine eng = (new ScriptEngineManager()).getEngineByName("php-interactive");
+	    ScriptEngine eng = (new ScriptEngineManager())
+	            .getEngineByName("php-interactive");
 	    eng.getContext().setErrorWriter(err);
 	    eng.eval("$a=new java('java.util.Vector');");
 	    eng.eval("$a->add(1);");
 	    eng.eval("$a->add(2);");
-	    try { eng.eval("die();"); } catch (Exception e) {
-		assertTrue(e.getMessage().equals("php.java.bridge.Request$AbortException"));
+	    try {
+		eng.eval("die();");
+	    } catch (Exception e) {
+		assertTrue(e.getMessage()
+		        .equals("php.java.bridge.Request$AbortException"));
 	    }
 	    assertTrue(eng.eval("echo $a").equals("[1, 2]"));
-	    ((Closeable)eng).close();
+	    ((Closeable) eng).close();
 	} catch (Exception e) {
-	    fail (String.valueOf(e));
+	    fail(String.valueOf(e));
 	}
     }
 }

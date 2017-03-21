@@ -31,7 +31,7 @@ import javax.script.ScriptException;
 /**
  * A cloneable CompiledScript
  */
-public class CompiledPhpScript extends CompiledScript implements CloneableScript {
+public class CompiledPhpScript extends CompiledScript {
     /**
      * 
      */
@@ -43,7 +43,7 @@ public class CompiledPhpScript extends CompiledScript implements CloneableScript
     /** {@inheritDoc} */
     public Object eval(ScriptContext context) throws ScriptException {
         try {
-    	return this.abstractPhpScriptEngine.evalCompiledPhp(null /*FIXME: AbstractPhpScriptEngine.DUMMY_READER*/, context);
+    	return this.abstractPhpScriptEngine.doEvalPhp(this.abstractPhpScriptEngine.getLocalReader(), context);
     	
         } catch (Exception e) {
     	throw new ScriptException(e);
@@ -52,9 +52,5 @@ public class CompiledPhpScript extends CompiledScript implements CloneableScript
     /** {@inheritDoc} */
     public ScriptEngine getEngine() {
         return this.abstractPhpScriptEngine;
-    }
-    /** {@inheritDoc} */
-    public Object clone() {
-        return new CompiledPhpScript((AbstractPhpScriptEngine) this.abstractPhpScriptEngine.clone());
     }
 }
