@@ -128,8 +128,7 @@ public final class PhpScriptContext extends AbstractPhpScriptContext {
     /**{@inheritDoc}*/
     public Continuation createContinuation(String[] args, Map env,
             OutputStream out, OutputStream err, FCGIHeaderParser headerParser) {
-	//FIXME urlReader
-return new FCGIProxy(args, env, out,  err, headerParser); 
+	return new FCGIProxy(args, env, out,  err, headerParser); 
     }
     private static JavaBridgeRunner httpServer;
     private static synchronized final JavaBridgeRunner getHttpServer() {

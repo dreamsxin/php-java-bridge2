@@ -1,5 +1,6 @@
 package php.java.test;
 
+import java.io.File;
 import java.io.Reader;
 
 import javax.script.Invocable;
@@ -21,18 +22,24 @@ public class TestInvocable extends TestCase {
     protected void tearDown() throws Exception {
 	super.tearDown();
     }
-    public void test () throws Exception {
+
+    public void test() throws Exception {
 
 	ScriptEngineManager manager = new ScriptEngineManager();
 	ScriptEngine e = manager.getEngineByName("php-invocable");
+	String[] args = new String[] {
+	        new File(new File("server/WEB-INF/cgi"), "php-cgi")
+	                .getAbsolutePath() };
+	e.put(ScriptEngine.ARGV, args);
 
-	e.eval("<?php class f {function a($p) {return java_values($p)+1;}}\n" +
-			"java_context()->setAttribute('f', java_closure(new f()), 100); ?>");
+	e.eval("<?php class f {function a($p) {return java_values($p)+1;}}\n"
+	        + "java_context()->setAttribute('f', java_closure(new f()), 100); ?>");
 
-	Invocable i = (Invocable)e;
+	Invocable i = (Invocable) e;
 	Object f = e.getContext().getAttribute("f", 100);
-	assertTrue(2==((Integer)i.invokeMethod(f, "a", new Object[] {new Integer(1)})).intValue());
+	assertTrue(2 == ((Integer) i.invokeMethod(f, "a",
+	        new Object[] { new Integer(1) })).intValue());
 
-	e.eval((Reader)null);
+	e.eval((Reader) null);
     }
 }
