@@ -39,11 +39,11 @@ public class TestScript extends TestCase {
 	eng.getContext().setWriter(w);
 	eng.getContext().setErrorWriter(w);
 
-	eng.eval(
+	Object res = eng.eval(
 	        "<?php if(java_is_true(java_context()->call(java_closure()))) print('test okay'); exit(9); ?>");
-	eng.eval((String) null);
 
 	assertTrue("test okay".equals(String.valueOf(out)));
+	assertEquals(9, ((Number)res).intValue());
     }
 
 }
