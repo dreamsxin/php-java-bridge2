@@ -42,9 +42,6 @@ import php.java.bridge.util.Logger;
 
 public abstract class Continuation implements IContinuation, Runnable {
 	
-//    protected Map env;
-//    protected OutputStream out, err;
-//    protected FCGIHeaderParser headerParser; //FIXME headerparser doesn't belong here
     
     private ScriptLock scriptLock = new ScriptLock();
     private Lock phpScript = new Lock();
@@ -85,11 +82,6 @@ public abstract class Continuation implements IContinuation, Runnable {
 	}
     }
     protected Continuation() {
-//	this.env = env;
-//	this.out = out;
-//	this.err = err;
-//	this.headerParser = headerParser;
-//	this.resultProxy = resultProxy;
     }
     public void run() {
 	try {

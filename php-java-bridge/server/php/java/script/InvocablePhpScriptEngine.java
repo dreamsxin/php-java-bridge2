@@ -218,6 +218,7 @@ public class InvocablePhpScriptEngine extends AbstractPhpScriptEngine
 	    localReader.close();
 	    localReader = null;
 
+	    //w.write(HEADER); //FIXME
 	    /* the script: */
 	    while ((c = reader.read(buf)) > 0)
 		w.write(buf, 0, c);
@@ -231,6 +232,7 @@ public class InvocablePhpScriptEngine extends AbstractPhpScriptEngine
 		w.write(buf, 0, c);
 	    localReader.close();
 	    localReader = null;
+	    //w.write(FOOTER); //FIXME
 	    w.close();
 	    w = null;
 
@@ -275,7 +277,7 @@ public class InvocablePhpScriptEngine extends AbstractPhpScriptEngine
 	} finally {
 	    handleRelease();
 	}
-	return null; // FIXME resultProxy;
+	return resultProxy;
     }
 
     protected void handleRelease() {

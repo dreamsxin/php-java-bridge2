@@ -278,7 +278,11 @@ public final class Request implements IDocHandler {
 	    arg.id.parseID(st[0]);
 	    break;
 	}
-	
+	case 'Z': {
+	    arg.type=ch;
+	    bridge.setExitCode(st[0].getIntValue());
+	    break;
+	}
 	case 'X': {
 	    arg = new CompositeArg(arg);
 	    arg.composite=st[0].string[st[0].off];

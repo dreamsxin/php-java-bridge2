@@ -40,7 +40,7 @@
   </target>
 
   <target name="compile" depends="init,JavaIncJava,JavaProxyPhpJava,PhpDebuggerPHPJava,LauncherUnix,LauncherWindows">
-    <javac srcdir="${javaSourceDir}" source="1.4" target="1.4" destdir="${javaClassDir}" debug="true" deprecation="true">
+    <javac srcdir="${javaSourceDir}" source="1.5" target="1.5" destdir="${javaClassDir}" debug="true" deprecation="true">
             <exclude name="php/java/test/**/*.java" />	
       <classpath refid="compilePath" />
     </javac>

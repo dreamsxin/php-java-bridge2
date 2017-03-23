@@ -79,6 +79,6 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	    release();
 	}
 
-	return null; // FIXME resultProxy;
+	return resultProxy;
     }
 }
