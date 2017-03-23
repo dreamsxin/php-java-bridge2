@@ -906,9 +906,13 @@ class java_Protocol {
   }
   function writeUnref($object) {
 	$this->client->sendBuffer.=$this->client->preparedToSendBuffer;
-	//echo "clear prepared to send buffer\n";
 	$this->client->preparedToSendBuffer=null;
     $this->write(sprintf("<U v=\"%x\"/>", $object));
+  }
+  function writeExitCode($code) {
+	$this->client->sendBuffer.=$this->client->preparedToSendBuffer;
+	$this->client->preparedToSendBuffer=null;
+    $this->write(sprintf("<Z v=\"%d\"/>", $code));
   }
 
   function getServerName() {

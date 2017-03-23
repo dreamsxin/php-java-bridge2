@@ -72,6 +72,8 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
         implements IPhpScriptEngine, Compilable, java.io.FileFilter,
         CloneableScript, java.io.Closeable {
 
+    protected static final char[] HEADER = "\n<?php $java_scriptengine_script=<<<'JAVA_EOF'\n".toCharArray();
+    protected static final char[] FOOTER = "\nJAVA_EOF;\njava_eval($java_scriptengine_script);?>".toCharArray();
     /**
      * The allocated script
      */
@@ -86,12 +88,13 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
     protected IContextFactory ctx = null;
 
     private ScriptEngineFactory factory = null;
-    // protected ResultProxy resultProxy;
+
     protected File compilerOutputFile;
 
     private boolean isCompiled;
     private File scriptFile;
     protected Reader localReader;
+    protected ResultProxy resultProxy;
 
     static HashMap getProcessEnvironment() {
 	return Util.COMMON_ENVIRONMENT;
@@ -140,7 +143,8 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
      */
     protected void setNewContextFactory() {
 	env = (Map) getProcessEnvironment().clone();
-
+	resultProxy = null;
+	
 	addNewContextFactory();
 
 	// short path S1: no PUT request
@@ -314,11 +318,14 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    localReader.close();
 	    localReader = null;
 
+	    w.write(HEADER);
 	    /* the script: */
 	    while ((c = reader.read(buf)) > 0)
 		w.write(buf, 0, c);
+	    w.write(FOOTER);
+	    
 	    w.close();
-	    w = null;
+	    w = null; 
 
 	    /* now evaluate our script */
 	    localReader = new InputStreamReader(
@@ -384,6 +391,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    try {
 		continuation.release();
 		ctx.releaseManaged();
+		this.resultProxy = new ResultProxy(this).withResult(ctx.getBridge().getExitCode());
 	    } catch (InterruptedException e) {
 		return;
 	    }

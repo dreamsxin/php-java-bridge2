@@ -40,6 +40,28 @@ public class JavaInc {
 "parent::__construct(\"illegal argument: \".gettype($ob));\n"+
 "}\n"+
 "};\n"+
+"function java_exit($exitCode) {\n"+
+"$c=__javaproxy_Client_getClient();\n"+
+"$c->setExitCode($exitCode);\n"+
+"}\n"+
+"function java_eval($code) {\n"+
+"$newCode='';\n"+
+"foreach (token_get_all($code) as $item)\n"+
+"{\n"+
+"if (is_array($item))\n"+
+"{\n"+
+"switch ($item[0])\n"+
+"{\n"+
+"case T_EXIT :\n"+
+"$item[1]='java_exit';\n"+
+"break;\n"+
+"}\n"+
+"$item=$item[1];\n"+
+"}\n"+
+"$newCode.=$item;\n"+
+"}\n"+
+"eval('?'.'>'.$newCode);\n"+
+"}\n"+
 "function java_autoload_function5($x) {\n"+
 "$s=str_replace(\"_\",\".\",$x);\n"+
 "$c=__javaproxy_Client_getClient();\n"+
@@ -561,6 +583,9 @@ public class JavaInc {
 "$this->protocol->invokeEnd();\n"+
 "$val=$this->getResult();\n"+
 "return $val;\n"+
+"}\n"+
+"function setExitCode($code) {\n"+
+"if (isset($this->protocol)) $this->protocol->writeExitCode($code);\n"+
 "}\n"+
 "function unref($object) {\n"+
 "if (isset($this->protocol)) $this->protocol->writeUnref($object);\n"+
@@ -1406,6 +1431,11 @@ public class JavaInc {
 "$this->client->sendBuffer.=$this->client->preparedToSendBuffer;\n"+
 "$this->client->preparedToSendBuffer=null;\n"+
 "$this->write(sprintf(\"<U v=\\\"%x\\\"/>\",$object));\n"+
+"}\n"+
+"function writeExitCode($code) {\n"+
+"$this->client->sendBuffer.=$this->client->preparedToSendBuffer;\n"+
+"$this->client->preparedToSendBuffer=null;\n"+
+"$this->write(sprintf(\"<Z v=\\\"%d\\\"/>\",$code));\n"+
 "}\n"+
 "function getServerName() {\n"+
 "return $this->serverName;\n"+

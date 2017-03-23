@@ -1,4 +1,4 @@
-VM Bridge protocol version 5.5
+VM Bridge protocol version 5.6
 
 Requests are marked with "->", request arguments with -), responses
 with "<-".  The server continues to process requests until EOF. Only
@@ -224,6 +224,11 @@ OPTIONAL requests:
 Destroy:
 <U v=object />
 v: unsigned long
+
+->
+Exit code:
+<Z v=i />
+i: signed int (usually in the range 0-255)
 
 <->
 EndConnection:

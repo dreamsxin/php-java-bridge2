@@ -105,6 +105,36 @@ if(!function_exists("java_get_base")) {
   /**
    * @access private
    */
+  function java_exit($exitCode) {
+    $c=__javaproxy_Client_getClient();
+    $c->setExitCode($exitCode);
+  }
+  
+  /**
+   * @access private
+   */
+  function java_eval($code) {
+    $newCode = '';
+    foreach (token_get_all($code) as $item)
+    {
+        if (is_array($item))
+        {
+            switch ($item[0])
+            {
+                case T_EXIT :
+                    $item[1] = 'java_exit';
+                    break;
+            }
+            $item = $item[1];
+        }
+        $newCode.= $item;
+    }
+    eval('?'.'>'.$newCode);
+  }
+
+  /**
+   * @access private
+   */
   function java_autoload_function5($x) {
 	$s=str_replace("_", ".", $x);
 

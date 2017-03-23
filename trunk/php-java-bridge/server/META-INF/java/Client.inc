@@ -558,6 +558,9 @@ class java_Client /* implements IDocHandler */ {
 	$val = $this->getResult();
 	return $val;
   }
+ function setExitCode($code) {
+	if (isset($this->protocol)) $this->protocol->writeExitCode($code);
+  }
   function unref($object) {
 	if (isset($this->protocol)) $this->protocol->writeUnref($object);
   }

@@ -1,6 +1,7 @@
 package php.java.test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -25,26 +26,48 @@ public class TestGetResult extends TestCase {
     protected void tearDown() throws Exception {
 	super.tearDown();
     }
+
     public void testDiscovery() {
 	try {
 	    ScriptEngine e = new ScriptEngineManager().getEngineByName("php");
 	    String result = String.valueOf(e.eval("<?php exit(2+3);"));
-	    if (!result.equals("5")) throw new ScriptException("test failed");
+
+	    if (!result.equals("5"))
+		throw new ScriptException("test failed");
 
 	    e = new ScriptEngineManager().getEngineByName("php-invocable");
 	    OutputStream out = new ByteArrayOutputStream();
-	    Writer w = new OutputStreamWriter(out); 
+	    Writer w = new OutputStreamWriter(out);
 	    e.getContext().setWriter(w);
 	    e.getContext().setErrorWriter(w);
 	    Object o = e.eval("<?php exit(7+9); ?>");
-	    result = String.valueOf(o); // note that this releases the engine, the next invoke will implicitly call eval() with an empty script
-	    ((Invocable)e).invokeFunction("phpinfo", new Object[]{});
-	    if (!result.equals("16")) 
-	        throw new ScriptException("test failed");
-	    if (out.toString().length() == 0) 
-	        throw new ScriptException("test failed");
+	    result = String.valueOf(o); // note that this releases the engine,
+	                                // the next invoke will implicitly call
+	                                // eval() with an empty script
+	    ((Invocable) e).invokeFunction("phpinfo", new Object[] {});
+	    if (!result.equals("16"))
+		throw new ScriptException("test failed");
+	    if (out.toString().length() == 0)
+		throw new ScriptException("test failed");
 	} catch (Exception e1) {
 	    fail(String.valueOf(e1));
-        }
+	}
+    }
+
+    public void testGetResult() {
+	try {
+	    ScriptEngine e = new ScriptEngineManager().getEngineByName("php");
+	    String[] args = new String[] {
+	            new File(new File("server/WEB-INF/cgi"), "php-cgi")
+	                    .getAbsolutePath() };
+	    e.put(ScriptEngine.ARGV, args);
+
+	    String result = String.valueOf(e.eval("<?php echo ('299'); exit(197);"));
+
+	    if (!result.equals("199"))
+		throw new ScriptException("test failed");
+	} catch (Exception e1) {
+	    fail(String.valueOf(e1));
+	}
     }
 }
