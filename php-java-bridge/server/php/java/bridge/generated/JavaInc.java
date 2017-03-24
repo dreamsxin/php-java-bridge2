@@ -53,14 +53,15 @@ public class JavaInc {
 "switch ($item[0])\n"+
 "{\n"+
 "case T_EXIT :\n"+
-"$item[1]='java_exit';\n"+
+"$item[1]='return';\n"+
 "break;\n"+
 "}\n"+
 "$item=$item[1];\n"+
 "}\n"+
 "$newCode.=$item;\n"+
 "}\n"+
-"eval('?'.'>'.$newCode);\n"+
+"$c=__javaproxy_Client_getClient();\n"+
+"$c->setExitCode((eval('?'.'>'.$newCode)));\n"+
 "}\n"+
 "function java_autoload_function5($x) {\n"+
 "$s=str_replace(\"_\",\".\",$x);\n"+

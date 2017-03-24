@@ -33,7 +33,6 @@ import java.util.Map;
 import javax.script.Bindings;
 
 import php.java.bridge.http.ContextServer;
-import php.java.bridge.util.ILogger;
 import php.java.bridge.util.NotImplementedException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;

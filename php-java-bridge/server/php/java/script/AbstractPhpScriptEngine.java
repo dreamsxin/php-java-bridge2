@@ -44,6 +44,7 @@ import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
+import javax.script.Invocable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
@@ -70,8 +71,9 @@ import php.java.fastcgi.FCGIHeaderParser;
  */
 abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
         implements IPhpScriptEngine, Compilable, java.io.FileFilter,
-        CloneableScript, java.io.Closeable {
+        CloneableScript, java.io.Closeable, Invocable {
 
+    protected static final char[] PHP_JAVA_CONTEXT_CALL_JAVA_CLOSURE = "<?php java_context()->call(java_closure()); ?>".toCharArray();
     protected static final char[] HEADER = "\n<?php $java_scriptengine_script=<<<'JAVA_EOF'\n".toCharArray();
     protected static final char[] FOOTER = "\nJAVA_EOF;\njava_eval($java_scriptengine_script);?>".toCharArray();
     /**
@@ -324,8 +326,13 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 		w.write(buf, 0, c);
 	    w.write(FOOTER);
 	    
+	    /*
+	     * get the default, top-level, closure and call it, to stop the
+	     * script from terminating
+	     */
+	    w.write(PHP_JAVA_CONTEXT_CALL_JAVA_CLOSURE);
 	    w.close();
-	    w = null; 
+	    w = null;
 
 	    /* now evaluate our script */
 	    localReader = new InputStreamReader(
@@ -391,7 +398,6 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    try {
 		continuation.release();
 		ctx.releaseManaged();
-		this.resultProxy = new ResultProxy(this).withResult(ctx.getContext().getExitCode());
 	    } catch (InterruptedException e) {
 		return;
 	    }
