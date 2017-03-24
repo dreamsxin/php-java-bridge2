@@ -50,6 +50,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import php.java.bridge.classloader.SimpleJavaBridgeClassLoader;
+import php.java.bridge.http.IContext;
 import php.java.bridge.http.ISession;
 import php.java.bridge.http.ISocketFactory;
 import php.java.bridge.http.SessionFactory;
@@ -1556,12 +1557,12 @@ public class JavaBridge implements Runnable {
 	return castToString(buf.toString());
     }
     
-    private Object contextCache = null;
+    private IContext contextCache = null;
     /**
      * Returns the JSR223 context. 
      * @return The JSR223 context.
      */
-    public Object getContext() {
+    public IContext getContext() {
 	if(contextCache!=null) return contextCache;
     	return contextCache = sessionFactory.getContext();
     }
@@ -2051,14 +2052,6 @@ public class JavaBridge implements Runnable {
 
     public void setStringCache(StringCache stringCache) {
 	this.stringCache = stringCache;
-    }
-
-    private int exitCode;
-    public int getExitCode() {
-	return exitCode;
-    }
-    public void setExitCode(int exitCode) {
-	this.exitCode = exitCode;
     }
 
 }

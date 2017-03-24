@@ -223,4 +223,15 @@ public abstract class PhpScriptContextDecorator implements IPhpScriptContext {
     public void startContinuation() {
 	ctx.startContinuation();
     }
+    
+    private int exitCode;
+    @Override
+    public void setExitCode(int exitCode) {
+	this.exitCode = exitCode;
+    }
+
+    @Override
+    public int getExitCode() {
+	return exitCode;
+    }
 }

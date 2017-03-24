@@ -280,7 +280,7 @@ public final class Request implements IDocHandler {
 	}
 	case 'Z': {
 	    arg.type=ch;
-	    bridge.setExitCode(st[0].getIntValue());
+	    bridge.getContext().setExitCode(st[0].getIntValue());
 	    break;
 	}
 	case 'X': {
