@@ -105,14 +105,6 @@ if(!function_exists("java_get_base")) {
   /**
    * @access private
    */
-  function java_exit($exitCode) {
-    $c=__javaproxy_Client_getClient();
-    $c->setExitCode($exitCode);
-  }
-  
-  /**
-   * @access private
-   */
   function java_eval($code) {
     $newCode = '';
     foreach (token_get_all($code) as $item)
@@ -122,14 +114,15 @@ if(!function_exists("java_get_base")) {
             switch ($item[0])
             {
                 case T_EXIT :
-                    $item[1] = 'java_exit';
+                    $item[1] = 'return';
                     break;
             }
             $item = $item[1];
         }
         $newCode.= $item;
     }
-    eval('?'.'>'.$newCode);
+    $c=__javaproxy_Client_getClient();
+    $c->setExitCode(eval('?'.'>'.$newCode));
   }
 
   /**

@@ -37,9 +37,7 @@ import php.java.bridge.Util;
 public class PhpScriptEngineFactory implements ScriptEngineFactory {
 
     protected class Factory {
-	protected boolean hasCloseable;
-	public Factory (boolean hasCloseable) {
-	    this.hasCloseable = hasCloseable;
+	public Factory () {
 	}
 	public ScriptEngine create () {
 		return new PhpScriptEngine(PhpScriptEngineFactory.this);
@@ -51,13 +49,8 @@ public class PhpScriptEngineFactory implements ScriptEngineFactory {
      * Create a new EngineFactory
      */
     public PhpScriptEngineFactory () {
-	try {
-	    Class.forName("java.io.Closeable");
-	    factory = new Factory(true);
-	} catch (ClassNotFoundException e) {
-	    factory = new Factory(false);
-	}
-    }
+	    factory = new Factory();
+   }
     private static final String ENGINE_NAME=Util.EXTENSION_NAME + " php script engine for Java";
     /**{@inheritDoc}*/
     public String getEngineName() {

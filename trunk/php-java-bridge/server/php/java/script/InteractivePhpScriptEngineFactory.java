@@ -29,11 +29,11 @@ import javax.script.ScriptEngine;
  * Create a standalone interactive PHP script engines.
  */
 
-public class InteractivePhpScriptEngineFactory extends InvocablePhpScriptEngineFactory {
+public class InteractivePhpScriptEngineFactory extends PhpScriptEngineFactory {
 
     protected class Factory extends PhpScriptEngineFactory.Factory {
-	public Factory(boolean hasCloseable) {
-	    super(hasCloseable);
+	public Factory() {
+	    super();
         }
 
 	public ScriptEngine create () {
@@ -45,12 +45,7 @@ public class InteractivePhpScriptEngineFactory extends InvocablePhpScriptEngineF
      * Create a new EngineFactory
      */
     public InteractivePhpScriptEngineFactory () {
-	try {
-	    Class.forName("java.io.Closeable");
-	    factory = new Factory(true);
-	} catch (ClassNotFoundException e) {
-	    factory = new Factory(false);
-	}
+	    factory = new Factory();
     }
 
 

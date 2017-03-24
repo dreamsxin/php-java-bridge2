@@ -50,7 +50,7 @@ import php.java.bridge.util.Logger;
  * @author jostb
  *
  */
-public class InteractivePhpScriptEngine extends InvocablePhpScriptEngine {
+public class InteractivePhpScriptEngine extends PhpScriptEngine {
 
     private static final String restoreState = ""
             + "$javabridge_values=unserialize(java_values(java_context()->getAttribute('php.java.bridge.JAVABRIDGE_TMP_VALUES', 100)));"
