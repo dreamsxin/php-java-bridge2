@@ -391,7 +391,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    try {
 		continuation.release();
 		ctx.releaseManaged();
-		this.resultProxy = new ResultProxy(this).withResult(ctx.getBridge().getExitCode());
+		this.resultProxy = new ResultProxy(this).withResult(ctx.getContext().getExitCode());
 	    } catch (InterruptedException e) {
 		return;
 	    }
