@@ -227,8 +227,8 @@ v: unsigned long
 
 ->
 Exit code:
-<Z v=i />
-i: signed int (usually in the range 0-255)
+<Z v=l />
+l: unsigned long (usually in the range 0-255)
 
 <->
 EndConnection:

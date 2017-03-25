@@ -3,6 +3,22 @@ php-java-bridge NEWS -- history of user-visible changes.
 Please send bug reports, questions and suggestions to
 <php-java-bridge-users@lists.sourceforge.net>.
 
+Version 7.1.1
+
+* PHP >= 5.3.0 is now required to run the bridge in FastCGI mode
+
+* FastCGI has been rewritten and is now used everywhere. As a result all PHP ScriptEngines could be 
+  removed except the "php" and the "php-interactive" ScriptEngine.
+
+* The php script engine now implements the "invocable" interface.
+
+* The PHP/Java Bridge protocol has been enhanced to send the exit code.
+
+* A new API function "java_eval" was introduced. It compiles PHP and executes it with an exit 
+  handler in place, so that the exit code is reported to PHP script engine. (It needs the 
+  tokenizer extension, which is part of the PHP core since at least 5.3.0).
+
+
 Version 7.0.1
 
 * PhpDebugger.php can now connect back to latest Eclipse or Zend Studio.
