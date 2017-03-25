@@ -912,7 +912,7 @@ class java_Protocol {
   function writeExitCode($code) {
 	$this->client->sendBuffer.=$this->client->preparedToSendBuffer;
 	$this->client->preparedToSendBuffer=null;
-    $this->write(sprintf("<Z v=\"%d\"/>", $code));
+	$this->write(sprintf("<Z v=\"%x\"/>", 0xffffffff&$code));
   }
 
   function getServerName() {

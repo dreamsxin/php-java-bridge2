@@ -66,7 +66,6 @@ import php.java.fastcgi.FCGIHeaderParser;
  * This class implements the ScriptEngine.
  * <p>
  * 
- * @see php.java.script.InvocablePhpScriptEngine
  * @see php.java.script.PhpScriptEngine
  */
 abstract class AbstractPhpScriptEngine extends AbstractScriptEngine

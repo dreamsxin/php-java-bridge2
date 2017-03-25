@@ -40,10 +40,6 @@ public class JavaInc {
 "parent::__construct(\"illegal argument: \".gettype($ob));\n"+
 "}\n"+
 "};\n"+
-"function java_exit($exitCode) {\n"+
-"$c=__javaproxy_Client_getClient();\n"+
-"$c->setExitCode($exitCode);\n"+
-"}\n"+
 "function java_eval($code) {\n"+
 "$newCode='';\n"+
 "foreach (token_get_all($code) as $item)\n"+
@@ -61,7 +57,7 @@ public class JavaInc {
 "$newCode.=$item;\n"+
 "}\n"+
 "$c=__javaproxy_Client_getClient();\n"+
-"$c->setExitCode((eval('?'.'>'.$newCode)));\n"+
+"$c->setExitCode(eval('?'.'>'.$newCode));\n"+
 "}\n"+
 "function java_autoload_function5($x) {\n"+
 "$s=str_replace(\"_\",\".\",$x);\n"+
@@ -1436,7 +1432,7 @@ public class JavaInc {
 "function writeExitCode($code) {\n"+
 "$this->client->sendBuffer.=$this->client->preparedToSendBuffer;\n"+
 "$this->client->preparedToSendBuffer=null;\n"+
-"$this->write(sprintf(\"<Z v=\\\"%d\\\"/>\",$code));\n"+
+"$this->write(sprintf(\"<Z v=\\\"%x\\\"/>\",0xffffffff&$code));\n"+
 "}\n"+
 "function getServerName() {\n"+
 "return $this->serverName;\n"+

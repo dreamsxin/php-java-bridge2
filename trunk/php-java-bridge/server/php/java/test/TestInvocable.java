@@ -1,11 +1,7 @@
 package php.java.test;
 
-import java.io.File;
-import java.io.Reader;
-
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
 import junit.framework.TestCase;
 
@@ -15,31 +11,20 @@ public class TestInvocable extends TestCase {
 	super(name);
     }
 
-    protected void setUp() throws Exception {
-	super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-	super.tearDown();
-    }
-
     public void test() throws Exception {
 
-	ScriptEngineManager manager = new ScriptEngineManager();
-	ScriptEngine e = manager.getEngineByName("php");
-	String[] args = new String[] {
-	        new File(new File("server/WEB-INF/cgi"), "php-cgi")
-	                .getAbsolutePath() };
-	e.put(ScriptEngine.ARGV, args);
+	ScriptEngine e = TestHelper.getPhpScriptEngine4Test();
 
-	Object result = e.eval("<?php class f {function a($p) {return java_values($p)+1;}}\n"
-	        + "java_context()->setAttribute('f', java_closure(new f()), 100); exit(42); ?>");
+	Object result = e
+	        .eval("<?php class f {function a($p) {return java_values($p)+1;}}\n"
+	                + "java_context()->setAttribute('f', java_closure(new f()), 100); exit(4294967295); ?>");
 
 	Invocable i = (Invocable) e;
 	Object f = e.getContext().getAttribute("f", 100);
 	assertTrue(2 == ((Integer) i.invokeMethod(f, "a",
 	        new Object[] { new Integer(1) })).intValue());
 
-	assertEquals(42, ((Number)result).intValue());
+	assertEquals(0xffffffff, ((Number) result).intValue());
     }
+
 }
