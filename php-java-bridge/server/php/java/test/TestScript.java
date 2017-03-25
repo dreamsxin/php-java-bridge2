@@ -1,49 +1,34 @@
 package php.java.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TestScript extends TestCase {
-
-    public TestScript(String name) {
-	super(name);
-    }
-
-    protected void setUp() throws Exception {
-	super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-	super.tearDown();
-    }
-
+public class TestScript {
+    @Test
     public void test() throws IOException, ScriptException {
-	ScriptEngine eng = (new ScriptEngineManager()).getEngineByName("php");
-	String[] args = new String[] {
-	        new File(new File("server/WEB-INF/cgi"), "php-cgi")
-	                .getAbsolutePath() };
-	eng.put(ScriptEngine.ARGV, args);
+	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
 	OutputStream out = new ByteArrayOutputStream();
 	Writer w = new OutputStreamWriter(out);
-	eng.getContext().setWriter(w);
-	eng.getContext().setErrorWriter(w);
+	e.getContext().setWriter(w);
+	e.getContext().setErrorWriter(w);
 
-	Object res = eng.eval(
+	Object res = e.eval(
 	        "<?php if(java_is_true(java_context()->call(java_closure()))) print('test okay'); exit(9); ?>");
 
 	assertTrue("test okay".equals(String.valueOf(out)));
-	assertEquals(9, ((Number)res).intValue());
+	assertEquals(9, ((Number) res).intValue());
     }
 
 }

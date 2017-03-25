@@ -1,6 +1,6 @@
 package php.java.test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,11 +11,10 @@ import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 
-import php.java.bridge.Util;
 import php.java.fastcgi.FCGIHeaderParser;
 import php.java.fastcgi.FCGIProxy;
 
-public class TestCGI {
+public class TestCGI  {
 
     private String[] args;
     private HashMap env;

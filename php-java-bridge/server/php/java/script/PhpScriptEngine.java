@@ -65,6 +65,7 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	this();
 	setBindings(n, ScriptContext.ENGINE_SCOPE);
     }
+
     /*
      * (non-Javadoc)
      * 
@@ -153,7 +154,6 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	        (PhpProcedure) Proxy.getInvocationHandler(thiz));
     }
 
-    
     protected Object doEvalPhp(Reader reader, ScriptContext context)
             throws ScriptException {
 	if ((continuation != null) || (reader == null))
@@ -181,13 +181,14 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 		throw (ScriptException) e;
 	    throw new ScriptException(e);
 	} finally {
-	    this.resultProxy = new ResultProxy(this).withResult(ctx.getContext().getExitCode());
+	    this.resultProxy = new ResultProxy(this)
+	            .withResult(ctx.getContext().getExitCode());
 	    handleRelease();
 	}
 
 	return resultProxy;
     }
-    
+
     protected void handleRelease() {
 	// make sure to properly release them upon System.exit().
 	synchronized (engines) {

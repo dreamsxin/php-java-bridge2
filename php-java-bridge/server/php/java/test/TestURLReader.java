@@ -1,32 +1,8 @@
 package php.java.test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.net.URL;
-
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-
-import junit.framework.TestCase;
-import php.java.script.IPhpScriptContext;
 //import php.java.script.URLReader;
 // FIXME
-public class TestURLReader extends TestCase {
-
-    public TestURLReader(String name) {
-	super(name);
-    }
-
-    protected void setUp() throws Exception {
-	super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-	super.tearDown();
-    }
+public class TestURLReader  {
 
     public void test() throws Exception {
 //	ScriptEngine e = new ScriptEngineManager().getEngineByName("php-invocable");
