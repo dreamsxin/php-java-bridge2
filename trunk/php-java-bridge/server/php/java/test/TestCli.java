@@ -1,55 +1,40 @@
 package php.java.test;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TestCli extends TestCase {
+public class TestCli {
 
-    public TestCli(String name) {
-	super(name);
-    }
-
-    protected void setUp() throws Exception {
-	super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-	super.tearDown();
-    }
-
+    @Test
     public void testSimple() {
 	try {
 	    ByteArrayOutputStream errOut = new ByteArrayOutputStream();
 	    Writer err = new OutputStreamWriter(errOut);
-	    ScriptEngine eng = (new ScriptEngineManager())
-	            .getEngineByName("php-interactive");
-	    String[] args = new String[] {
-	            new File(new File("server/WEB-INF/cgi"), "php-cgi")
-	                    .getAbsolutePath() };
-	    eng.put(ScriptEngine.ARGV, args);
+	    ScriptEngine e = ScriptEngineHelper.getPhpInteractiveScriptEngine4Test();
 
-	    eng.getContext().setErrorWriter(err);
-	    eng.eval("$a=new java('java.util.Vector');");
-	    eng.eval("$a->add(1);");
-	    eng.eval("$a->add(2);");
-	    eng.eval("$a->add(3);");
-	    eng.eval("class C{function toString() {return 'foo';}}");
-	    eng.eval("$a->add(java_closure(new C()));");
-	    eng.eval("$b=new java('java.util.Vector');");
-	    eng.eval("$b->add(1);");
-	    eng.eval("$b->add(2);");
-	    eng.eval("$b->add(3);");
-	    assertTrue("[1, 2, 3]".equals(eng.eval("echo $b")));
-	    assertTrue("[1, 2, 3, foo]".equals(eng.eval("echo $a")));
-	    ((Closeable) eng).close();
+	    e.getContext().setErrorWriter(err);
+	    e.eval("$a=new java('java.util.Vector');");
+	    e.eval("$a->add(1);");
+	    e.eval("$a->add(2);");
+	    e.eval("$a->add(3);");
+	    e.eval("class C{function toString() {return 'foo';}}");
+	    e.eval("$a->add(java_closure(new C()));");
+	    e.eval("$b=new java('java.util.Vector');");
+	    e.eval("$b->add(1);");
+	    e.eval("$b->add(2);");
+	    e.eval("$b->add(3);");
+	    assertTrue("[1, 2, 3]".equals(e.eval("echo $b")));
+	    assertTrue("[1, 2, 3, foo]".equals(e.eval("echo $a")));
+	    ((Closeable) e).close();
 	} catch (Exception e) {
 	    fail(String.valueOf(e));
 	}

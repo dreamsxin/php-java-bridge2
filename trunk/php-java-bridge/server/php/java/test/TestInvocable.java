@@ -1,19 +1,19 @@
 package php.java.test;
 
+import static org.junit.Assert.*;
+
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TestInvocable extends TestCase {
+public class TestInvocable  {
 
-    public TestInvocable(String name) {
-	super(name);
-    }
 
+    @Test
     public void test() throws Exception {
 
-	ScriptEngine e = TestHelper.getPhpScriptEngine4Test();
+	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
 	Object result = e
 	        .eval("<?php class f {function a($p) {return java_values($p)+1;}}\n"

@@ -1,7 +1,8 @@
 package php.java.test;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -11,31 +12,19 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TestGetResult extends TestCase {
-
-    public TestGetResult(String name) {
-	super(name);
-    }
-
-    protected void setUp() throws Exception {
-	super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-	super.tearDown();
-    }
-
+public class TestGetResult {
+    @Test
     public void testDiscovery() {
 	try {
-	    ScriptEngine e = new ScriptEngineManager().getEngineByName("php");
+	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	    String result = String.valueOf(e.eval("<?php exit(2+3);"));
 
 	    if (!result.equals("5"))
 		throw new ScriptException("test failed");
 
-	    e = new ScriptEngineManager().getEngineByName("php-invocable");
+	    e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	    OutputStream out = new ByteArrayOutputStream();
 	    Writer w = new OutputStreamWriter(out);
 	    e.getContext().setWriter(w);
@@ -56,13 +45,10 @@ public class TestGetResult extends TestCase {
 
     public void testGetResult() {
 	try {
-	    ScriptEngine e = new ScriptEngineManager().getEngineByName("php");
-	    String[] args = new String[] {
-	            new File(new File("server/WEB-INF/cgi"), "php-cgi")
-	                    .getAbsolutePath() };
-	    e.put(ScriptEngine.ARGV, args);
+	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
-	    String result = String.valueOf(e.eval("<?php echo ('299'); exit(197);"));
+	    String result = String
+	            .valueOf(e.eval("<?php echo ('299'); exit(197);"));
 
 	    if (!result.equals("199"))
 		throw new ScriptException("test failed");

@@ -1,5 +1,7 @@
 package php.java.test;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -12,29 +14,23 @@ import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class TestInvocablePhpScriptEngine extends TestCase {
+public class TestInvocablePhpScriptEngine {
 
     private ScriptEngine e;
     private Bindings b;
     private String script;
-    private ScriptEngineManager m;
     private String invocableScript;
 
-    public TestInvocablePhpScriptEngine(String name) {
-	super(name);
-    }
-
-    protected void setUp() throws Exception {
-	super.setUp();
-
-	m = new ScriptEngineManager();
-	e = m.getEngineByName("php-invocable");
+    @Before
+    public void setUp() throws Exception {
+	e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	b = new SimpleBindings();
 	script = "<?php function f($arg) {return 1 + (string)$arg;}; exit(1+2); ?>";
 	invocableScript = "<?php function f($arg) {return 1 + (string)$arg;}; ?>"; // no
@@ -42,11 +38,12 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 
     }
 
-    protected void tearDown() throws Exception {
-	super.tearDown();
+    @After
+    public void tearDown() throws Exception {
 	((Closeable) e).close();
     }
 
+    @Test
     public void testEvalReader() {
 	try {
 	    Reader r = new StringReader(script);
@@ -57,6 +54,7 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testEvalReaderBindings() {
 	try {
 	    Reader r = new StringReader(script);
@@ -67,6 +65,7 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testEvalString() {
 	try {
 	    assertTrue("3".equals(String.valueOf(e.eval(script))));
@@ -75,6 +74,7 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testEvalStringBindings() {
 	try {
 	    assertTrue("3".equals(String.valueOf(e.eval(script, b))));
@@ -83,9 +83,10 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testEvalCompilableString() {
 	try {
-	    ScriptEngine e = m.getEngineByName("php-invocable");
+	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    OutputStreamWriter writer = new OutputStreamWriter(out);
 	    e.getContext().setWriter(writer);
@@ -111,9 +112,10 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testInvokeFunction() {
 	try {
-	    ScriptEngine e = m.getEngineByName("php-invocable");
+	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	    String[] args = new String[] {
 	            new File(new File("server/WEB-INF/cgi"), "php-cgi")
 	                    .getAbsolutePath() };
@@ -127,9 +129,10 @@ public class TestInvocablePhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testInvokeFunctionCompiled() {
 	try {
-	    ScriptEngine e = m.getEngineByName("php-invocable");
+	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	    ((java.io.FileFilter) e).accept(
 	            new File(System.getProperty("java.io.tmpdir", "/tmp")
 	                    + File.separator + "test.php"));

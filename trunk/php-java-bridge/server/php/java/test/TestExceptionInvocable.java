@@ -1,5 +1,7 @@
 package php.java.test;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.OutputStream;
@@ -11,21 +13,11 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TestExceptionInvocable extends TestCase {
-
-    public TestExceptionInvocable(String name) {
-	super(name);
-    }
-
-    protected void setUp() throws Exception {
-	super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-	super.tearDown();
-    }
+public class TestExceptionInvocable {
+    
+    @Test
     public void test() throws Exception {
 	ScriptEngineManager manager = new ScriptEngineManager();
 	ScriptEngine e = manager.getEngineByName("php-invocable");

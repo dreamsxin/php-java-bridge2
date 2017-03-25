@@ -1,5 +1,7 @@
 package php.java.test;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
@@ -11,36 +13,32 @@ import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-public class TestPhpScriptEngine extends TestCase {
+public class TestPhpScriptEngine {
 
     private ScriptEngine e;
     private Bindings b;
     private String script;
-    private ScriptEngineManager m;
 
-    public TestPhpScriptEngine(String name) {
-	super(name);
-    }
-
-    protected void setUp() throws Exception {
-	super.setUp();
-	m = new ScriptEngineManager();
-	e = m.getEngineByName("php");
+    @Before
+    public void setUp() throws Exception {
+	e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	b = new SimpleBindings();
 	script = "<?php exit(1+2);?>";
     }
 
-    protected void tearDown() throws Exception {
-	super.tearDown();
+    @After
+    public void tearDown() throws Exception {
 	((Closeable) e).close();
     }
 
+    @Test
     public void testEvalReader() {
 	try {
 	    Reader r = new StringReader(script);
@@ -51,6 +49,7 @@ public class TestPhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testEvalReaderBindings() {
 	try {
 	    Reader r = new StringReader(script);
@@ -61,6 +60,7 @@ public class TestPhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testEvalString() {
 	try {
 	    assertTrue("3".equals(String.valueOf(e.eval(script))));
@@ -69,6 +69,7 @@ public class TestPhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testEvalStringBindings() {
 	try {
 	    assertTrue("3".equals(String.valueOf(e.eval(script, b))));
@@ -77,11 +78,12 @@ public class TestPhpScriptEngine extends TestCase {
 	}
     }
 
+    @Test
     public void testEvalCompilableString() {
 	try {
 	    ByteArrayOutputStream out = new ByteArrayOutputStream();
 	    OutputStreamWriter writer = new OutputStreamWriter(out);
-	    ScriptEngine e = m.getEngineByName("php");
+	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
 	    e.getContext().setWriter(writer);
 	    ((java.io.FileFilter) e).accept(

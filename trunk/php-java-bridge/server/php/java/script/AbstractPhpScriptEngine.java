@@ -72,9 +72,12 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
         implements IPhpScriptEngine, Compilable, java.io.FileFilter,
         CloneableScript, java.io.Closeable, Invocable {
 
-    protected static final char[] PHP_JAVA_CONTEXT_CALL_JAVA_CLOSURE = "<?php java_context()->call(java_closure()); ?>".toCharArray();
-    protected static final char[] HEADER = "\n<?php $java_scriptengine_script=<<<'JAVA_EOF'\n".toCharArray();
-    protected static final char[] FOOTER = "\nJAVA_EOF;\njava_eval($java_scriptengine_script);?>".toCharArray();
+    protected static final char[] PHP_JAVA_CONTEXT_CALL_JAVA_CLOSURE = "<?php java_context()->call(java_closure()); ?>"
+            .toCharArray();
+    protected static final char[] HEADER = "\n<?php $java_scriptengine_script=<<<'JAVA_EOF'\n"
+            .toCharArray();
+    protected static final char[] FOOTER = "\nJAVA_EOF;\njava_eval($java_scriptengine_script);?>"
+            .toCharArray();
     /**
      * The allocated script
      */
@@ -145,7 +148,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
     protected void setNewContextFactory() {
 	env = (Map) getProcessEnvironment().clone();
 	resultProxy = null;
-	
+
 	addNewContextFactory();
 
 	// short path S1: no PUT request
@@ -324,7 +327,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    while ((c = reader.read(buf)) > 0)
 		w.write(buf, 0, c);
 	    w.write(FOOTER);
-	    
+
 	    /*
 	     * get the default, top-level, closure and call it, to stop the
 	     * script from terminating

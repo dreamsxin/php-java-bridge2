@@ -66,7 +66,7 @@ public class FCGIProxy extends Continuation {
     private static final Object globalCtxLock = new Object();
     private static FCGIConnectionPool fcgiConnectionPool = null;
     protected void setupFastCGIServer() throws ConnectException {
-	synchronized(globalCtxLock) {
+	synchronized(globalCtxLock) { //FIXME refactor
 	    if(null == fcgiConnectionPool) {
 		fcgiConnectionPool = FCGIConnectionPool.createConnectionPool(args, env);
 	    }
@@ -122,6 +122,10 @@ public class FCGIProxy extends Continuation {
     public void release() throws InterruptedException {
 	super.release();
 	fcgiConnectionPool.destroy();
+	synchronized(globalCtxLock) { //FIXME clean this up!
+	    fcgiConnectionPool=null;
+	}
+
     }
 
 }
