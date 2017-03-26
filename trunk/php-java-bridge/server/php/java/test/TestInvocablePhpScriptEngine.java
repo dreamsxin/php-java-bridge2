@@ -1,6 +1,7 @@
 package php.java.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -130,23 +131,26 @@ public class TestInvocablePhpScriptEngine {
     }
 
     @Test
-    public void testInvokeFunctionCompiled() {
-	try {
-	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
-	    ((java.io.FileFilter) e).accept(
-	            new File(System.getProperty("java.io.tmpdir", "/tmp")
-	                    + File.separator + "test.php"));
-	    CompiledScript c = ((Compilable) e).compile(invocableScript);
-	    c.eval();
-	    assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
-	            new Object[] { "5" })).intValue());
-	    c.eval();
-	    assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
-	            new Object[] { "5" })).intValue());
-	    ((Closeable) e).close();
-	} catch (Exception e) {
-	    fail(String.valueOf(e));
-	}
+    public void testCompile() throws Exception {
+	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
+
+	CompiledScript c = ((Compilable) e).compile(invocableScript);
+	c.eval();
+	assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
+	        new Object[] { "5" })).intValue());
+    }
+    @Test
+    public void testInvokeFunctionCompiled() throws Exception {
+	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
+
+	CompiledScript c = ((Compilable) e).compile(invocableScript);
+	c.eval();
+	assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
+	        new Object[] { "5" })).intValue());
+	c.eval();
+	assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
+	        new Object[] { "5" })).intValue());
+	((Closeable) e).close();
     }
 
     // public void testInvokeMethod() {

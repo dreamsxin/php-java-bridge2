@@ -27,8 +27,8 @@ public class TestScript {
 	Object res = e.eval(
 	        "<?php if(java_is_true(java_context()->call(java_closure()))) print('test okay'); exit(9); ?>");
 
-	assertTrue("test okay".equals(String.valueOf(out)));
 	assertEquals(9, ((Number) res).intValue());
+	assertTrue("test okay".equals(String.valueOf(out)));
     }
 
 }

@@ -1,15 +1,15 @@
 package php.java.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.io.Writer;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.junit.Test;
@@ -33,7 +33,10 @@ public class TestGetResult {
 	    result = String.valueOf(o); // note that this releases the engine,
 	                                // the next invoke will implicitly call
 	                                // eval() with an empty script
+
 	    ((Invocable) e).invokeFunction("phpinfo", new Object[] {});
+	    e.eval((Reader)null); // terminate the new engine as well
+	    
 	    if (!result.equals("16"))
 		throw new ScriptException("test failed");
 	    if (out.toString().length() == 0)
