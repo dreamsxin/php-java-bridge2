@@ -23,8 +23,8 @@ public class TestSimpleInvocation {
 	e.getContext().setErrorWriter(w);
 	Invocable i = (Invocable) e;
 	i.invokeFunction("phpinfo", new Object[0]);
+	((Closeable) e).close();
 	if (out.toString().length() == 0)
 	    throw new ScriptException("test failed");
-	((Closeable) e).close();
     }
 }

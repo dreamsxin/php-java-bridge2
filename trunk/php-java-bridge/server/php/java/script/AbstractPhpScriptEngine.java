@@ -96,13 +96,11 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
     // protected File compilerOutputFile;
 
     private boolean isCompiled;
+
     public boolean isCompiled() {
-        return isCompiled;
+	return isCompiled && continuation!=null;
     }
 
-    public void setCompiled(boolean isCompiled) {
-        this.isCompiled = isCompiled;
-    }
 
     private File scriptFile;
     protected Reader localReader;
@@ -202,7 +200,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    }
 	    writer.close();
 	}
-	if (env!=null) {
+	if (env != null) {
 	    env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
 	}
 	return (String[]) get(ScriptEngine.ARGV);
@@ -437,6 +435,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 		    Logger.printStackTrace(e);
 		}
 	    }
+	    scriptFile = null;
 	}
     }
 
@@ -556,12 +555,6 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	StringBuffer buf = new StringBuffer(STANDARD_HEADER);
 	buf.insert(20, filePath);
 	return cachedSimpleStandardHeader = buf.toString();
-    }
-
-    /** {@inheritDoc} */
-    public boolean accept(File outputFile) {
-	// this.compilerOutputFile = outputFile;
-	return true;
     }
 
     private String getEmbeddedStandardHeader(String filePath)
