@@ -121,8 +121,8 @@ public class FCGIProxy extends Continuation {
 
     public void release() throws InterruptedException {
 	super.release();
-	fcgiConnectionPool.destroy();
 	synchronized(globalCtxLock) { //FIXME clean this up!
+		fcgiConnectionPool.destroy();
 	    fcgiConnectionPool=null;
 	}
 

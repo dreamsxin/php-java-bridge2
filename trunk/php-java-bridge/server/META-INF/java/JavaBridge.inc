@@ -122,7 +122,9 @@ if(!function_exists("java_get_base")) {
         $newCode.= $item;
     }
     $c=__javaproxy_Client_getClient();
-    $c->setExitCode(eval('?'.'>'.$newCode));
+	$exitCode=eval((substr($newCode,0,2)=='<'.'?'?'?'.'>':'').$newCode);
+	$c->setExitCode($exitCode);
+	return $exitCode;
   }
 
   /**

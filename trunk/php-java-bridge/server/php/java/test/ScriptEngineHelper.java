@@ -16,14 +16,4 @@ public class ScriptEngineHelper {
 	e.put(ScriptEngine.ARGV, args);
 	return e;
     }
-    public static ScriptEngine getPhpInteractiveScriptEngine4Test() {
-	ScriptEngineManager manager = new ScriptEngineManager();
-	ScriptEngine e = manager.getEngineByName("php-interactive");
-	String[] args = new String[] {
-	        new File(new File("server/WEB-INF/cgi"), "php-cgi")
-	                .getAbsolutePath() };
-	e.put(ScriptEngine.ARGV, args);
-	return e;
-    }
-
 }

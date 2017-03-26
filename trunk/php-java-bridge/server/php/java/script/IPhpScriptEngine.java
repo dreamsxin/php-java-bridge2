@@ -36,8 +36,7 @@ import javax.script.ScriptEngine;
  */
 public interface IPhpScriptEngine extends ScriptEngine, Compilable, java.io.FileFilter {
     /**
-     * free all resources associated with the script engine. Must be called explicitly for 
-     * the {@link InvocablePhpScriptEngine} and {@link InteractivePhpScriptEngine}.
+     * free all resources associated with the script engine. Must be called explicitly.
      * @throws IOException
      */
     public void close() throws IOException;

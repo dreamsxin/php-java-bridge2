@@ -14,9 +14,9 @@ import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.Invocable;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 
 import org.junit.After;
 import org.junit.Before;
@@ -32,7 +32,7 @@ public class TestInvocablePhpScriptEngine {
     @Before
     public void setUp() throws Exception {
 	e = ScriptEngineHelper.getPhpScriptEngine4Test();
-	b = new SimpleBindings();
+	b = e.getBindings(ScriptContext.ENGINE_SCOPE);
 	script = "<?php function f($arg) {return 1 + (string)$arg;}; exit(1+2); ?>";
 	invocableScript = "<?php function f($arg) {return 1 + (string)$arg;}; ?>"; // no
 	                                                                           // exit()

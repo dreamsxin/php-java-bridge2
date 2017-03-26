@@ -57,7 +57,9 @@ public class JavaInc {
 "$newCode.=$item;\n"+
 "}\n"+
 "$c=__javaproxy_Client_getClient();\n"+
-"$c->setExitCode(eval('?'.'>'.$newCode));\n"+
+"$exitCode=eval((substr($newCode,0,2)=='<'.'?'?'?'.'>':'').$newCode);\n"+
+"$c->setExitCode($exitCode);\n"+
+"return $exitCode;\n"+
 "}\n"+
 "function java_autoload_function5($x) {\n"+
 "$s=str_replace(\"_\",\".\",$x);\n"+

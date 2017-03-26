@@ -183,10 +183,11 @@ public abstract class FCGIFactory {
 	    } catch (IOException e) {
 		/* ignore */}
 	} catch (Exception e) {
+	    Logger.printStackTrace(e);
 	    lastException = e;
-	    System.err.println("Could not start FCGI server: " + e);
+	    Logger.logError("Could not start FCGI server: " + e);
 	}
-	;
+	
     }
 
     protected abstract FCGIProcess doBind() throws IOException;

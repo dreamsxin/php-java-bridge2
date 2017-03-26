@@ -1,7 +1,5 @@
 # list of script engine factories 
 #
 # php             => php.java.script.PhpScriptEngineFactory
-# php-interactive => php.java.script.InteractivePhpScriptEngineFactory
 
 php.java.script.PhpScriptEngineFactory
-php.java.script.InteractivePhpScriptEngineFactory
