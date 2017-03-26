@@ -192,7 +192,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 
     private String[] doGetArgs(Reader reader) throws IOException {
 	if (scriptFile == null) {
-	    scriptFile = File.createTempFile("tmp", "php").getAbsoluteFile();
+	    scriptFile = File.createTempFile("tmp", ".php").getAbsoluteFile();
 	    FileWriter writer = new FileWriter(scriptFile);
 	    int count;
 	    char[] cbuf = new char[Util.BUF_SIZE];

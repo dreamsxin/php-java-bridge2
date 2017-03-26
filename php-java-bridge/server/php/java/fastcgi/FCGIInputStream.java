@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import php.java.bridge.Util;
+import php.java.bridge.util.Logger;
 
 public class FCGIInputStream extends FCGIConnectionInputStream {
     public FCGIInputStream(Connection connection, InputStream in) {
@@ -81,7 +82,7 @@ public class FCGIInputStream extends FCGIConnectionInputStream {
 		throw new IOException("Protocol error while reading FCGI data");
 	    if(type==FCGIUtil.FCGI_STDERR) { 
 		String s = new String(buf, 0, n, Util.ASCII);
-		//this.processFactory.log(s); //FIXME 
+		Logger.logDebug(s); //FIXME Someone forgot the FCGIErrorStream
 		contentLength = 0;
 
 		if(error==null) error = new StringBuffer(s);

@@ -18,7 +18,7 @@ public class TestInteractiveRequestAbort  {
     public void test() throws Exception {
 	String devNull = new File("/dev/null").exists() ? "/dev/null"
 	        : "devNull";
-	ScriptEngine e = ScriptEngineHelper.getPhpInteractiveScriptEngine4Test();
+	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	e.getContext().setErrorWriter(new FileWriter(new File(devNull)));
 	e.getContext().setWriter(new FileWriter(new File(devNull)));
 

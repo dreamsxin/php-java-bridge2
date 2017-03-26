@@ -1,65 +1,67 @@
 package php.java.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import org.junit.Test;
 
 public class TestCli {
 
     @Test
+    public void testInvokeFunction() throws NoSuchMethodException, ScriptException {
+	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
+	    Invocable i = (Invocable)e;
+	    Object res = i.invokeFunction("java_eval", "<?php exit(1+2); ?>");
+	    assertEquals("3", res.toString());
+	    res = i.invokeFunction("java_eval", "<?php exit(3+5); ?>");
+	    assertEquals("8", res.toString());
+	    res = i.invokeFunction("java_eval", "return 5+8;");
+	    assertEquals("13", res.toString());
+	    
+	    res = i.invokeFunction("java_eval", "$GLOBALS['a']=12;");
+	    res = i.invokeFunction("java_eval", "return $GLOBALS['a']+1;");
+	    assertEquals("13", res.toString());
+	    res = i.invokeFunction("java_eval", "function foo() {return 1;}");
+	    res = i.invokeFunction("java_eval", "function bar() {return 2;}");
+	    res = i.invokeFunction("java_eval", "return foo()+bar();");
+	    assertEquals("3", res.toString());
+    }
+    @Test
     public void testSimple() {
 	try {
 	    ByteArrayOutputStream errOut = new ByteArrayOutputStream();
 	    Writer err = new OutputStreamWriter(errOut);
-	    ScriptEngine e = ScriptEngineHelper.getPhpInteractiveScriptEngine4Test();
+	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
 	    e.getContext().setErrorWriter(err);
-	    e.eval("$a=new java('java.util.Vector');");
-	    e.eval("$a->add(1);");
-	    e.eval("$a->add(2);");
-	    e.eval("$a->add(3);");
-	    e.eval("class C{function toString() {return 'foo';}}");
-	    e.eval("$a->add(java_closure(new C()));");
-	    e.eval("$b=new java('java.util.Vector');");
-	    e.eval("$b->add(1);");
-	    e.eval("$b->add(2);");
-	    e.eval("$b->add(3);");
-	    assertTrue("[1, 2, 3]".equals(e.eval("echo $b")));
-	    assertTrue("[1, 2, 3, foo]".equals(e.eval("echo $a")));
-	    ((Closeable) e).close();
+	    Invocable i = (Invocable)e;
+	    i.invokeFunction("java_eval", "$GLOBALS['a']=new java('java.util.Vector');");
+	    i.invokeFunction("java_eval", "$GLOBALS['a']->add(1);");
+	    i.invokeFunction("java_eval", "$GLOBALS['a']->add(2);");
+	    i.invokeFunction("java_eval", "$GLOBALS['a']->add(3);");
+	    i.invokeFunction("java_eval", "class C{function toString() {return 'foo';}}");
+	    i.invokeFunction("java_eval", "$GLOBALS['a']->add(java_closure(new C()));");
+	    i.invokeFunction("java_eval", "$GLOBALS['b']=new java('java.util.Vector');");
+	    i.invokeFunction("java_eval", "$GLOBALS['b']->add(1);");
+	    i.invokeFunction("java_eval", "$GLOBALS['b']->add(2);");
+	    i.invokeFunction("java_eval", "function f() {return 3;}");
+	    i.invokeFunction("java_eval", "$GLOBALS['b']->add(f());");
+	    Object res = i.invokeFunction("java_eval", "return $GLOBALS['b'];");
+	    assertTrue("[1, 2, 3]".equals(String.valueOf(res)));
+	    res = i.invokeFunction("java_eval", "return $GLOBALS[a];");
+	    assertTrue("[1, 2, 3, foo]".equals(String.valueOf(res)));
 	} catch (Exception e) {
 	    fail(String.valueOf(e));
 	}
     }
 
-    public void testClosure() {
-	try {
-	    ByteArrayOutputStream errOut = new ByteArrayOutputStream();
-	    Writer err = new OutputStreamWriter(errOut);
-	    ScriptEngine eng = (new ScriptEngineManager())
-	            .getEngineByName("php-interactive");
-	    eng.getContext().setErrorWriter(err);
-	    eng.eval("$a=new java('java.util.Vector');");
-	    eng.eval("$a->add(1);");
-	    eng.eval("$a->add(2);");
-	    try {
-		eng.eval("die();");
-	    } catch (Exception e) {
-		assertTrue(e.getMessage()
-		        .equals("php.java.bridge.Request$AbortException"));
-	    }
-	    assertTrue(eng.eval("echo $a").equals("[1, 2]"));
-	    ((Closeable) eng).close();
-	} catch (Exception e) {
-	    fail(String.valueOf(e));
-	}
-    }
 }
