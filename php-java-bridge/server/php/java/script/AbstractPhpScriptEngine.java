@@ -69,8 +69,8 @@ import php.java.fastcgi.FCGIHeaderParser;
  * @see php.java.script.PhpScriptEngine
  */
 abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
-        implements IPhpScriptEngine, Compilable, java.io.FileFilter,
-        CloneableScript, java.io.Closeable, Invocable {
+        implements IPhpScriptEngine, Compilable, CloneableScript,
+        java.io.Closeable, Invocable {
 
     protected static final char[] PHP_JAVA_CONTEXT_CALL_JAVA_CLOSURE = "<?php java_context()->call(java_closure()); ?>"
             .toCharArray();
@@ -93,9 +93,17 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 
     private ScriptEngineFactory factory = null;
 
-    protected File compilerOutputFile;
+    // protected File compilerOutputFile;
 
     private boolean isCompiled;
+    public boolean isCompiled() {
+        return isCompiled;
+    }
+
+    public void setCompiled(boolean isCompiled) {
+        this.isCompiled = isCompiled;
+    }
+
     private File scriptFile;
     protected Reader localReader;
     protected ResultProxy resultProxy;
@@ -183,27 +191,28 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
     }
 
     private String[] doGetArgs(Reader reader) throws IOException {
-	scriptFile = File.createTempFile("tmp", "php").getAbsoluteFile();
-	FileWriter writer = new FileWriter(scriptFile);
-	int count;
-	char[] cbuf = new char[Util.BUF_SIZE];
+	if (scriptFile == null) {
+	    scriptFile = File.createTempFile("tmp", "php").getAbsoluteFile();
+	    FileWriter writer = new FileWriter(scriptFile);
+	    int count;
+	    char[] cbuf = new char[Util.BUF_SIZE];
 
-	while ((count = reader.read(cbuf)) != -1) {
-	    writer.write(cbuf, 0, count);
+	    while ((count = reader.read(cbuf)) != -1) {
+		writer.write(cbuf, 0, count);
+	    }
+	    writer.close();
 	}
-	writer.close();
-	env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
-
+	if (env!=null) {
+	    env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
+	}
 	return (String[]) get(ScriptEngine.ARGV);
     }
 
     protected Object evalPhp(Reader reader, ScriptContext context)
             throws ScriptException {
-	if (isCompiled)
-	    throw new IllegalStateException("already compiled");
 
 	ScriptContext current = getContext();
-	if (reader != null)
+	if (!isCompiled && reader != null)
 	    try {
 		reader = getLocalReader(reader, true);
 	    } catch (IOException e) {
@@ -220,18 +229,19 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    return doEvalPhp(reader, current);
     }
 
-    protected void compilePhp(Reader reader) throws IOException {
+    protected void compilePhp(Reader reader)
+            throws IOException, ScriptException {
+	getArgs(getLocalReader(reader, true));
 	this.isCompiled = true;
-	getLocalReader(reader, true);
     }
 
     private void updateGlobalEnvironment(ScriptContext context)
             throws IOException {
-	if (isCompiled) {
-	    if (compilerOutputFile == null)
-		throw new NullPointerException("SCRIPT_FILENAME");
-	    env.put("SCRIPT_FILENAME", compilerOutputFile.getCanonicalPath());
-	}
+	// if (isCompiled) {
+	// if (compilerOutputFile == null)
+	// throw new NullPointerException("SCRIPT_FILENAME");
+	// env.put("SCRIPT_FILENAME", compilerOutputFile.getCanonicalPath());
+	// }
     }
 
     private final class SimpleHeaderParser extends FCGIHeaderParser {
@@ -400,6 +410,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    try {
 		continuation.release();
 		ctx.releaseManaged();
+		resultProxy.setResult(ctx.getContext().getExitCode());
 	    } catch (InterruptedException e) {
 		return;
 	    }
@@ -549,7 +560,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 
     /** {@inheritDoc} */
     public boolean accept(File outputFile) {
-	this.compilerOutputFile = outputFile;
+	// this.compilerOutputFile = outputFile;
 	return true;
     }
 
@@ -584,7 +595,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	AbstractPhpScriptEngine other = (AbstractPhpScriptEngine) getFactory()
 	        .getScriptEngine();
 	other.isCompiled = isCompiled;
-	other.compilerOutputFile = compilerOutputFile;
+	// other.compilerOutputFile = compilerOutputFile;
 	return other;
     }
 

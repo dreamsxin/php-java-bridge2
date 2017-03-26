@@ -36,21 +36,30 @@ public class CompiledPhpScript extends CompiledScript {
      * 
      */
     private final AbstractPhpScriptEngine abstractPhpScriptEngine;
-    protected CompiledPhpScript(AbstractPhpScriptEngine abstractPhpScriptEngine) {
-        super();
-        this.abstractPhpScriptEngine = abstractPhpScriptEngine;
+
+    protected CompiledPhpScript(
+            AbstractPhpScriptEngine abstractPhpScriptEngine) {
+	super();
+	this.abstractPhpScriptEngine = abstractPhpScriptEngine;
     }
+
     /** {@inheritDoc} */
     public Object eval(ScriptContext context) throws ScriptException {
-        try {
-    	return this.abstractPhpScriptEngine.doEvalPhp(this.abstractPhpScriptEngine.getLocalReader(), context);
-    	
-        } catch (Exception e) {
-    	throw new ScriptException(e);
-        }
+	if (abstractPhpScriptEngine.isCompiled()) {
+	    return this.abstractPhpScriptEngine.resultProxy;
+	}
+
+	try {
+	    return this.abstractPhpScriptEngine.doEvalPhp(
+	            this.abstractPhpScriptEngine.getLocalReader(), context);
+
+	} catch (Exception e) {
+	    throw new ScriptException(e);
+	}
     }
+
     /** {@inheritDoc} */
     public ScriptEngine getEngine() {
-        return this.abstractPhpScriptEngine;
+	return this.abstractPhpScriptEngine;
     }
 }
