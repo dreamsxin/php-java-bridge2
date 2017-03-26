@@ -40,7 +40,7 @@
 		<delete file="server/php/java/bridge/generated/LauncherWindows7.java" />
 	</target>
 
-	<target name="compile" depends="init,JavaIncJava,JavaProxyPhpJava,PhpDebuggerPHPJava,LauncherUnix,LauncherWindows">
+	<target name="compile" depends="init,JavaIncJava,JavaProxyPhpJava,PhpDebuggerPHPJava,LauncherUnix">
 		<javac srcdir="${javaSourceDir}" source="1.5" target="1.5" destdir="${javaClassDir}" debug="true" deprecation="true">
 			<exclude name="php/java/test/**/*.java" />
 			<classpath refid="compilePath" />
@@ -53,7 +53,6 @@
 				<exclude name="php/java/test/**/*.java" />
 				<include name="javax/script/*.java" />
 				<include name="php/java/bridge/global.properties" />
-				<include name="WEB-INF/cgi/launcher.c" />
 				<include name="WEB-INF/cgi/launcher.sh" />
 				<include name="WEB-INF/cgi/README.sh" />
 			</fileset>
@@ -174,14 +173,6 @@
 			<arg value="LauncherUnix" />
 			<fileset dir="${javaBaseDir}">
 				<include name="WEB-INF/cgi/launcher.sh" />
-			</fileset>
-		</apply>
-	</target>
-	<target name="LauncherWindows" depends="init">
-		<apply executable="php" failonerror="true" dir="${javaBaseDir}" parallel="true">
-			<arg value="${javaBaseDir}/buildLauncherWindows.php" />
-			<fileset dir="${javaBaseDir}">
-				<include name="WEB-INF/cgi/launcher.exe" />
 			</fileset>
 		</apply>
 	</target>

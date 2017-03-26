@@ -102,27 +102,27 @@ public abstract class FCGIFactory {
 		e.printStackTrace();
 	    }
 	}
-	File javaProxyFile = new File(cgiOsDir, "launcher.exe");
-	if (!Util.USE_SH_WRAPPER) {
-	    try {
-		if (!javaProxyFile.exists()) {
-		    OutputStream out = new FileOutputStream(javaProxyFile);
-		    for (Class c : new Class[] { Util.LAUNCHER_WINDOWS,
-		            Util.LAUNCHER_WINDOWS2, Util.LAUNCHER_WINDOWS3,
-		            Util.LAUNCHER_WINDOWS4, Util.LAUNCHER_WINDOWS5,
-		            Util.LAUNCHER_WINDOWS6, Util.LAUNCHER_WINDOWS7 }) {
-			if (c != null) {
-			    Field f = c.getField("bytes");
-			    byte[] buf = (byte[]) f.get(c);
-			    out.write(buf);
-			}
-		    }
-		    out.close();
-		}
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
-	}
+//	File javaProxyFile = new File(cgiOsDir, "launcher.exe");
+//	if (!Util.USE_SH_WRAPPER) {
+//	    try {
+//		if (!javaProxyFile.exists()) {
+//		    OutputStream out = new FileOutputStream(javaProxyFile);
+//		    for (Class c : new Class[] { Util.LAUNCHER_WINDOWS,
+//		            Util.LAUNCHER_WINDOWS2, Util.LAUNCHER_WINDOWS3,
+//		            Util.LAUNCHER_WINDOWS4, Util.LAUNCHER_WINDOWS5,
+//		            Util.LAUNCHER_WINDOWS6, Util.LAUNCHER_WINDOWS7 }) {
+//			if (c != null) {
+//			    Field f = c.getField("bytes");
+//			    byte[] buf = (byte[]) f.get(c);
+//			    out.write(buf);
+//			}
+//		    }
+//		    out.close();
+//		}
+//	    } catch (Exception e) {
+//		e.printStackTrace();
+//	    }
+//	}
 
 	startServer();
 	test();
@@ -213,17 +213,34 @@ public abstract class FCGIFactory {
 		return;
 	    try {
 		OutputStream out = proc.getOutputStream();
-		if (out != null)
-		    out.close();
-	    } catch (IOException e) {
+		out.close();
+	    } catch (Exception e) {
 		Logger.printStackTrace(e);
 	    }
+	    try {
+		InputStream in = proc.getInputStream();
+		in.close();
+	    } catch (Exception e) {
+		Logger.printStackTrace(e);
+	    }
+	    try {
+		proc.destroy();
+	    } catch (Exception e) {
+		Logger.printStackTrace(e);
+	    }
+	    try {
+		InputStream in = proc.getErrorStream();
+		in.close();
+	    } catch (Exception e) {
+		Logger.printStackTrace(e);
+	    }
+
 	    try {
 		proc.waitFor();
 	    } catch (InterruptedException e) {
 		// ignore
 	    }
-	    proc.destroy();
+
 	    proc = null;
 	}
     }
@@ -278,11 +295,8 @@ public abstract class FCGIFactory {
     public static FCGIFactory createConnectionFactory(String[] args, Map env,
             CloseableConnection fcgiConnectionPool, int maxRequests,
             boolean promiscuous) {
-	if (Util.USE_SH_WRAPPER)
 	    return new SocketFactory(args, env, fcgiConnectionPool, maxRequests,
 	            promiscuous);
-	else
-	    return new PipeFactory(args, env, fcgiConnectionPool, maxRequests);
     }
 
     /** required by IFCGIProcessFactory */
@@ -291,13 +305,13 @@ public abstract class FCGIFactory {
             throws IOException {
 	env = new HashMap(env);
 	env.put("PHP_FCGI_MAX_REQUESTS", maxRequests);
-	Object children = env.get("PHP_JAVA_BRIDGE_FCGI_CHILDREN");
+	Object children = env.get("PHP_FCGI_CHILDREN");
 	if (children == null) {
-	    env.put("PHP_JAVA_BRIDGE_FCGI_CHILDREN",
+	    env.put("PHP_FCGI_CHILDREN",
 	            FCGIUtil.PHP_FCGI_CONNECTION_POOL_SIZE);
 	} else if (Integer
 	        .parseInt(String.valueOf(children)) > THREAD_POOL_MAX_SIZE) {
-	    env.put("PHP_JAVA_BRIDGE_FCGI_CHILDREN",
+	    env.put("PHP_FCGI_CHILDREN",
 	            FCGIUtil.PHP_FCGI_CONNECTION_POOL_SIZE);
 	}
 	return new FCGIProcess.Builder().withArgs(args).withEnv(env).build();

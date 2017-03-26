@@ -143,7 +143,7 @@ Build and execution instructions:
     cd $HOME
     export REDIRECT_STATUS="200"
     export X_JAVABRIDGE_OVERRIDE_HOSTS="/"
-    export PHP_JAVA_BRIDGE_FCGI_CHILDREN="5"
+    export PHP_FCGI_CHILDREN="5"
     export PHP_FCGI_MAX_REQUESTS="5000"
     /usr/bin/php-cgi -d allow_url_include=On -b 127.0.0.1:9667
 
@@ -151,7 +151,7 @@ Build and execution instructions:
 
     set REDIRECT_STATUS "200"
     set X_JAVABRIDGE_OVERRIDE_HOSTS "/"
-    set PHP_JAVA_BRIDGE_FCGI_CHILDREN "5"
+    set PHP_FCGI_CHILDREN "5"
     set PHP_FCGI_MAX_REQUESTS "5000"
     launcher.exe php-cgi \\.\pipe\JavaBridge@9667 -d allow_url_include=On
 

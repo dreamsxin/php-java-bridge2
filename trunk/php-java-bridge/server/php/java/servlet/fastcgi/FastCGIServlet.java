@@ -55,7 +55,7 @@ import php.java.servlet.ServletUtil;
  * server on the computer. Default is Autostart.  
  * <p>The admin may start a FCGI
  * server for all users with the command:<br><code> cd /tmp<br>
- * REDIRECT_STATUS=200 X_JAVABRIDGE_OVERRIDE_HOSTS="/" PHP_JAVA_BRIDGE_FCGI_CHILDREN="5"
+ * REDIRECT_STATUS=200 X_JAVABRIDGE_OVERRIDE_HOSTS="/" PHP_FCGI_CHILDREN="5"
  * PHP_FCGI_MAX_REQUESTS="5000" /usr/bin/php-cgi -b 127.0.0.1:9667<br>
  * </code>
  * </p>
