@@ -113,9 +113,4 @@ public class FCGIUtil {
      * exitting. When one process exits, another will be created. Default is 5000.
      */
     public static final String PHP_FCGI_MAX_REQUESTS = "5000";
-
-    /**
-     * The default channel name on Windows
-     */
-    public static final String FCGI_PIPE = PipeFactory.PREFIX +"JavaBridge@9667";
 }

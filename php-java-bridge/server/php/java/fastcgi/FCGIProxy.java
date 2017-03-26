@@ -122,7 +122,11 @@ public class FCGIProxy extends Continuation {
     public void release() throws InterruptedException {
 	super.release();
 	synchronized(globalCtxLock) { //FIXME clean this up!
+	    try {
 		fcgiConnectionPool.destroy();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
 	    fcgiConnectionPool=null;
 	}
 

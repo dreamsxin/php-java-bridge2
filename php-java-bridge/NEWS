@@ -7,8 +7,11 @@ Version 7.1.1
 
 * PHP >= 5.3.0 is now required to run the bridge in FastCGI mode
 
-* FastCGI has been rewritten and is now used everywhere. As a result all PHP ScriptEngines could be 
-  removed except the "php" ScriptEngine.
+* FastCGI has been rewritten and is now used everywhere.
+
+* LauncherWindows removed. On Windows PHP 7 is now required.
+
+* 64 bit Windows php-cgi added.
 
 * The php script engine now implements the "invocable" interface.
 
