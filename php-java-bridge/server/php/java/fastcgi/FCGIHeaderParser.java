@@ -71,15 +71,20 @@ public abstract class FCGIHeaderParser {
      * @throws UnsupportedEncodingException
      * @throws IOException
      */
-    public static void parseBody(byte[] buf, InputStream natIn, OutputStream out, FCGIHeaderParser parser) throws UnsupportedEncodingException, IOException {
+    public static void parseBody(byte[] buf, InputStream natIn, OutputStream out, OutputStream err, FCGIHeaderParser parser) throws UnsupportedEncodingException, IOException {
 	int i = 0, n, s = 0;
 	boolean eoh = false;
 	boolean rn = false;
 	String remain = null;
 	String line;
-
+	boolean error = false;
+	
 	// the header and content
 	while((n = natIn.read(buf)) !=-1 ) {
+	    if (n<-1) {
+		error = true;
+		n = n*-1+1;
+	    }
 	    System.err.println("HEADER:::"+new String(buf, 0, n, "ASCII"));
 	    int N = i + n;
 	    // header
@@ -113,7 +118,7 @@ public abstract class FCGIHeaderParser {
 	    if(eoh) {
 		if(i<N) {
 		    System.err.println("BODY:::"+new String(buf, i, N-i, "ASCII")); 
-		    out.write(buf, i, N-i);
+		    (error?err:out).write(buf, i, N-i);
 		}
 	    }  else { 
 		if (remain != null) {
