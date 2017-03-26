@@ -93,7 +93,7 @@ public class FCGIProxy extends Continuation {
 	    natOut.writeParams(env);
 	    natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
 	    natOut.close(); natOut = null;
-	    FCGIHeaderParser.parseBody(buf, natIn, out, headerParser);
+	    FCGIHeaderParser.parseBody(buf, natIn, out, err, headerParser);
 	    natIn.close(); natIn = null;
 	    connection = null;
 	} catch (InterruptedException e) {
