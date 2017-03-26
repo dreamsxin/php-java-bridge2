@@ -34,18 +34,20 @@ public class TestCGI  {
 
     }
 
-    private static final String CODE = "<?php echo 'hello world'; exit(9);?>";
+    private static final String CODE = "<?php echo 'hello world'; error_log('bleh'); exit(9);?>";
 
     @Test
     public void testFastCGIRunner() throws Exception {
 	ByteArrayOutputStream out = new ByteArrayOutputStream();
+	ByteArrayOutputStream err = new ByteArrayOutputStream();
 
-	FCGIProxy fastCGIProxy = new FCGIProxy(args, env, out, System.err,
+	FCGIProxy fastCGIProxy = new FCGIProxy(args, env, out, err,
 	        FCGIHeaderParser.DEFAULT_HEADER_PARSER);
 
 	new Thread(fastCGIProxy).start();
 	fastCGIProxy.release();
 	assertEquals("hello world", out.toString());
+	assertEquals("bleh", err.toString().trim());
 
     }
 }

@@ -16,8 +16,7 @@ import org.junit.Test;
 
 public class TestGetResult {
     @Test
-    public void testDiscovery() {
-	try {
+    public void testDiscovery() throws Exception {
 	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	    String result = String.valueOf(e.eval("<?php exit(2+3);"));
 
@@ -41,9 +40,6 @@ public class TestGetResult {
 		throw new ScriptException("test failed");
 	    if (out.toString().length() == 0)
 		throw new ScriptException("test failed");
-	} catch (Exception e1) {
-	    fail(String.valueOf(e1));
-	}
     }
 
     public void testGetResult() {

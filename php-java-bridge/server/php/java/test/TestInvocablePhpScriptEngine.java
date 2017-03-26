@@ -84,50 +84,14 @@ public class TestInvocablePhpScriptEngine {
 	}
     }
 
-    @Test
-    public void testEvalCompilableString() {
-	try {
-	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
-	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-	    OutputStreamWriter writer = new OutputStreamWriter(out);
-	    e.getContext().setWriter(writer);
-	    e.getContext().getWriter();
-	    ((java.io.FileFilter) e).accept(
-	            new File(System.getProperty("java.io.tmpdir", "/tmp")
-	                    + File.separator + "test.php"));
-	    CompiledScript s = ((Compilable) e).compile("<?php echo 1+2;?>");
-
-	    long t1 = System.currentTimeMillis();
-	    for (int i = 0; i < 100; i++) {
-		s.eval();
-		((Closeable) e).close();
-		assertTrue("3".equals(out.toString()));
-		out.reset();
-	    }
-	    long t2 = System.currentTimeMillis();
-	    System.out.println(
-	            "testEvalInvocableCompilableString time:" + (t2 - t1));
-
-	} catch (Exception e) {
-	    fail(String.valueOf(e));
-	}
-    }
 
     @Test
-    public void testInvokeFunction() {
-	try {
-	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
-	    String[] args = new String[] {
-	            new File(new File("server/WEB-INF/cgi"), "php-cgi")
-	                    .getAbsolutePath() };
-	    e.put(ScriptEngine.ARGV, args);
-	    e.eval(invocableScript);
-	    assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
-	            new Object[] { "5" })).intValue());
-	    ((Closeable) e).close();
-	} catch (Exception e) {
-	    fail(String.valueOf(e));
-	}
+    public void testInvokeFunction() throws Exception {
+	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
+	e.eval(invocableScript);
+	assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
+	        new Object[] { "5" })).intValue());
+	((Closeable) e).close();
     }
 
     @Test
@@ -139,6 +103,7 @@ public class TestInvocablePhpScriptEngine {
 	assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
 	        new Object[] { "5" })).intValue());
     }
+
     @Test
     public void testInvokeFunctionCompiled() throws Exception {
 	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();

@@ -34,7 +34,7 @@ import javax.script.ScriptEngine;
  * @author jostb
  *
  */
-public interface IPhpScriptEngine extends ScriptEngine, Compilable, java.io.FileFilter {
+public interface IPhpScriptEngine extends ScriptEngine, Compilable {
     /**
      * free all resources associated with the script engine. Must be called explicitly.
      * @throws IOException
