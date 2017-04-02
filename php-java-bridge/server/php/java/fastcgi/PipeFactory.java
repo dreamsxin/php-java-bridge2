@@ -56,6 +56,7 @@ public class PipeFactory extends FCGIFactory {
     private String raPath;
     private String testRaPath;
 
+    private File testRafile;
 
     
     /**
@@ -84,6 +85,8 @@ public class PipeFactory extends FCGIFactory {
 	    return new PipeConnection(fcgiConnectionPool, maxRequests,new RandomAccessFile( raPath, "rw"));
 	} catch (IOException e) {
 	    throw new ConnectException(e);
+	} finally {
+	    testRafile.delete();
 	}
     }
     /**
@@ -139,9 +142,8 @@ public class PipeFactory extends FCGIFactory {
     public void findFreePort(boolean select) {
 	try {
 	    if(select) {
-		File testRafile = File.createTempFile("JavaBridge", ".socket");
+		testRafile = File.createTempFile("JavaBridge", ".socket");
 		testRaPath = PREFIX+testRafile.getCanonicalPath();
-		testRafile.delete();
 	    } else {
 		testRaPath  = FCGIUtil.FCGI_PIPE;
 	    }

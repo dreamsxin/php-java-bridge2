@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import php.java.bridge.Util;
 import php.java.bridge.util.Logger;
@@ -173,15 +174,9 @@ public abstract class FCGIFactory {
 	    /// make sure that the wrapper script launcher.sh does not output to
 	    /// stdout
 	    proc.getInputStream().close();
+	    proc.getErrorStream().close();
 	    // proc.OutputStream should be closed in shutdown, see
 	    // PhpCGIServlet.destroy()
-	    InputStream in = proc.getErrorStream();
-	    while ((c = in.read(buf)) != -1)
-		System.err.write(buf, 0, c);
-	    try {
-		in.close();
-	    } catch (IOException e) {
-		/* ignore */}
 	} catch (Exception e) {
 	    Logger.printStackTrace(e);
 	    lastException = e;
@@ -223,7 +218,18 @@ public abstract class FCGIFactory {
 	    } catch (InterruptedException e) {
 		// ignore
 	    }
-	    proc.destroy();
+
+	    try {
+		proc.waitFor(200, TimeUnit.MILLISECONDS);
+	    } catch (InterruptedException e) {
+		// ignore
+	    }
+	    try {
+		proc.destroy();
+	    } catch (Exception e) {
+		Logger.printStackTrace(e);
+	    }
+
 	    proc = null;
 	}
     }
