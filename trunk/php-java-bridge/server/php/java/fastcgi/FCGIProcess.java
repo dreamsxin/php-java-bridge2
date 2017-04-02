@@ -297,7 +297,7 @@ public class FCGIProcess extends java.lang.Process {
 	    }
 	    buf.addAll(java.util.Arrays.asList(Util.ALLOW_URL_INCLUDE));
 	} else {
-//	    buf.add(realPath + File.separator + "launcher.exe");
+	    buf.add(realPath + File.separator + "launcher.exe");
 	    buf.addAll(java.util.Arrays.asList(php));
 	    for (int i = 1; i < args.length; i++) {
 		buf.add(args[i]);
