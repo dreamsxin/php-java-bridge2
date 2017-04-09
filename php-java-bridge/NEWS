@@ -5,22 +5,37 @@ Please send bug reports, questions and suggestions to
 
 Version 7.1.1
 
-* PHP >= 5.3.0 is now required to run the bridge in FastCGI mode
+* On windows PHP >= 7 is now required to run the bridge in FastCGI mode. The "named pipe"
+  communication channel has been dropped.
 
-* FastCGI has been rewritten and is now used everywhere.
+* The bridge, especially fastcgi has been rewritten to become more developer-friendly.
 
-* LauncherWindows removed. On Windows PHP 7 is now required.
+* The php script engine now implements the "invocable" interface. All other engines
+  have been dropped.
 
-* 64 bit Windows php-cgi added.
+* The old JavaDoc has been dropped. The bridge should be accessed through the Java Script API. 
 
-* The php script engine now implements the "invocable" interface.
+* The PHP/Java Bridge protocol has been enhanced to send an exit code.
 
-* The PHP/Java Bridge protocol has been enhanced to send the exit code.
+* build.xml has been rewritten to use the Eclipse java compiler.
 
 * A new API function "java_eval" was introduced. It compiles PHP and executes it with an exit 
   handler in place, so that the exit code is reported to PHP script engine. (It needs the 
   tokenizer extension, which is part of the PHP core since at least 5.3.0).
 
+* If php-fpm is available, the bridge can use it. Default port is 9667
+
+* Standalone now outputs to stderr if invoked from Eclipse.
+
+* JEE deployment descriptor added for Eclipse.
+
+* Resources moved to WebContent.
+
+* To start development, go to server/php/java/test and add your
+  junit test cases there. Use the existing tests as a template (you
+  may want to ignore the "testConnectionPoolSmoke" test, which runs for 
+  ~15 minutes while trying to crash the server).
+  
 
 Version 7.0.1
 

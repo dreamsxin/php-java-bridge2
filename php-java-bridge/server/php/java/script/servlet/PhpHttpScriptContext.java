@@ -20,6 +20,7 @@ import php.java.bridge.http.ContextServer;
 import php.java.bridge.http.WriterOutputStream;
 import php.java.bridge.util.Logger;
 import php.java.bridge.util.NotImplementedException;
+import php.java.fastcgi.ConnectException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;
 import php.java.script.IPhpScriptContext;
@@ -58,7 +59,7 @@ import php.java.servlet.ServletUtil;
  * <code>
  * static final CompiledScript script = ((Compilable)(new ScriptEngineManager().getEngineByName("php-invocable"))).compile("<?php ...?>");<br>
  * <br>
- * script.eval(new php.java.script.servlet.PhpCompiledHttpScriptContext(script.getEngine().getContext(),this,application,request,response));
+ * script.eval(new php.java.script.servlet.PhpHttpScriptContext(script.getEngine().getContext(),this,application,request,response));
  * </code>
  * </blockquote>
  * 
@@ -79,22 +80,19 @@ public class PhpHttpScriptContext extends PhpScriptContextDecorator {
 	this.context = context;
 	this.servlet = servlet;
     }
-    /**{@inheritDoc}*/
-    public Continuation createContinuation(String[]args, Map env,
-            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) {
-	return null; //FIXME
-//		Continuation cont;
-//		if (isCompiled) {
-//		    ContextLoaderListener listener = ContextLoaderListener.getContextLoaderListener((ServletContext) getServletContext());
-//		    cont = new HttpFastCGIProxy(env, out,  err, headerParser, result, listener.getConnectionPool());
-//		} else 
-//		    cont = super.createContinuation(reader, env, out, err, headerParser, result, logger, isCompiled);
-//
-//		return cont;
-    }
     public void startContinuation() {
 	ContextLoaderListener listener = ContextLoaderListener.getContextLoaderListener((ServletContext) getServletContext());
 	listener.getThreadPool().start(getContinuation());
+    }
+    public Continuation createContinuation(String[] args, Map env,
+            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws ConnectException {
+	ContextLoaderListener listener = ContextLoaderListener.getContextLoaderListener((ServletContext) getServletContext());
+	return listener.createContinuation(args, env, out, err, headerParser);
+    }
+
+    @Override
+    public void destroy() {
+	// ignore
     }
     
     /** Integer value for the level of SCRIPT_SCOPE */

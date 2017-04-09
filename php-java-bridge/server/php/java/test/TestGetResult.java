@@ -14,10 +14,9 @@ import javax.script.ScriptException;
 
 import org.junit.Test;
 
-public class TestGetResult {
+public class TestGetResult extends ScriptEngineTestBase {
     @Test
     public void testDiscovery() throws Exception {
-	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	    String result = String.valueOf(e.eval("<?php exit(2+3);"));
 
 	    if (!result.equals("5"))

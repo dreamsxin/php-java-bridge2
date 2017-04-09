@@ -77,7 +77,7 @@ public abstract class JavaBridgeFactory implements IJavaBridgeFactory {
     public JavaBridge getBridge() {
 	if(bridge != null) return bridge;
 	bridge=new JavaBridge(this);
-	if(Logger.logLevel>=4) Logger.logDebug("created new bridge: " + bridge);
+	if(Logger.getLogLevel()>=4) Logger.logDebug("created new bridge: " + bridge);
 	return bridge;
     }
     /**{@inheritDoc}*/

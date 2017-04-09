@@ -41,53 +41,61 @@ import java.io.OutputStream;
  */
 
 public abstract class Connection {
-    protected int ostate, state; // bit0: input closed, bit1: output closed
     private boolean isClosed;
     private int maxRequests;
     private int counter;
-    private CloseableConnection fcgiConnectionPool;
-    
-    protected void reset() {
-        this.state = this.ostate = 0;
+
+    public int getMaxRequests() {
+	return maxRequests;
     }
+
     protected void init() {
-        counter = maxRequests; 
-        reset();
+	counter = maxRequests;
     }
-    protected Connection(CloseableConnection fcgiConnectionPool, int maxRequests) {
-        this.fcgiConnectionPool = fcgiConnectionPool;
-	this.isClosed = true;
-        this.maxRequests = maxRequests;
-        init();
+
+    protected Connection(int maxRequests) {
+	this.maxRequests = maxRequests;
+	init();
     }
-    /** Set the closed/abort flag for this connection */
-    public void setIsClosed() {
-        isClosed=true;
-        init();
+
+    public void setIsClosed() throws ConnectException {
+	init();
+	isClosed = true;
     }
+
     public boolean isClosed() {
 	return isClosed;
     }
-    protected void closeConnection() throws ConnectException {
-        // PHP child terminated: mark as closed, so that reopen() can allocate 
-        // a new connection for the new PHP child
-        if (maxRequests>0 && --counter==0) {
-            setIsClosed();
-        }
-        
-        this.fcgiConnectionPool.closeConnection(this);
-    }
+
     public abstract InputStream getInputStream() throws IOException;
-    
+
     public abstract OutputStream getOutputStream() throws IOException;
-    public abstract void close();
-    protected InputStream getInputStream(
-            InputStream in) {
+
+    public abstract void closeConnection();
+
+    protected InputStream getInputStream(InputStream in) {
 	return new FCGIInputStream(this, in);
     }
-    protected OutputStream getOutputStream(
-            OutputStream out) {
-	return new FCGIOutputStream(this, out);
+
+    protected OutputStream getOutputStream(OutputStream out) {
+	return new FCGIOutputStream(out);
     }
 
-}
+    protected boolean decrementCounter() {
+	return maxRequests > 0 && --counter == 0;
+    }
+
+    public boolean isLast() {
+	return (maxRequests>0 && counter==1);
+    }
+
+    private int id;
+    public int getId() {
+	return id;
+    }
+
+    public void setId(int id) {
+	this.id = id;
+    }
+
+ }

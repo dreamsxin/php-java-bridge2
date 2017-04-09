@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
 import php.java.bridge.Util;
 
 /*
- * Copyright (C) 2017 Jost Bökemeier
+ * Copyright (C) 2017 Jost BÃ¶kemeier
  *
  * The PHP/Java Bridge ("the library") is free software; you can
  * redistribute it and/or modify it under the terms of the GNU General
@@ -71,7 +71,7 @@ public abstract class FCGIHeaderParser {
      * @throws UnsupportedEncodingException
      * @throws IOException
      */
-    public static void parseBody(byte[] buf, InputStream natIn, OutputStream out, OutputStream err, FCGIHeaderParser parser) throws UnsupportedEncodingException, IOException {
+    public void parseBody(byte[] buf, InputStream natIn, OutputStream out, OutputStream err) throws UnsupportedEncodingException, IOException {
 	int i = 0, n, s = 0;
 	boolean eoh = false;
 	boolean rn = false;
@@ -85,7 +85,6 @@ public abstract class FCGIHeaderParser {
 		err.write(buf, 0, n);
 		continue;
 	    }
-	    System.err.println("HEADER:::"+new String(buf, 0, n, "ASCII"));
 	    int N = i + n;
 	    // header
 	    while(!eoh && i<N) {
@@ -102,7 +101,7 @@ public abstract class FCGIHeaderParser {
 			} else {
 			    line = new String(buf, s, i-s-2, Util.ASCII);
 			}
-			parser.parseHeader(line);
+			this.parseHeader(line); //addHeader
 			s=i;
 		    }
 		    rn=true;
@@ -117,7 +116,6 @@ public abstract class FCGIHeaderParser {
 	    // body
 	    if(eoh) {
 		if(i<N) {
-		    System.err.println("BODY:::"+new String(buf, i, N-i, "ASCII")); 
 		    out.write(buf, i, N-i);
 		}
 	    }  else { 

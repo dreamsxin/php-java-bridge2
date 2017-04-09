@@ -34,6 +34,7 @@ import javax.script.Bindings;
 
 import php.java.bridge.http.ContextServer;
 import php.java.bridge.util.NotImplementedException;
+import php.java.fastcgi.ConnectException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;
 
@@ -195,7 +196,7 @@ public abstract class PhpScriptContextDecorator implements IPhpScriptContext {
     }
     /**{@inheritDoc}*/
     public Continuation createContinuation(String[] args, Map env,
-            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) {
+            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws ConnectException {
 	return ctx.createContinuation(args, env, out, err, headerParser);
     }
     /**@deprecated*/
@@ -223,14 +224,21 @@ public abstract class PhpScriptContextDecorator implements IPhpScriptContext {
 	ctx.startContinuation();
     }
     
-    private int exitCode;
+    /**{@inheritDoc}*/
     @Override
     public void setExitCode(int exitCode) {
-	this.exitCode = exitCode;
+	ctx.setExitCode(exitCode);
     }
 
+    /**{@inheritDoc}*/
     @Override
     public int getExitCode() {
-	return exitCode;
+	return ctx.getExitCode();
     }
-}
+    /**{@inheritDoc}*/
+    @Override
+    public void destroy() {
+	ctx.destroy();
+    }
+
+ }

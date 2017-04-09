@@ -42,6 +42,7 @@ import php.java.bridge.http.HttpRequest;
 import php.java.bridge.http.HttpResponse;
 import php.java.bridge.http.JavaBridgeRunner;
 import php.java.bridge.util.Logger;
+import php.java.script.servlet.PhpScriptLogWriter;
 
 /**
  * This is the main entry point for the PHP/Java Bridge library.
@@ -159,7 +160,7 @@ public class JavaBridgeScriptRunner extends JavaBridgeRunner {
 	    ScriptContext ctx = engine.getContext();
 	    ctx = new PhpJavaBridgeRunnerScriptContext(ctx, this);
 	    ctx.setWriter(writer);
-	    ctx.setErrorWriter(writer);
+	    ctx.setErrorWriter(PhpScriptLogWriter.getWriter(Logger.getLogger()));
 	    if (isSecure) engine.setContext(new PhpSecureScriptContext(ctx));
 
 	    StringBuffer buf = new StringBuffer("/");

@@ -154,7 +154,7 @@ public class StandaloneJavaBridgeClassLoader extends SimpleJavaBridgeClassLoader
       	cachedPath = null;
       	try {
       	    Thread.currentThread().setContextClassLoader(scl);
-      	}catch (SecurityException e) {if (Logger.logLevel>4) Logger.printStackTrace(e);}
+      	}catch (SecurityException e) {if (Logger.getLogLevel()>4) Logger.printStackTrace(e);}
     }
     /**
      * Switch the current thread context class loader.

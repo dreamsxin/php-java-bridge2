@@ -36,8 +36,11 @@ import php.java.bridge.http.IContext;
 import php.java.bridge.http.JavaBridgeRunner;
 import php.java.bridge.util.Logger;
 import php.java.bridge.util.NotImplementedException;
+import php.java.fastcgi.ConnectException;
 import php.java.fastcgi.Continuation;
+import php.java.fastcgi.FCGIConnectionPool;
 import php.java.fastcgi.FCGIHeaderParser;
+import php.java.fastcgi.FCGIHelper;
 import php.java.fastcgi.FCGIProxy;
 
 /**
@@ -52,6 +55,8 @@ import php.java.fastcgi.FCGIProxy;
  */
 
 public final class PhpScriptContext extends AbstractPhpScriptContext {
+    private FCGIHelper helper = new FCGIHelper();
+
     public PhpScriptContext(ScriptContext ctx) {
 	super(ctx);
     }
@@ -125,10 +130,24 @@ public final class PhpScriptContext extends AbstractPhpScriptContext {
     public Map getAll() {
 	return Collections.unmodifiableMap(getBindings(IContext.ENGINE_SCOPE));
     }
+    
+    private static final Object globalCtxLock = new Object();
+    private static FCGIConnectionPool fcgiConnectionPool = null;
+    protected void setupFastCGIServer(String[] args, Map env) throws ConnectException {
+	synchronized(globalCtxLock) { //FIXME refactor
+	    if(null == fcgiConnectionPool) {
+		fcgiConnectionPool = FCGIConnectionPool.createConnectionPool(args, env, helper);
+	    }
+	}
+
+    }
+ 
+
     /**{@inheritDoc}*/
     public Continuation createContinuation(String[] args, Map env,
-            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) {
-	return new FCGIProxy(args, env, out,  err, headerParser); 
+            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws ConnectException {
+	setupFastCGIServer(args, env); 
+	return new FCGIProxy(args, env, out,  err, headerParser, fcgiConnectionPool); 
     }
     private static JavaBridgeRunner httpServer;
     private static synchronized final JavaBridgeRunner getHttpServer() {
@@ -159,5 +178,13 @@ public final class PhpScriptContext extends AbstractPhpScriptContext {
     /**{@inheritDoc}*/
     public ContextServer getContextServer() {
 	return getHttpServer().getContextServer();
+    }
+    @Override
+    public void destroy() {
+	synchronized(globalCtxLock) { //FIXME clean this up!
+	    if (fcgiConnectionPool!=null)
+		fcgiConnectionPool.destroy();
+	    fcgiConnectionPool=null;
+	}
     }
 }

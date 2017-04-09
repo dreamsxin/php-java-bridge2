@@ -10,10 +10,10 @@ public class ScriptEngineHelper {
     public static ScriptEngine getPhpScriptEngine4Test() {
 	ScriptEngineManager manager = new ScriptEngineManager();
 	ScriptEngine e = manager.getEngineByName("php");
-	String[] args = new String[] {
-	        new File(new File("server/WEB-INF/cgi"), "php-cgi")
-	                .getAbsolutePath() };
-	e.put(ScriptEngine.ARGV, args);
+	
+	// set ARGV[0] so that first element points to our PHP executable (the directory containing the machine-specific versions, actually), otherwise php-cgi must be in the PATH
+	((String[])(e.get(ScriptEngine.ARGV)))[0]=new File(new File("WebContent/WEB-INF/cgi"), "php-cgi").getAbsolutePath();
+	
 	return e;
     }
 }

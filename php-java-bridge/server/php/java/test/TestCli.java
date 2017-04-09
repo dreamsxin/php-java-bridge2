@@ -5,6 +5,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
@@ -14,11 +16,10 @@ import javax.script.ScriptException;
 
 import org.junit.Test;
 
-public class TestCli {
+public class TestCli extends ScriptEngineTestBase {
 
     @Test
-    public void testInvokeFunction() throws NoSuchMethodException, ScriptException {
-	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
+    public void testInvokeFunction() throws NoSuchMethodException, ScriptException, IOException {
 	    Invocable i = (Invocable)e;
 	    Object res = i.invokeFunction("java_eval", "<?php exit(1+2); ?>");
 	    assertEquals("3", res.toString());
@@ -40,7 +41,6 @@ public class TestCli {
 	try {
 	    ByteArrayOutputStream errOut = new ByteArrayOutputStream();
 	    Writer err = new OutputStreamWriter(errOut);
-	    ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
 	    e.getContext().setErrorWriter(err);
 	    Invocable i = (Invocable)e;

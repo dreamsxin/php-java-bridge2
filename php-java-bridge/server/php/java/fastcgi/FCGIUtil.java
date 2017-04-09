@@ -78,6 +78,11 @@ public class FCGIUtil {
     public static final int FCGI_KEEP_CONN  = 1;
 
     /**
+     * Mask for flags component of FCGI_BeginRequestBody
+     */
+    public static final int FCGI_END_CONN  = 0;
+
+    /**
      * Values for role component of FCGI_BeginRequestBody
      */
     public static final int FCGI_RESPONDER  = 1;
@@ -112,10 +117,9 @@ public class FCGIUtil {
      * This controls how many requests each child process will handle before
      * exitting. When one process exits, another will be created. Default is 5000.
      */
-    public static final String PHP_FCGI_MAX_REQUESTS = "5000";
+    public static final String PHP_FCGI_MAX_REQUESTS = "500"; //FIXME set to 5000 before release
+    
+    
+    
 
-    /**
-     * The default channel name on Windows
-     */
-    public static final String FCGI_PIPE = PipeFactory.PREFIX +"JavaBridge@9667";
 }

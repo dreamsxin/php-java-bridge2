@@ -57,9 +57,8 @@ class SocketFactory extends FCGIFactory {
     private  ServerSocket fcgiTestSocket = null;
     private  int fcgiTestPort;
 
-    public SocketFactory (String[] args, Map env, CloseableConnection fcgiConnectionPool, int maxRequests, boolean promiscuous) {
-	super(args, env, fcgiConnectionPool, maxRequests);
-	this.promiscuous = promiscuous;
+    public SocketFactory (String[] args, Map env, CloseableConnection fcgiConnectionPool, FCGIHelper helper) {
+	super(args, env, fcgiConnectionPool, helper);
     }
     @Override
     public void test() throws ConnectException {
@@ -69,7 +68,7 @@ class SocketFactory extends FCGIFactory {
 	    testSocket.close();
 	} catch (IOException e) {
 	    if (lastException != null) {
-		throw new ConnectException(String.valueOf(e), lastException);
+		throw new ConnectException(e);
 	    }
 	    throw new ConnectException(e);
 	}
@@ -100,26 +99,23 @@ class SocketFactory extends FCGIFactory {
     @Override
     public Connection connect() throws ConnectException {
 	Socket s = doConnect(getName(), getPort());
-	return new SocketConnection(fcgiConnectionPool, maxRequests, s); 	
+	return new SocketConnection(helper.getPhpFcgiMaxRequests(), s); 	
     }
     @Override
     protected void waitForDaemon() throws UnknownHostException, InterruptedException {
-	long T0 = System.currentTimeMillis();
 	int count = 15;
 	InetAddress addr = InetAddress.getByName(LOCAL_HOST);
-	if(Logger.logLevel>3) Logger.logDebug("Waiting for PHP FastCGI daemon");
+	if(Logger.getLogLevel()>3) Logger.logDebug("Waiting for PHP FastCGI daemon");
 	while(count-->0) {
 	    try {
-		System.out.println("waiting...");;
 		Socket s = new Socket(addr, getPort());
 		s.close();
 		break;
 	    } catch (IOException e) {/*ignore*/}
-	    if(System.currentTimeMillis()-16000>T0) break;
-	    Thread.sleep(1000);
+	    Thread.sleep(100);
 	}
 	if(count==-1) Logger.logError("Timeout waiting for PHP FastCGI daemon");
-	if(Logger.logLevel>3) Logger.logDebug("done waiting for PHP FastCGI daemon");
+	if(Logger.getLogLevel()>3) Logger.logDebug("done waiting for PHP FastCGI daemon");
     }
 	    
     /* Start a fast CGI Server process on this computer. Switched off per default. */
@@ -156,7 +152,7 @@ class SocketFactory extends FCGIFactory {
 	    "cd " + base + File.separator + Util.osArch + "-" + Util.osName+ "\n" + 
 	    "REDIRECT_STATUS=200 " +
 	    "X_JAVABRIDGE_OVERRIDE_HOSTS=\"/\" " +
-	    "PHP_JAVA_BRIDGE_FCGI_CHILDREN=\"5\" " +
+	    "PHP_FCGI_CHILDREN=\"5\" " +
 	    "PHP_FCGI_MAX_REQUESTS=\""+php_fcgi_max_requests+"\" /usr/bin/php-cgi -b 127.0.0.1:" +
 	    getPort()+"\n\n";
 	return msg;
@@ -181,7 +177,7 @@ class SocketFactory extends FCGIFactory {
     }
     @Override
     public void setDefaultPort() {
-	port = FCGIUtil.FCGI_PORT;
+	port = Integer.parseInt(helper.getSocketPort());
     }
     @Override
     protected void setDynamicPort() {

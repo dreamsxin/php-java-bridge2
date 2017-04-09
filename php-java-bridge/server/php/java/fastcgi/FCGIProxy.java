@@ -48,37 +48,25 @@ public class FCGIProxy extends Continuation {
 //    private static final String PROCESSES = Util.THREAD_POOL_MAX_SIZE; // PROCESSES must == Util.THREAD_POOL_MAX_SIZE
 //    private static final String MAX_REQUESTS = FCGIUtil.PHP_FCGI_MAX_REQUESTS;
     
-    private String[] args;
     protected Map env;
     protected OutputStream out;
     private OutputStream err;
     protected FCGIHeaderParser headerParser;
+    private FCGIConnectionPool fcgiConnectionPool;
     public FCGIProxy(String[] args, Map env, OutputStream out,
-            OutputStream err, FCGIHeaderParser headerParser) {
+            OutputStream err, FCGIHeaderParser headerParser, FCGIConnectionPool fcgiConnectionPool) {
 	super();
-	this.args = args;
 	this.env = env;
 	this.out = out;
 	this.err = err;
 	this.headerParser = headerParser;
+	this.fcgiConnectionPool = fcgiConnectionPool;
     }
 
-    private static final Object globalCtxLock = new Object();
-    private static FCGIConnectionPool fcgiConnectionPool = null;
-    protected void setupFastCGIServer() throws ConnectException {
-	synchronized(globalCtxLock) { //FIXME refactor
-	    if(null == fcgiConnectionPool) {
-		fcgiConnectionPool = FCGIConnectionPool.createConnectionPool(args, env);
-	    }
-	}
-
-    }
- 
 
 	Connection connection = null;
     protected void doRun() throws IOException, PhpException {
 	byte[] buf = new byte[FCGIUtil.FCGI_BUF_SIZE];
-	setupFastCGIServer(); 
 	
 	FCGIInputStream natIn = null;
 	FCGIOutputStream natOut = null;
@@ -86,24 +74,25 @@ public class FCGIProxy extends Continuation {
 	
 	try {
 	    connection = fcgiConnectionPool.openConnection();
-	    natOut = (FCGIOutputStream) connection.getOutputStream();
 	    natIn = (FCGIInputStream) connection.getInputStream();
-
-	    natOut.writeBegin();
+	    natOut = (FCGIOutputStream) connection.getOutputStream();
+	    natOut.setId(connection.getId());
+	    
+	    natOut.writeBegin(connection.isLast());
 	    natOut.writeParams(env);
 	    natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
 	    natOut.close(); natOut = null;
-	    FCGIHeaderParser.parseBody(buf, natIn, out, err, headerParser);
+	    
+	    headerParser.parseBody(buf, natIn, out, err);
+	    
 	    natIn.close(); natIn = null;
-	    connection = null;
 	} catch (InterruptedException e) {
 	    /*ignore*/
 	} catch (Throwable t) {
             Logger.printStackTrace(t);
         } finally {
-	    if(connection!=null) connection.setIsClosed(); 
-	    if(natIn!=null) try {natIn.close();} catch (IOException e) {}
-	    if(natOut!=null) try {natOut.close();} catch (IOException e) {}
+	    if(natIn!=null) connection.setIsClosed(); 
+	    fcgiConnectionPool.closeConnection(connection); connection = null;
         }
     }
 
@@ -117,15 +106,6 @@ public class FCGIProxy extends Continuation {
     /** {@inheritDoc} */
     public void log(String msg) {
 	Logger.logMessage(msg);
-    }
-
-    public void release() throws InterruptedException {
-	super.release();
-	synchronized(globalCtxLock) { //FIXME clean this up!
-		fcgiConnectionPool.destroy();
-	    fcgiConnectionPool=null;
-	}
-
     }
 
 }

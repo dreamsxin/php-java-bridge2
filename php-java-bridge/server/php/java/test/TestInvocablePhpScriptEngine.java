@@ -45,58 +45,39 @@ public class TestInvocablePhpScriptEngine {
     }
 
     @Test
-    public void testEvalReader() {
-	try {
+    public void testEvalReader() throws Exception {
 	    Reader r = new StringReader(script);
 	    assertTrue("3".equals(String.valueOf(e.eval(r))));
 	    r.close();
-	} catch (Exception e) {
-	    fail(String.valueOf(e));
-	}
     }
 
     @Test
-    public void testEvalReaderBindings() {
-	try {
+    public void testEvalReaderBindings() throws Exception {
 	    Reader r = new StringReader(script);
 	    assertTrue("3".equals(String.valueOf(e.eval(r, b))));
 	    r.close();
-	} catch (Exception e) {
-	    fail(String.valueOf(e));
-	}
     }
 
     @Test
-    public void testEvalString() {
-	try {
+    public void testEvalString() throws ScriptException {
 	    assertTrue("3".equals(String.valueOf(e.eval(script))));
-	} catch (ScriptException e) {
-	    fail(String.valueOf(e));
-	}
     }
 
     @Test
-    public void testEvalStringBindings() {
-	try {
+    public void testEvalStringBindings() throws Exception {
 	    assertTrue("3".equals(String.valueOf(e.eval(script, b))));
-	} catch (ScriptException e) {
-	    fail(String.valueOf(e));
-	}
     }
 
 
     @Test
     public void testInvokeFunction() throws Exception {
-	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	e.eval(invocableScript);
 	assertTrue(6 == ((Integer) ((Invocable) e).invokeFunction("f",
 	        new Object[] { "5" })).intValue());
-	((Closeable) e).close();
     }
 
     @Test
     public void testCompile() throws Exception {
-	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
 	CompiledScript c = ((Compilable) e).compile(invocableScript);
 	c.eval();

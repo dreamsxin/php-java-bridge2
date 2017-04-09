@@ -7,13 +7,12 @@ import javax.script.ScriptEngine;
 
 import org.junit.Test;
 
-public class TestInvocable  {
+public class TestInvocable  extends ScriptEngineTestBase {
 
 
     @Test
     public void test() throws Exception {
 
-	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
 	Object result = e
 	        .eval("<?php class f {function a($p) {return java_values($p)+1;}}\n"

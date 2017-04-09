@@ -38,12 +38,12 @@ class FileLogger implements ILogger {
     private static Object _form;
     private boolean isInit = false;
     private void init() {
-	if(Logger.logStream==null) {
-	    if((Util.DEFAULT_LOG_FILE==null) || (Util.DEFAULT_LOG_FILE.trim().length()==0))  Logger.logStream = System.err;
+	if(Logger.getLogStream()==null) {
+	    if((Util.DEFAULT_LOG_FILE==null) || (Util.DEFAULT_LOG_FILE.trim().length()==0))  Logger.setLogStream(System.err);
 	    else 
 		try {
-		    Logger.logStream=new java.io.PrintStream(new java.io.FileOutputStream(Util.DEFAULT_LOG_FILE));
-		} catch (FileNotFoundException e1) {Logger.logStream=System.err;}
+		    Logger.setLogStream(new java.io.PrintStream(new java.io.FileOutputStream(Util.DEFAULT_LOG_FILE)));
+		} catch (FileNotFoundException e1) {Logger.setLogStream(System.err);}
 	}
 	isInit = true;
     }
@@ -75,9 +75,9 @@ class FileLogger implements ILogger {
 	    Logger.printStackTrace(e);
 	    bytes = s.getBytes();
 	}
-	Logger.logStream.write(bytes, 0, bytes.length);
-	Logger.logStream.println("");
-	Logger.logStream.flush();
+	Logger.getLogStream().write(bytes, 0, bytes.length);
+	Logger.getLogStream().println("");
+	Logger.getLogStream().flush();
     }
    	
     /* (non-Javadoc)
@@ -85,13 +85,13 @@ class FileLogger implements ILogger {
      */
     public void printStackTrace(Throwable t) {
 	if(!isInit) init();
-   	if(Logger.logLevel > 0) {
+   	if(Logger.getLogLevel() > 0) {
    	    if (t instanceof Error) {
    	        Logger.println(1, "An error occured: " + t);
-   	    } else if (Logger.logLevel > 1) {
+   	    } else if (Logger.getLogLevel() > 1) {
    	        Logger.println(2, "An exception occured: " + t);
    	    }
-   	    t.printStackTrace(Logger.logStream);
+   	    t.printStackTrace(Logger.getLogStream());
    	}
     }
     /* (non-Javadoc)

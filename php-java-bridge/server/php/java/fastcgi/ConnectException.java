@@ -46,10 +46,7 @@ public class ConnectException extends IOException {
         super("Could not connect to server");
         initCause(ex);
     }
-    protected ConnectException(String reason, Exception ex) {
-        super("Could not connect to server");
-	IOException e = new IOException(reason);
-	e.initCause(ex);
-        initCause(e);
+    protected ConnectException(String reason) {
+        super("Could not connect to server: "+reason);
     }
 }

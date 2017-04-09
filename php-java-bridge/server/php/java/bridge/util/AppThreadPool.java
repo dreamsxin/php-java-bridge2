@@ -85,7 +85,7 @@ public final class AppThreadPool extends ThreadPool {
 	        terminate = true;
 	        String name = getName();
 	        setName(name+",isDaemon=true");
-	        if(Logger.logLevel>5) name+="+";
+	        if(Logger.getLogLevel()>5) name+="+";
 	        createThread(name);
 	    }
 	    end();
@@ -95,7 +95,7 @@ public final class AppThreadPool extends ThreadPool {
 	    group.unlock(); super.createThread(name); group.lock();
 	}
 	protected void terminate() {
-	    if(Logger.logLevel>4) Logger.logDebug("term (thread removed from pool): " + this);
+	    if(Logger.getLogLevel()>4) Logger.logDebug("term (thread removed from pool): " + this);
 	    ThreadGroup group = appGroup;
 	    if(group!=null) {  
 	        try {
@@ -111,7 +111,7 @@ public final class AppThreadPool extends ThreadPool {
 	}
 	protected void end() {
 	    super.end();
-	    if(Logger.logLevel>4) Logger.logDebug("end (thread returned to pool): " + this);
+	    if(Logger.getLogLevel()>4) Logger.logDebug("end (thread returned to pool): " + this);
 	    ThreadGroup group = appGroup;
 	    if(group!=null)  
 	        try {

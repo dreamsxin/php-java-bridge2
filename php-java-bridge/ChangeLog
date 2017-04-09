@@ -1,5 +1,22 @@
 2017-02-25  <jostb@intern>
 
+    * WebContent: Resources moved here
+    
+    * server/php/java/fastcgi, server/php/java/script/servlet, server/php/java/servlet/fastcgi: Rewritten
+    
+    * php-java.bridge.spec, build.xml, server/META-INF/MANIFEST.MF: Removed obsolete 
+    
+    * WebContent/WEB-INF/cgi/launcher.c: Rewritten to use PHP 7. Accept -b <port>
+    
+    * test.php, WebContent/index.php: Use include_once instead of require_once, as Java.inc may already be loaded by config option.
+    
+    * server/php/java/fastcgi/FCGIHelper.java: PHPDebugger switched off per default.
+    
+    * VERSION, php-java.bridge.spec: Release-7.1.1
+    
+    
+2017-02-25  <jostb@intern>
+
     * PhpDebugger.php: Rewritten to be called by JavaProxy.php
 
 	* JavaProxy.inc, Protocol.inc: htmlspecialchars use ISO-8859-1 for backward compatibility
@@ -286,9 +303,9 @@
 
 	* server/example-web.xml, server/WEB-INF/web.xml: Rewritten
 
-	* server/WEB-INF/cgi/launcher.c: Quote Arguments
+	* WebContent/WEB-INF/cgi/launcher.c: Quote Arguments
 
-	* server/WEB-INF/cgi/launcher.exe, server/WEB-INF/cgi/launcher.exe, server/WEB-INF/cgi/php5ts.dll, server/WEB-INF/cgi/php-cgi-i386-freebsd, server/WEB-INF/cgi/php-cgi-i386-linux, server/WEB-INF/cgi/php-cgi-x86-sunos, server/WEB-INF/cgi/php-cgi-x86-windows.exe: Updated to version 5.3.1
+	* WebContent/WEB-INF/cgi/launcher.exe, WebContent/WEB-INF/cgi/launcher.exe, WebContent/WEB-INF/cgi/php5ts.dll, WebContent/WEB-INF/cgi/php-cgi-i386-freebsd, WebContent/WEB-INF/cgi/php-cgi-i386-linux, WebContent/WEB-INF/cgi/php-cgi-x86-sunos, WebContent/WEB-INF/cgi/php-cgi-x86-windows.exe: Updated to version 5.3.1
 
 	* server/META-INF/PHPDebugger.php, server/META-INF/dummy.php: Rewritten
 
@@ -2230,13 +2247,13 @@
 	(appendParam, appendArgs): Display the parameter and argument
 	type.
 
-	* server/WEB-INF/cgi/launcher.sh: New file
+	* WebContent/WEB-INF/cgi/launcher.sh: New file
 
-	* server/WEB-INF/cgi/launcher.exe: New file
+	* WebContent/WEB-INF/cgi/launcher.exe: New file
 
-	* server/WEB-INF/cgi/launcher.c: New file
+	* WebContent/WEB-INF/cgi/launcher.c: New file
 
-	* server/WEB-INF/cgi/php-fcgi.sh: Removed
+	* WebContent/WEB-INF/cgi/php-fcgi.sh: Removed
 	
 	
 2007-02-10  Jost Boekemeier  <jostb@intern>
@@ -2329,7 +2346,7 @@
 	
 	works as expected.
 
-	* server/WEB-INF/cgi/php-fcgi.sh
+	* WebContent/WEB-INF/cgi/php-fcgi.sh
 	(read): the original bourne shell (*BSD) needs an argument to make
 	the FastCGI SAPI work.
 
@@ -2633,10 +2650,10 @@
 	compatibility. The servlet_log_level changes the request log
 	level.
 
-	* server/WEB-INF/cgi/php-cgi-i386-linux.ini: Set include_path for
+	* WebContent/WEB-INF/cgi/php-cgi-i386-linux.ini: Set include_path for
 	the pure PHP implementation.
 
-	* server/WEB-INF/cgi/php-fcgi.sh: Use read instead of cat. When
+	* WebContent/WEB-INF/cgi/php-fcgi.sh: Use read instead of cat. When
 	the bash waits for a child, the wait cannot be interrupted and all
 	signals are lost(!).
 
@@ -2787,7 +2804,7 @@
 
 	* examples/php+jsp/excel.php: Use standard mime type.
 
-	* server/WEB-INF/cgi/php-fcgi.sh: Avoid warning.
+	* WebContent/WEB-INF/cgi/php-fcgi.sh: Avoid warning.
 	
 	* VERSION, php-java-bridge.spec: Version 3.1.7 released
 
@@ -3497,7 +3514,7 @@
 	Do not set X_JAVABRIDGE_OVERRIDE_HOSTS, if this is a HTTPS
 	request.
 
-	* server/WEB-INF/cgi/php-cgi-i386-linux.ini: Added java.servlet
+	* WebContent/WEB-INF/cgi/php-cgi-i386-linux.ini: Added java.servlet
 	and java.hosts, for HTTPS requests.
 	
 2006-06-05  Jost Boekemeier  <jostb@intern>
