@@ -11,7 +11,7 @@ import javax.script.ScriptEngine;
 
 import org.junit.Test;
 
-public class TestSetWriter {
+public class TestSetWriter extends ScriptEngineTestBase {
 
     
     public static class TestWriter extends Writer {
@@ -44,7 +44,6 @@ public class TestSetWriter {
 
     @Test
     public void test() throws Exception {
-	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	ScriptContext c = e.getContext();
 	c.setWriter(new TestWriter());
 	c.setErrorWriter(new TestWriter());

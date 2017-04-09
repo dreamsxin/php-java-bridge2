@@ -14,11 +14,9 @@ import javax.script.ScriptException;
 
 import org.junit.Test;
 
-public class TestScript {
+public class TestScript extends ScriptEngineTestBase {
     @Test
     public void test() throws IOException, ScriptException {
-	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
-
 	OutputStream out = new ByteArrayOutputStream();
 	Writer w = new OutputStreamWriter(out);
 	e.getContext().setWriter(w);

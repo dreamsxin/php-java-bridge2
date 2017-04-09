@@ -1,5 +1,5 @@
 #-*- mode: rpm-spec; tab-width:4 -*-
-%define version 7.0.2
+%define version 7.1.1
 %define release 1
 %define PHP_MAJOR_VERSION %(((LANG=C rpm -q --queryformat "%{VERSION}" php) || echo "4.0.0") | tail -1 | sed 's/\\\..*$//')
 %define PHP_MINOR_VERSION %(((LANG=C rpm -q --queryformat "%{VERSION}" php) || echo "4.0.0") | tail -1 | LANG=C cut -d. -f2)
@@ -133,15 +133,6 @@ echo >filelist-devel
 
 mod_dir=`pwd`/dist
 
-files="php-script script-api"
-mkdir -p $RPM_BUILD_ROOT/%{shared_java}
-for i in $files; 
-  do cp $mod_dir/${i}.jar $RPM_BUILD_ROOT/%{shared_java}/${i}-%{version}.jar; 
-  (cd $RPM_BUILD_ROOT/%{shared_java}; ln -fs ${i}-%{version}.jar ${i}.jar;)
-  rm -f $mod_dir/$i; 
-  echo %{shared_java}/${i}-%{version}.jar >>filelist-devel
-  echo %{shared_java}/${i}.jar >>filelist-devel
-done
 cp $mod_dir/JavaBridge.jar $RPM_BUILD_ROOT/%{shared_java}/JavaBridge-%{version}.jar; 
 (cd $RPM_BUILD_ROOT/%{shared_java}; ln -fs JavaBridge-%{version}.jar JavaBridge.jar); 
 echo %{shared_java}/JavaBridge.jar >>filelist-devel

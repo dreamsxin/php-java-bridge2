@@ -59,7 +59,12 @@ public final class Util {
      * See also system property <code>php.java.bridge.max_wait</code>
      */
     public static int MAX_WAIT;
-    
+
+    /** Used by the launcher.exe for CreateProcess. This should be 16777216 (CREATE_BREAKAWAY_FROM_JOB) in order to let php-cgi.exe create a new job object.
+     * Once the main php-cgi process is killed all sub processes (see PHP_FCGI_CHILDREN) go away, too.
+     */
+    public static String LAUNCHER_FLAGS;
+
     /** The java/Java.inc code */
     public static Class JAVA_INC;
     /** The java/Java.inc code */
@@ -196,7 +201,7 @@ public final class Util {
 
     /**
      * The default log file. Default is stderr, if started as a
-     * sub-process of Apache/IIS or <code>EXTENSION_NAME</code>.log,
+     * sub-process of Apache/IIS/Eclipse or <code>EXTENSION_NAME</code>.log,
      * if started via java -jar JavaBridge.jar.
      * @see System property <code>php.java.bridge.default_log_file</code>
      */
@@ -245,13 +250,13 @@ public final class Util {
 	    LAUNCHER_UNIX = Class.forName("php.java.bridge.generated.LauncherUnix");
 	} catch (Exception e) {/*ignore*/}
 	try {
-	    LAUNCHER_WINDOWS = Class.forName("php.java.bridge.LauncherWindows");
-	    LAUNCHER_WINDOWS2 = Class.forName("php.java.bridge.LauncherWindows2");
-	    LAUNCHER_WINDOWS3 = Class.forName("php.java.bridge.LauncherWindows3");
-	    LAUNCHER_WINDOWS4 = Class.forName("php.java.bridge.LauncherWindows4");
-	    LAUNCHER_WINDOWS5 = Class.forName("php.java.bridge.LauncherWindows5");
-	    LAUNCHER_WINDOWS6 = Class.forName("php.java.bridge.LauncherWindows6");
-	    LAUNCHER_WINDOWS7 = Class.forName("php.java.bridge.LauncherWindows7");
+	    LAUNCHER_WINDOWS = Class.forName("php.java.bridge.generated.LauncherWindows");
+	    LAUNCHER_WINDOWS2 = Class.forName("php.java.bridge.generated.LauncherWindows2");
+	    LAUNCHER_WINDOWS3 = Class.forName("php.java.bridge.generated.LauncherWindows3");
+	    LAUNCHER_WINDOWS4 = Class.forName("php.java.bridge.generated.LauncherWindows4");
+	    LAUNCHER_WINDOWS5 = Class.forName("php.java.bridge.generated.LauncherWindows5");
+	    LAUNCHER_WINDOWS6 = Class.forName("php.java.bridge.generated.LauncherWindows6");
+	    LAUNCHER_WINDOWS7 = Class.forName("php.java.bridge.generated.LauncherWindows7");
 	} catch (Exception e) {/*ignore*/}
 	    
     	Properties p = new Properties();
@@ -289,6 +294,8 @@ public final class Util {
 		    
 		} catch (Exception e) { /*ignore*/ }
 	} catch (Throwable xe) {/*ignore*/}
+	
+	LAUNCHER_FLAGS = getProperty(p, "php.java.bridge.launcher_flags", "16777216");
 	try {
 	    MAX_WAIT = Integer.parseInt(getProperty(p, "php.java.bridge.max_wait", "15000"));
 	} catch (Exception e) {
@@ -361,7 +368,7 @@ public final class Util {
 	try {
 	    String s = getProperty(p, "DEFAULT_LOG_LEVEL", "3");
 	    DEFAULT_LOG_LEVEL = Integer.parseInt(s);
-	    Logger.logLevel=Util.DEFAULT_LOG_LEVEL; /* java.log_level in php.ini overrides */
+	    Logger.setLogLevel(Util.DEFAULT_LOG_LEVEL); /* java.log_level in php.ini overrides */
 	} catch (Throwable t) {/*ignore*/}
 	try {
 	    DEFAULT_LOG_FILE_SET = false;
@@ -618,7 +625,27 @@ public final class Util {
     	String path = phpFile.getParent();
     	String file = phpFile.getName();
     	
-    	StringBuffer buf = new StringBuffer();
+    	StringBuffer buf = canonicalPath(path, file);
+	
+	if (USE_SH_WRAPPER) {
+	    location = new File(buf.toString() + ".sh");
+	    if(Logger.getLogLevel()>3) Logger.logDebug("trying: " + location);
+	    if(location.exists()) return new String[] {"/bin/sh", location.getAbsolutePath()};
+	} else {
+	    location = new File(buf.toString() + ".exe");
+	    if(Logger.getLogLevel()>3) Logger.logDebug("trying: " + location);
+	    if(location.exists()) return new String[] {location.getAbsolutePath()};
+	}
+	
+	location = new File(buf.toString());
+	if(Logger.getLogLevel()>3) Logger.logDebug("trying: " + location);
+	if(location.exists()) return new String[] {location.getAbsolutePath()};
+	
+	return null;
+    }
+
+    public static StringBuffer canonicalPath(String path, String file) {
+	StringBuffer buf = new StringBuffer();
     	if (path != null) {
     	    buf.append(path);
     	    buf.append(File.separatorChar);
@@ -628,22 +655,7 @@ public final class Util {
 	buf.append(osName);
 	buf.append(File.separatorChar);
 	buf.append(file);
-	
-	if (USE_SH_WRAPPER) {
-	    location = new File(buf.toString() + ".sh");
-	    if(Logger.logLevel>3) Logger.logDebug("trying: " + location);
-	    if(location.exists()) return new String[] {"/bin/sh", location.getAbsolutePath()};
-	} else {
-	    location = new File(buf.toString() + ".exe");
-	    if(Logger.logLevel>3) Logger.logDebug("trying: " + location);
-	    if(location.exists()) return new String[] {location.getAbsolutePath()};
-	}
-	
-	location = new File(buf.toString());
-	if(Logger.logLevel>3) Logger.logDebug("trying: " + location);
-	if(location.exists()) return new String[] {location.getAbsolutePath()};
-	
-	return null;
+	return buf;
     }
 
     /**
@@ -791,24 +803,4 @@ public final class Util {
 	buf.append(".phpjavabridge");
 	return buf.toString();
     }
-    /**
-     * Destroy the thread associated with util.
-     */
-    public static void destroy () {
-//	try {
-//	    PHP_SCRIPT_ENGINE_THREAD_POOL.destroy();
-//	} catch (Exception e) {
-//	    Util.printStackTrace(e);
-//	}
-//	try {
-//	    if (fcgiConnectionPool!=null) fcgiConnectionPool.destroy();
-//	} catch (Exception e) {
-//	    Util.printStackTrace(e);
-//	}
-//	try {
-//	    JavaBridgeRunner.destroyRunner();
-//	} catch (Exception e) {
-//	    Util.printStackTrace(e);
-//	}
-    }
-}
+ }

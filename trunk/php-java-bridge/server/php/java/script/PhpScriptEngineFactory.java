@@ -112,7 +112,7 @@ public class PhpScriptEngineFactory implements ScriptEngineFactory {
     }
 
     /**{@inheritDoc}*/
-    public String getMethodCallSyntax(String obj, String m, String[] args) {
+    public String getMethodCallSyntax(String obj, String m, String... args) {
 	StringBuffer b = new StringBuffer();
 	b.append("$");
 	b.append(obj);
@@ -135,7 +135,7 @@ public class PhpScriptEngineFactory implements ScriptEngineFactory {
     }
 
     /**{@inheritDoc}*/
-    public String getProgram(String[] statements) {
+    public String getProgram(String... statements) {
 	int i=0;
 	StringBuffer b = new StringBuffer("<?php ");
       

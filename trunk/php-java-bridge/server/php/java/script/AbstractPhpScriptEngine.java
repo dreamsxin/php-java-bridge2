@@ -78,6 +78,10 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
             .toCharArray();
     protected static final char[] FOOTER = "\nJAVA_EOF;\njava_eval($java_scriptengine_script);?>"
             .toCharArray();
+    private static final String[] STANDARD_BINDING_KEYS = new String[]{ScriptEngine.ARGV, ScriptEngine.ENGINE, ScriptEngine.ENGINE_VERSION, 
+	    								ScriptEngine.FILENAME, ScriptEngine.LANGUAGE, 
+	    								ScriptEngine.LANGUAGE_VERSION,ScriptEngine.NAME};
+    
     /**
      * The allocated script
      */
@@ -121,6 +125,20 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	super();
 	this.factory = factory;
 	getContext(); // update context in parent as a side effect
+	setStandardBindings();
+    }
+    private void setStandardBindings() {
+	int i=0;
+	for (String s:STANDARD_BINDING_KEYS) {
+	    switch(i++) {
+	    case 0: getBindings(ScriptContext.ENGINE_SCOPE).put(s, new String[]{Util.PHP_EXEC==null?"php-cgi":Util.PHP_EXEC}); break;
+	    case 1: getBindings(ScriptContext.ENGINE_SCOPE).put(s, factory.getEngineName()); break;
+	    case 2: getBindings(ScriptContext.ENGINE_SCOPE).put(s, factory.getEngineVersion()); break;
+	    case 4: getBindings(ScriptContext.ENGINE_SCOPE).put(s, factory.getLanguageName()); break;
+	    case 5: getBindings(ScriptContext.ENGINE_SCOPE).put(s, factory.getLanguageVersion()); break;
+	    case 6: getBindings(ScriptContext.ENGINE_SCOPE).put(s, factory.getEngineName()); break;
+	    }
+	}
     }
 
     /**
@@ -136,6 +154,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	 * handleRedirectConnection
 	 */
 	env.put(Util.X_JAVABRIDGE_CONTEXT, ctx.getId());
+	getBindings(ScriptContext.ENGINE_SCOPE).put(STANDARD_BINDING_KEYS[3], env.get("SCRIPT_FILENAME"));
     }
 
     protected void addNewContextFactory() {
@@ -203,7 +222,9 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	if (env != null) {
 	    env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
 	}
-	return (String[]) get(ScriptEngine.ARGV);
+	String[] args = (String[]) get(ScriptEngine.ARGV);
+	if (args==null) throw new NullPointerException("ScriptEngine.ARGV must not be null");
+	return args;
     }
 
     protected Object evalPhp(Reader reader, ScriptContext context)
@@ -408,6 +429,7 @@ abstract class AbstractPhpScriptEngine extends AbstractScriptEngine
 	    try {
 		continuation.release();
 		ctx.releaseManaged();
+		
 		resultProxy.setResult(ctx.getContext().getExitCode());
 	    } catch (InterruptedException e) {
 		return;

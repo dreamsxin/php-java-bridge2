@@ -13,11 +13,10 @@ import javax.script.ScriptEngine;
 
 import org.junit.Test;
 
-public class TestExceptionInvocable2 {
+public class TestExceptionInvocable2 extends ScriptEngineTestBase {
 
     @Test
     public void test() throws Exception {
-	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	OutputStream out = new ByteArrayOutputStream();
 	Writer w = new OutputStreamWriter(out);
 	e.getContext().setWriter(w);

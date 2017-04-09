@@ -39,109 +39,111 @@ package php.java.fastcgi;
  */
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 public class FCGIConnectionPool implements CloseableConnection {
 
-    private final static int PHP_FCGI_MAX_REQUESTS = Integer.parseInt(FCGIUtil.PHP_FCGI_MAX_REQUESTS);
-    private long timeout;
     private int connections = 0;
-    private List freeList = new LinkedList();
-    private List connectionList = new LinkedList();
+    private List freeList = new ArrayList();
+    private List connectionList = new ArrayList();
     private FCGIFactory factory;
- 
-    /**
-     * Create a new connection pool.
-     * @param channelName The channel name
-     * 
-     * @param limit The max. number of physical connections
-     * @param maxRequests 
-     * @param factory A factory for creating In- and OutputStreams.
-     * @throws ConnectException 
-     * @see FCGIIOFactory
-     */
-    private FCGIConnectionPool() throws ConnectException {
-        this.timeout = -1;
+    private FCGIHelper helper;
+
+    public FCGIConnectionPool(FCGIHelper helper) {
+	this.helper = helper;
     }
-    /**
-     * Create a new connection pool.
-     * @param channelName The channel name
-     * 
-     * @param limit The max. number of physical connections
-     * @param maxRequests 
-     * @param factory A factory for creating In- and OutputStreams.
-     * @param timeout The pool timeout in milliseconds.
-     * @throws ConnectException 
-     * @see FCGIIOFactory
-     */
-    public FCGIConnectionPool(long timeout) throws ConnectException {
-	this();
-	this.timeout = timeout;
-    }
+
     /* helper for openConnection() */
     private Connection createNewConnection() throws ConnectException {
-        Connection connection = factory.connect();
-        connectionList.add(connection);
-        connections++;
-        return connection;
-    }
-    /**
-     * Opens a connection to the back end.
-     * @return The connection
-     * @throws InterruptedException
-     * @throws ConnectException 
-     */
-    public synchronized Connection openConnection() throws InterruptedException, ConnectException {
-        Connection connection;
-      	if(freeList.isEmpty() && connections<PHP_FCGI_MAX_REQUESTS) {
-      	    connection = createNewConnection();
-      	} else {
-      	    while(freeList.isEmpty()) {
-      		if (timeout > 0) {
-      		    long t1 = System.currentTimeMillis();
-      		    wait(timeout);
-      		    long t2 = System.currentTimeMillis();
-      		    long t = t2 - t1;
-      		    if (t >= timeout) throw new ConnectException(new IOException("pool timeout "+timeout+" exceeded: "+t));
-      		} else {
-      		    wait();
-      		}
-      	    }
-      	    connection = (Connection) freeList.remove(0);
-      	    connection.reset();
-      	}
-      	return reopen(connection);
-    }
-    private Connection reopen(Connection connection) throws ConnectException {
-	if(connection.isClosed()) connection = factory.connect();
+	Connection connection = factory.connect();
+	connectionList.add(connection);
+	connection.setId(connections++);
 	return connection;
     }
-    public synchronized void closeConnection(Connection connection) {
-        freeList.add(connection);
-        notify();
-    }
+
     /**
-     * Destroy the connection pool. 
+     * Opens a connection to the back end.
+     * 
+     * @return The connection
+     * @throws InterruptedException
+     * @throws ConnectException
+     */
+    public synchronized Connection openConnection()
+            throws InterruptedException, ConnectException {
+	Connection connection;
+	if (freeList.isEmpty()
+	        && connections < helper.getPhpFcgiConnectionPoolSize()) {
+	    connection = createNewConnection();
+	} else {
+	    while (freeList.isEmpty()) {
+		if (helper.getPhpFcgiConnectionPoolTimeout() > 0) {
+		    long t1 = System.currentTimeMillis();
+		    wait(helper.getPhpFcgiConnectionPoolTimeout());
+		    long t2 = System.currentTimeMillis();
+		    long t = t2 - t1;
+		    if (t >= helper.getPhpFcgiConnectionPoolTimeout())
+			throw new ConnectException(
+			        new IOException("pool timeout "
+			                + helper.getPhpFcgiConnectionPoolTimeout()
+			                + " exceeded: " + t));
+		} else {
+		    wait();
+		}
+	    }
+	    connection = (Connection) freeList.remove(0);
+	}
+	return connection;
+    }
+
+    private synchronized Connection reopen(Connection connection) throws ConnectException {
+	if (connection.decrementCounter()) {
+	    connection.setIsClosed();
+	}
+
+	if (connection.isClosed()) {
+	    int id = connection.getId();
+	    connectionList.remove(connection);
+	    connection.closeConnection();
+	    
+	    connection = factory.connect();
+	    connectionList.add(connection);
+	    connection.setId(id);
+	}
+
+	return connection;
+    }
+
+    public synchronized void closeConnection(Connection connection)
+            throws ConnectException {
+	freeList.add(reopen(connection));
+	notify();
+    }
+
+    /**
+     * Destroy the connection pool.
      * 
      * It releases all physical connections.
      *
      */
     public synchronized void destroy() {
-        for(Iterator ii = connectionList.iterator(); ii.hasNext();) {
-            Connection connection = (Connection) ii.next();
-            connection.close();
-        }
-        
-    	if(factory!=null) 
-    	    factory.destroy();
+	for (Iterator ii = connectionList.iterator(); ii.hasNext();) {
+	    Connection connection = (Connection) ii.next();
+	    connection.closeConnection();
+	    connection.setId(-1);
+	}
+
+	if (factory != null)
+	    factory.destroy();
     }
-    
-    public static FCGIConnectionPool createConnectionPool(String[] args, Map env) throws ConnectException {
-	FCGIConnectionPool pool = new FCGIConnectionPool(-1L);//FIXME timeout
-	pool.factory = FCGIFactory.createConnectionFactory(args, env, pool, PHP_FCGI_MAX_REQUESTS, false); //FIXME promiscuous;
+
+    public static FCGIConnectionPool createConnectionPool(String[] args,
+            Map env, FCGIHelper helper) throws ConnectException {
+	FCGIConnectionPool pool = new FCGIConnectionPool(helper);
+	pool.factory = FCGIFactory.createConnectionFactory(args, env, pool,
+	        helper);
 	pool.factory.startFCGIServer();
 	return pool;
     }

@@ -54,7 +54,6 @@ import php.java.bridge.http.IContext;
 import php.java.bridge.http.ISession;
 import php.java.bridge.http.ISocketFactory;
 import php.java.bridge.http.SessionFactory;
-import php.java.bridge.http.Standalone;
 import php.java.bridge.parser.ConstructorCache;
 import php.java.bridge.parser.GlobalRef;
 import php.java.bridge.parser.MethodCache;
@@ -107,7 +106,7 @@ public class JavaBridge implements Runnable {
     /**
      * For internal use only. The request log level.
      */
-    public int logLevel = Logger.logLevel;
+    public int logLevel = Logger.getLogLevel();
   
     /**
      * Return the log level:
@@ -253,7 +252,7 @@ public class JavaBridge implements Runnable {
      * @throws IOException 
      */
     public static ISocketFactory bind(String sockname) throws IOException  {
-        return Standalone.bind(Logger.logLevel, sockname);
+        return Standalone.bind(Logger.getLogLevel(), sockname);
     }
     /**
      * Global init. Redirects System.out and System.err to the server
@@ -269,17 +268,18 @@ public class JavaBridge implements Runnable {
     // called by Standalone.init()
     public static void initLog(String socket, int logLevel, String s[]) {
 	String logFile=null, rawLogFile=null;
-	
-	if(logLevel==-1) logLevel = Util.DEFAULT_LOG_LEVEL;
-	Logger.logLevel = logLevel;
 
+	if(logLevel==-1) logLevel = Util.DEFAULT_LOG_LEVEL;
+	Logger.setLogLevel(logLevel);
+
+	boolean logTostderr = s.length>0 || (System.err!=null&&System.getProperty("java.library.path","").contains("eclipse"));
 	try {
 	    try {
-		rawLogFile=logFile=s.length>0?"":Util.DEFAULT_LOG_FILE;
+		rawLogFile=logFile=logTostderr?"":Util.DEFAULT_LOG_FILE;
 		if(s.length>2) {
 		    rawLogFile=logFile=s[2];
-		    Logger.setDefaultLogger(logFile);
-		    if(Logger.logLevel>3) System.err.println(Util.EXTENSION_NAME+" log: " + rawLogFile);
+		    Logger.setLogger(logFile);
+		    if(Logger.getLogLevel()>3) System.err.println(Util.EXTENSION_NAME+" log: " + rawLogFile);
 		}
 	    }catch (Throwable t) {
 		t.printStackTrace();
@@ -290,7 +290,7 @@ public class JavaBridge implements Runnable {
 	    if(Util.VERSION != null)
 		Logger.logMessage(Util.EXTENSION_NAME+  " version             : " + Util.VERSION);
 	    Logger.logMessage("logFile             : " + rawLogFile);
-	    Logger.logMessage("default logLevel    : " + Logger.logLevel);
+	    Logger.logMessage("default logLevel    : " + Logger.getLogLevel());
 	    Logger.logMessage("socket              : " + socket);
 	    Logger.logMessage("java.ext.dirs       : " + System.getProperty("java.ext.dirs"));
 	    Logger.logMessage("php.java.bridge.base: " + Util.JAVABRIDGE_BASE);

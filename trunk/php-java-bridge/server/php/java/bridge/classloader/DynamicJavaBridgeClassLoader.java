@@ -117,10 +117,10 @@ class DynamicJavaBridgeClassLoader extends DynamicClassLoader {
         JarFile jar = new JarFile(f);
         try {
             Manifest mf = jar.getManifest();
-            if(Logger.logLevel>4) {
+            if(Logger.getLogLevel()>4) {
         	if(mf!=null) {
         	    Set main = mf.getMainAttributes().entrySet();
-        	    if(Logger.logLevel>5) Logger.logDebug("ClassLoader: loaded file: " + f + ", main attributes: " + main);
+        	    if(Logger.getLogLevel()>5) Logger.logDebug("ClassLoader: loaded file: " + f + ", main attributes: " + main);
         	}
             }
         } finally {
@@ -210,7 +210,7 @@ class DynamicJavaBridgeClassLoader extends DynamicClassLoader {
     	                    public Class loadClass(String name) throws ClassNotFoundException {                      
     	                        Class result = null;
     	                  	Object c = null;
-    	                    	if(Logger.logLevel>4) Logger.logDebug("trying to load class: " +name + " from: "+ "LOADER-ID"+System.identityHashCode(this));
+    	                    	if(Logger.getLogLevel()>4) Logger.logDebug("trying to load class: " +name + " from: "+ "LOADER-ID"+System.identityHashCode(this));
 				c = cache.get(name);
 				if (c != nf) {
 				    if (c != null)
@@ -241,14 +241,14 @@ class DynamicJavaBridgeClassLoader extends DynamicClassLoader {
     	                	
 			    }
 			    protected String findLibrary(String name) {
-				if(Logger.logLevel>4) Logger.logDebug("trying to load library: " +name + " from: "+"LOADER-ID"+System.identityHashCode(this));
+				if(Logger.getLogLevel()>4) Logger.logDebug("trying to load library: " +name + " from: "+"LOADER-ID"+System.identityHashCode(this));
 				if(!Util.IS_GNU_JAVA) throw new UnsatisfiedLinkError("This java VM can only load pure java libraries. Either use GNU java instead or move the java library to " + CLASSPATH + " and the shared library "+ name +" to "+ LD_LIBRARY_PATH);
 				String s = super.findLibrary(name);
 				if(s!=null) return s;
 				return resolveLibraryName(name);
 			    }
 			};
-			if(Logger.logLevel>4) Logger.logDebug("Added LOADER-ID"+System.identityHashCode(loader)+"\nOrigPath: " + classPath + "\nTranslated: "+ arrayToString(urls));
+			if(Logger.getLogLevel()>4) Logger.logDebug("Added LOADER-ID"+System.identityHashCode(loader)+"\nOrigPath: " + classPath + "\nTranslated: "+ arrayToString(urls));
 			return loader;
     	        }
 	    };

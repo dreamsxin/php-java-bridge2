@@ -13,13 +13,12 @@ import javax.script.ScriptException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-public class TestException  {
+public class TestException  extends ScriptEngineTestBase {
 
     // FIXME: needs protocol change to get exception through
     @Ignore
     @Test
     public void test() throws Exception {
-	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	OutputStream out = new ByteArrayOutputStream();
 	Writer w = new OutputStreamWriter(out);
 	e.getContext().setWriter(w);

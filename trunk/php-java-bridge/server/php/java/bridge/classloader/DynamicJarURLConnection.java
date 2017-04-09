@@ -59,12 +59,12 @@ class DynamicJarURLConnection extends JarURLConnection {
     protected DynamicJarURLConnection(URL u, DynamicHttpURLConnectionHandler handler) throws MalformedURLException {
 	super(u);
 	this.handler = handler;
-	if(Logger.logLevel>4) Logger.logDebug("tempfile create DynamicJarURLConnection for " + handler);	
+	if(Logger.getLogLevel()>4) Logger.logDebug("tempfile create DynamicJarURLConnection for " + handler);	
     }
     public void connect() throws IOException
     {
 	if(!connected) {
-	    if(Logger.logLevel>4) Logger.logDebug("tempfile open connection for " + handler);
+	    if(Logger.getLogLevel()>4) Logger.logDebug("tempfile open connection for " + handler);
 	    jarFileURLConnection = getJarFileURL().openConnection();
 	    jarFileURLConnection.connect();
 	    connected = true;
@@ -78,7 +78,7 @@ class DynamicJarURLConnection extends JarURLConnection {
 	if((this.headerFields = this.handler.getHeaderFields())!=null) return this.headerFields;
 	try {
 	    if(!connected) connect();
-	    if(Logger.logLevel>4) Logger.logDebug("tempfile getHeaderFields for " + handler);
+	    if(Logger.getLogLevel()>4) Logger.logDebug("tempfile getHeaderFields for " + handler);
 	    this.headerFields = new HashMap();
 	    Map headerFields = jarFileURLConnection.getHeaderFields();
 	    StringBuffer b = new StringBuffer();
@@ -119,7 +119,7 @@ class DynamicJarURLConnection extends JarURLConnection {
 	if(this.jarFile!=null) return this.jarFile;
 	if((this.jarFile = this.handler.getTempFile())!=null) return this.jarFile;
 	if(!connected) connect();
-	if(Logger.logLevel>4) Logger.logDebug("tempfile getJarFile for " + handler);
+	if(Logger.getLogLevel()>4) Logger.logDebug("tempfile getJarFile for " + handler);
 	InputStream is = jarFileURLConnection.getInputStream();
 	byte[] buf = new byte[Util.BUF_SIZE];
 	File f = File.createTempFile("cache", "jar");
@@ -151,7 +151,7 @@ class DynamicJarURLConnection extends JarURLConnection {
 	long lastModified = 0;
 	try {
 	    if(!connected) connect();
-	    if(Logger.logLevel>4) Logger.logDebug("tempfile getLastModified for " + handler);
+	    if(Logger.getLogLevel()>4) Logger.logDebug("tempfile getLastModified for " + handler);
 	    lastModified = jarFileURLConnection.getLastModified();
 	} catch (IOException e) {
 	    Logger.printStackTrace(e);

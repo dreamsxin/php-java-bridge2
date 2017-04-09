@@ -79,7 +79,7 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	}
 
 	if (scriptClosure == null) {
-	    if (Logger.logLevel > 4)
+	    if (Logger.getLogLevel() > 4)
 		Logger.warn(
 		        "Evaluating an empty script either because eval() has not been called or release() has been called.");
 	    eval(PHP_EMPTY_SCRIPT);
@@ -95,7 +95,7 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
     }
 
     /** {@inheritDoc} */
-    public Object invokeFunction(String methodName, Object[] args)
+    public Object invokeFunction(String methodName, Object... args)
             throws ScriptException, NoSuchMethodException {
 	return invoke(methodName, args);
     }
@@ -134,7 +134,7 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
     }
 
     /** {@inheritDoc} */
-    public Object invokeMethod(Object thiz, String methodName, Object[] args)
+    public Object invokeMethod(Object thiz, String methodName, Object... args)
             throws ScriptException, NoSuchMethodException {
 	return invoke(thiz, methodName, args);
     }
@@ -198,8 +198,6 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 		    Runtime.getRuntime()
 		            .addShutdownHook(new php.java.bridge.util.Thread() {
 			        public void run() {
-			            if (engines == null)
-				        return;
 			            synchronized (engines) {
 				        for (Iterator ii = engines
 				                .iterator(); ii.hasNext(); ii
@@ -207,7 +205,9 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 				            PhpScriptEngine e = (PhpScriptEngine) ii
 				                    .next();
 				            e.releaseInternal();
+				            ctx.destroy(); // FIXME: necessary? shut down the SocketContextServer
 				        }
+					((IPhpScriptContext) context).destroy(); // shut down the FastCGI Server
 			            }
 			        }
 		            });

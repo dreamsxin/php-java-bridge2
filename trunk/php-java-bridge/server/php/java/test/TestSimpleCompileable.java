@@ -1,5 +1,11 @@
 package php.java.test;
 
+import static org.junit.Assert.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.OutputStreamWriter;
+
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 
@@ -18,9 +24,14 @@ public class TestSimpleCompileable {
 
     @Test
     public void test() throws Exception {
+	ByteArrayOutputStream out = new ByteArrayOutputStream();
+	script.getEngine().getContext().setWriter(new OutputStreamWriter(out));
 	  script.getEngine().put("hello", "world!");
 	  script.eval();
 	  script.getEngine().put("hello", String.valueOf(this));
 	  script.eval();
+	  
+	  ((Closeable)(script.getEngine())).close();
+	  assertEquals("Hello world!!", out.toString());
     }
 }

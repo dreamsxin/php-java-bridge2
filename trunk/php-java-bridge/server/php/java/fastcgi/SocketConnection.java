@@ -2,6 +2,9 @@
 
 package php.java.fastcgi;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+
 /*
  * Copyright (C) 2017 Jost Bökemeier
  *
@@ -43,24 +46,31 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
+import php.java.bridge.Util;
+import php.java.bridge.util.Logger;
+
 class SocketConnection extends Connection {
-    public Socket socket;
-    public SocketConnection(CloseableConnection fcgiConnectionPool, int maxRequests, Socket socket) {
-        super(fcgiConnectionPool, maxRequests);
+    private Socket socket;
+
+    public SocketConnection(int maxRequests, Socket socket) {
+	super(maxRequests);
 	this.socket = socket;
     }
-    public void close() {
-        try {
+
+    public void closeConnection() {
+	try {
 	    socket.close();
 	} catch (IOException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    Logger.printStackTrace(e);
 	}
     }
+
     public InputStream getInputStream() throws IOException {
-        return super.getInputStream(socket.getInputStream());
+	return super.getInputStream(socket.getInputStream());
     }
+
     public OutputStream getOutputStream() throws IOException {
-        return super.getOutputStream(socket.getOutputStream());
+	return super.getOutputStream(
+	        new BufferedOutputStream(socket.getOutputStream()));
     }
 }

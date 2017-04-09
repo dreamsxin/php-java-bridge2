@@ -33,6 +33,7 @@ import php.java.bridge.IManaged;
 import php.java.bridge.http.ContextServer;
 import php.java.bridge.http.IContext;
 import php.java.bridge.parser.Invocable;
+import php.java.fastcgi.ConnectException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;
 
@@ -63,14 +64,21 @@ public interface IPhpScriptContext extends IManaged, Invocable, IContext, Script
      * @param err the fcgi error stream
      * @param headerParser fcgi header parser
      * @return the Continuation
+     * @throws ConnectException 
      */
-    public Continuation createContinuation(String[] args, Map env, OutputStream out, OutputStream err, FCGIHeaderParser headerParser);
+    public Continuation createContinuation(String[] args, Map env, OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws ConnectException;
     
     /**
      * Start the current continuation using a context-specific thread pool
      */
     public void startContinuation();
-    
+
+    /**
+     * Destroy the context. Usually called on shutdown.
+     * Will destroy the ContextServer as well.
+     */
+    public void destroy();
+
     /**
      * Get the context server associated with this context, usually a HttpServer (JavaBridgeRunner) or a ContextServer from a ContextLoaderListener
      * @return the ContextServer

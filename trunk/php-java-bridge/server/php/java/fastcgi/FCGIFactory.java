@@ -57,6 +57,7 @@ public abstract class FCGIFactory {
     protected boolean promiscuous;
     protected CloseableConnection fcgiConnectionPool;
 
+    
     /*
      * The fast CGI Server process on this computer. Switched off per default.
      */
@@ -67,7 +68,8 @@ public abstract class FCGIFactory {
 
     protected Map env;
     protected String[] args;
-    protected int maxRequests;
+//    protected int maxRequests;
+    protected FCGIHelper helper;
 
     /**
      * Create a new FCGIConnectionFactory using a FCGIProcessFactory
@@ -76,59 +78,27 @@ public abstract class FCGIFactory {
      *            the FCGIProcessFactory
      */
     public FCGIFactory(String args[], Map env,
-            CloseableConnection fcgiConnectionPool, int maxRequests) {
+            CloseableConnection fcgiConnectionPool, FCGIHelper helper) {
+	if (args==null) throw new NullPointerException("args");
 	this.args = args;
 	this.env = env;
 	this.fcgiConnectionPool = fcgiConnectionPool;
-	this.maxRequests = maxRequests;
+	this.helper = helper;
     }
 
     public void startFCGIServer() throws ConnectException {
 
-	findFreePort(true); // FIXME
+	findFreePort(!helper.isExternalFCGIPool());
 	initialize();
 
 	File cgiOsDir = Util.TMPDIR;
-	File javaIncFile = new File(cgiOsDir, "launcher.sh");
-	if (Util.USE_SH_WRAPPER) {
-	    try {
-		if (!javaIncFile.exists()) {
-		    Field f = Util.LAUNCHER_UNIX.getField("bytes");
-		    byte[] buf = (byte[]) f.get(Util.LAUNCHER_UNIX);
-		    OutputStream out = new FileOutputStream(javaIncFile);
-		    out.write(buf);
-		    out.close();
-		}
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
-	}
-	File javaProxyFile = new File(cgiOsDir, "launcher.exe");
-	if (!Util.USE_SH_WRAPPER) {
-	    try {
-		if (!javaProxyFile.exists()) {
-		    OutputStream out = new FileOutputStream(javaProxyFile);
-		    for (Class c : new Class[] { Util.LAUNCHER_WINDOWS,
-		            Util.LAUNCHER_WINDOWS2, Util.LAUNCHER_WINDOWS3,
-		            Util.LAUNCHER_WINDOWS4, Util.LAUNCHER_WINDOWS5,
-		            Util.LAUNCHER_WINDOWS6, Util.LAUNCHER_WINDOWS7 }) {
-			if (c != null) {
-			    Field f = c.getField("bytes");
-			    byte[] buf = (byte[]) f.get(c);
-			    out.write(buf);
-			}
-		    }
-		    out.close();
-		}
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
-	}
+	helper.createLauncher(cgiOsDir);
 
 	startServer();
 	test();
 
     }
+
 
     /**
      * Start the FastCGI server
@@ -174,9 +144,10 @@ public abstract class FCGIFactory {
 	    /// make sure that the wrapper script launcher.sh does not output to
 	    /// stdout
 	    proc.getInputStream().close();
-	    proc.getErrorStream().close();
 	    // proc.OutputStream should be closed in shutdown, see
 	    // PhpCGIServlet.destroy()
+	    InputStream in = proc.getErrorStream();
+	    try { while((c=in.read(buf))!=-1) Logger.logError(new String(buf, 0, c)); } finally { try { in.close(); } catch (IOException e) {/*ignore*/} }
 	} catch (Exception e) {
 	    Logger.printStackTrace(e);
 	    lastException = e;
@@ -282,13 +253,8 @@ public abstract class FCGIFactory {
      * @return The concrete ChannelFactory (NP or Socket channel factory).
      */
     public static FCGIFactory createConnectionFactory(String[] args, Map env,
-            CloseableConnection fcgiConnectionPool, int maxRequests,
-            boolean promiscuous) {
-	if (Util.USE_SH_WRAPPER)
-	    return new SocketFactory(args, env, fcgiConnectionPool, maxRequests,
-	            promiscuous);
-	else
-	    return new PipeFactory(args, env, fcgiConnectionPool, maxRequests);
+            CloseableConnection fcgiConnectionPool, FCGIHelper helper) {
+	    return new SocketFactory(args, env, fcgiConnectionPool, helper);
     }
 
     /** required by IFCGIProcessFactory */
@@ -296,14 +262,14 @@ public abstract class FCGIFactory {
     protected FCGIProcess createFCGIProcess(String[] args, Map env)
             throws IOException {
 	env = new HashMap(env);
-	env.put("PHP_FCGI_MAX_REQUESTS", maxRequests);
-	Object children = env.get("PHP_JAVA_BRIDGE_FCGI_CHILDREN");
+	env.put("PHP_FCGI_MAX_REQUESTS", helper.getPhpFcgiMaxRequests());
+	Object children = env.get("PHP_FCGI_CHILDREN");
 	if (children == null) {
-	    env.put("PHP_JAVA_BRIDGE_FCGI_CHILDREN",
+	    env.put("PHP_FCGI_CHILDREN",
 	            FCGIUtil.PHP_FCGI_CONNECTION_POOL_SIZE);
 	} else if (Integer
 	        .parseInt(String.valueOf(children)) > THREAD_POOL_MAX_SIZE) {
-	    env.put("PHP_JAVA_BRIDGE_FCGI_CHILDREN",
+	    env.put("PHP_FCGI_CHILDREN",
 	            FCGIUtil.PHP_FCGI_CONNECTION_POOL_SIZE);
 	}
 	return new FCGIProcess.Builder().withArgs(args).withEnv(env).build();

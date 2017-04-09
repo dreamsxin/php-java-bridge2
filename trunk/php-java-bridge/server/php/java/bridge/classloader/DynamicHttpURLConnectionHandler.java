@@ -40,14 +40,14 @@ class DynamicHttpURLConnectionHandler extends URLStreamHandler {
     private Map headerFields;
 
     public DynamicHttpURLConnectionHandler() {
-	if(Logger.logLevel>4) Logger.logDebug("tempfile create DynamicHttpURLConnectionHander " + this);
+	if(Logger.getLogLevel()>4) Logger.logDebug("tempfile create DynamicHttpURLConnectionHander " + this);
     }
     protected URLConnection openConnection(URL u) throws IOException {
 	return new DynamicJarURLConnection(u, this);
     }
 
     public void deleteTempFile() {
-	if(Logger.logLevel>4) Logger.logDebug("classloader tempfile deleted: " + baseFile + " handler: " + this);
+	if(Logger.getLogLevel()>4) Logger.logDebug("classloader tempfile deleted: " + baseFile + " handler: " + this);
 	baseFile.delete();
     }
     public Map getHeaderFields() {
@@ -57,7 +57,7 @@ class DynamicHttpURLConnectionHandler extends URLStreamHandler {
 	return jarFile;
     }
     public void setTempFile(JarFile jarFile, File baseFile) {
-	if(Logger.logLevel>4) Logger.logDebug("classloader tempfile created: " + baseFile + " handler" + this);
+	if(Logger.getLogLevel()>4) Logger.logDebug("classloader tempfile created: " + baseFile + " handler" + this);
 	this.jarFile = jarFile;
 	this.baseFile = baseFile;
     }

@@ -87,7 +87,7 @@ public class DynamicClassLoader extends SecureClassLoader {
     }
 
     static void debugMsg(String str) {
-	if(Logger.logLevel>5) Logger.logDebug((System.currentTimeMillis()-debugStart)+"::"+str);
+	if(Logger.getLogLevel()>5) Logger.logDebug((System.currentTimeMillis()-debugStart)+"::"+str);
     }
 
     static void clearCache() {
@@ -108,7 +108,7 @@ public class DynamicClassLoader extends SecureClassLoader {
      * @param classpath
      */
     public static void invalidate(String classpath) {
-	if(Logger.logLevel>5) Logger.logDebug("DynamicClassLoader.invalidate("+classpath+")\n");
+	if(Logger.getLogLevel()>5) Logger.logDebug("DynamicClassLoader.invalidate("+classpath+")\n");
 	classLoaderCache.remove(classpath);
     }
 
@@ -199,7 +199,7 @@ public class DynamicClassLoader extends SecureClassLoader {
     }
 
     protected void clearLoader() {
-      if(Logger.logLevel>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").clear()\n");
+      if(Logger.getLogLevel()>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").clear()\n");
 	classLoaders.clear();
 	classPaths.clear();
 	urlsToAdd.clear();
@@ -248,7 +248,7 @@ public class DynamicClassLoader extends SecureClassLoader {
     }
 
     protected URLClassLoaderEntry realAddURLs(String classPath, URL urls[]) {
-        if(Logger.logLevel>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").realAddURLs(\""+classPath+"\","+getStringFromURLArray(urls)+")\n");
+        if(Logger.getLogLevel()>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").realAddURLs(\""+classPath+"\","+getStringFromURLArray(urls)+")\n");
 	URLClassLoaderEntry entry = getClassPathFromCache(classPath);
 	if (entry==null) {
 	    entry = createURLClassLoader(classPath, urls);
@@ -271,7 +271,7 @@ public class DynamicClassLoader extends SecureClassLoader {
     }
 
     protected void lazyAddURLs(String classPath, URL urls[]) {
-        if(Logger.logLevel>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").lazyAddURLs(\""+classPath+"\","+getStringFromURLArray(urls)+")\n");
+        if(Logger.getLogLevel()>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").lazyAddURLs(\""+classPath+"\","+getStringFromURLArray(urls)+")\n");
 	Object params[] = new Object[] {classPath, urls};
 	urlsToAdd.add(params);
     }
@@ -327,7 +327,7 @@ public class DynamicClassLoader extends SecureClassLoader {
 	    start();
 	}
 	public void run() {
-            if (Logger.logLevel>5) 
+            if (Logger.getLogLevel()>5) 
         	    System.out.println ("lifecycle: init observer "+System.identityHashCode(DynamicClassLoader.class));
 
 	    try {
@@ -338,10 +338,10 @@ public class DynamicClassLoader extends SecureClassLoader {
 		    DELETE_TEMP_FILE_ACTIONS.remove(action);
 		}
             } catch (InterruptedException e) {
-		if (Logger.logLevel>5) 
+		if (Logger.getLogLevel()>5) 
 			System.out.println ("lifecycle: observer got interrupt"+System.identityHashCode(SessionFactory.class));
 	    }
-            if (Logger.logLevel>5) 
+            if (Logger.getLogLevel()>5) 
         	    System.out.println ("lifecycle: observer terminating "+System.identityHashCode(DynamicClassLoader.class));
 	}
     }
@@ -358,7 +358,7 @@ public class DynamicClassLoader extends SecureClassLoader {
 	    super(arg0, arg1);
 	    this.handlers = handlers;
 	    DELETE_TEMP_FILE_ACTIONS.add(this);
-	    if(Logger.logLevel>4) {
+	    if(Logger.getLogLevel()>4) {
 		int count = 0, orphaned = 0;
 		for(Iterator ii = DELETE_TEMP_FILE_ACTIONS.iterator(); ii.hasNext(); ) {
 		    SoftReference val = (SoftReference) ii.next();
@@ -405,7 +405,7 @@ public class DynamicClassLoader extends SecureClassLoader {
     protected URLClassLoaderEntry createURLClassLoader(String classPath, URL urls[]) {
 	List handlers = new LinkedList();
 	urls = rewriteURLs(urls, handlers);
-        if(Logger.logLevel>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").createURLClassLoader(\""+classPath+"\","+getStringFromURLArray(urls)+")\n");
+        if(Logger.getLogLevel()>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").createURLClassLoader(\""+classPath+"\","+getStringFromURLArray(urls)+")\n");
 	URLClassLoader cl = factory.createUrlClassLoader(classPath, urls, this.getParent());
 	URLClassLoaderEntry entry = new URLClassLoaderEntry(cl, System.currentTimeMillis());
 	SoftReference cacheEntry = getReference(entry, handlers);
@@ -451,8 +451,8 @@ public class DynamicClassLoader extends SecureClassLoader {
      */
     public Class loadClass(String name) throws ClassNotFoundException {
 	Class result = null;
-	if(Logger.logLevel>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").loadClass("+name+")\n");
-	if(Logger.logLevel>5) Logger.logDebug("Trying parent\n");
+	if(Logger.getLogLevel()>5) Logger.logDebug("DynamicClassLoader("+System.identityHashCode(this)+").loadClass("+name+")\n");
+	if(Logger.getLogLevel()>5) Logger.logDebug("Trying parent\n");
 	Object c = null;
 	synchronized(parentCache) {
 	    c = parentCache.get(name);
@@ -464,7 +464,7 @@ public class DynamicClassLoader extends SecureClassLoader {
 	URLClassLoaderEntry e = null;
 	while (iter.hasNext()) {
 	    e = (URLClassLoaderEntry) classLoaders.get(iter.next());
-	    if(Logger.logLevel>5) Logger.logDebug("Trying "+(System.identityHashCode(e.cl)+"\n"));
+	    if(Logger.getLogLevel()>5) Logger.logDebug("Trying "+(System.identityHashCode(e.cl)+"\n"));
 	    synchronized(e.cache) {
 		c = e.cache.get(name);
 		if (c!=nf) {
@@ -481,7 +481,7 @@ public class DynamicClassLoader extends SecureClassLoader {
 	}
 	e = addDelayedURLs();
 	while (e!=null) {
-	    if(Logger.logLevel>5) Logger.logDebug("Trying "+(System.identityHashCode(e.cl)+"\n"));
+	    if(Logger.getLogLevel()>5) Logger.logDebug("Trying "+(System.identityHashCode(e.cl)+"\n"));
 	    synchronized(e.cache) {
 		c = e.cache.get(name);
 		if (c!=nf) {

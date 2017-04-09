@@ -47,11 +47,4 @@ public class PhpCompiledScriptContext extends PhpScriptContextDecorator {
     public PhpCompiledScriptContext(IPhpScriptContext ctx) {
 	super(ctx);
     }
-
-    /** {@inheritDoc} */
-    public Continuation createContinuation(String[] args, Map env,
-            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) {
-	//FIXME
-	return super.createContinuation(args, env, out, err, headerParser);
-    }
 }

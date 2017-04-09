@@ -61,7 +61,7 @@ public class ResultProxy extends Number {
      * @return the result code from PHP
      */
     public String toString() {
-	if (Logger.logLevel>3) return "DEBUG WARNING: toString() did not terminate script because logLevel > 3!";
+	if (Logger.getLogLevel()>3) return "DEBUG WARNING: toString() did not terminate script because logLevel > 3!";
 	return String.valueOf(getResult());
     }
 

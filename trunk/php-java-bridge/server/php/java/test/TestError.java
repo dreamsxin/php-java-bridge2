@@ -11,11 +11,10 @@ import javax.script.ScriptEngine;
 
 import org.junit.Test;
 
-public class TestError {
+public class TestError extends ScriptEngineTestBase {
 
     @Test
     public void test() throws Exception {
-	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	OutputStream out = new ByteArrayOutputStream();
 	OutputStream err = new ByteArrayOutputStream();
 	Writer ou = new OutputStreamWriter(out);
