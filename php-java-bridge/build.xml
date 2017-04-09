@@ -219,7 +219,16 @@
 	</target>
 	<target name="JavaBridgeWar" depends="JavaBridgeJar,PhpServletJar,JavaInc,JavaProxyPhp,init">
 		<war destfile="${distDir}/JavaBridge.war" webxml="${webContentDir}/WEB-INF/web.xml">
-			<fileset dir="${webContentDir}">
+            <manifest>
+                <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
+                <attribute name="Rsrc-Main-Class" value="php.java.bridge.TestInstallation"/>
+                <attribute name="Class-Path" value="."/>
+                <attribute name="Rsrc-Class-Path" value="./ JavaBridge.jar"/>
+            </manifest>
+            <zipfileset src="jar-in-jar-loader.zip"/>
+			<zipfileset prefix="WEB-INF/lib" dir="${distDir}" />
+		    
+						<fileset dir="${webContentDir}">
 				<include name="WEB-INF/weblogic.xml" />
 			</fileset>
 			<fileset dir="${javaClassDir}">
