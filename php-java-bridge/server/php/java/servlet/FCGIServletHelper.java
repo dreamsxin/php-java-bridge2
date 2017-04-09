@@ -118,7 +118,7 @@ public class FCGIServletHelper extends FCGIHelper {
 	    e.printStackTrace();
 	}
 
-	createLauncher(cgiOsDir);
+	createLauncher(cgiOsDir.getParentFile());
 
 	boolean exeExists = true;
 	if (Util.USE_SH_WRAPPER) {
@@ -369,7 +369,7 @@ public class FCGIServletHelper extends FCGIHelper {
 	    /* ignore */}
 
 	val = null;
-	phpIncludeDebugger = true;
+	phpIncludeDebugger = false;
 	try {
 	    val = context.getInitParameter("php_include_debugger");
 	    if (val == null)
@@ -377,9 +377,9 @@ public class FCGIServletHelper extends FCGIHelper {
 	    if (val == null)
 		val = System
 		        .getProperty("php.java.bridge.php_include_debugger");
-	    if (val != null && (val.equalsIgnoreCase("off")
-	            || val.equalsIgnoreCase("false")))
-		phpIncludeDebugger = false;
+	    if (val != null && (val.equalsIgnoreCase("on")
+	            || val.equalsIgnoreCase("true")))
+		phpIncludeDebugger = true;
 	} catch (Throwable t) {
 	    /* ignore */}
 
