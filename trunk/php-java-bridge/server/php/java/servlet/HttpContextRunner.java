@@ -84,7 +84,7 @@ final class HttpContextRunner implements Serializable {
     }
 
     private boolean init() throws IOException {
-	if(Logger.logLevel>4) Logger.logDebug("starting a new ContextRunner " + this);
+	if(Logger.getLogLevel()>4) Logger.logDebug("starting a new ContextRunner " + this);
 	out = channel.getOuptutStream();
 	in = channel.getInputStream();
 
@@ -119,7 +119,7 @@ final class HttpContextRunner implements Serializable {
 	    else
 		Logger.warn("context runner init failed");
 	} catch (IOException e) {
-	    if(Logger.logLevel>4) Logger.printStackTrace(e);
+	    if(Logger.getLogLevel()>4) Logger.printStackTrace(e);
         } catch (Exception e) {
     	    Logger.printStackTrace(e);
         } finally {

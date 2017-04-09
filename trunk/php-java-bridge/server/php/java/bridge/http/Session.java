@@ -117,7 +117,7 @@ class Session implements ISession {
 		if((ref.timeout >0) && (ref.lastAccessedTime+ref.timeout<=System.currentTimeMillis())) {
 		    sessionCount--;
 		    e.remove();
-		    if(Logger.logLevel>3) Logger.logDebug("Session " + ref.name + " expired.");
+		    if(Logger.getLogLevel()>3) Logger.logDebug("Session " + ref.name + " expired.");
 		}
 	    }
 	}
@@ -134,7 +134,7 @@ class Session implements ISession {
 		Session ref = (Session)e.next();
 		sessionCount--;
 		e.remove();
-		if(Logger.logLevel>3) Logger.logDebug("Session " + ref.name + " destroyed.");
+		if(Logger.getLogLevel()>3) Logger.logDebug("Session " + ref.name + " destroyed.");
 	    }
 	}
   	

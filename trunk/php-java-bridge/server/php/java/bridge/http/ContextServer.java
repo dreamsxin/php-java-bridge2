@@ -6,22 +6,6 @@ import php.java.bridge.Util;
 import php.java.bridge.util.AppThreadPool;
 import php.java.bridge.util.ILogger;
 
-/**
- * A bridge pattern which either uses the PipeContextServer or the SocketContextServer, 
- * depending on the OS and/or the security restrictions. On windows, which cannot use named pipes,
- * a SocketContextServer is used. All other operating systems use a PipeContextServer unless the 
- * system property php.java.bridge.promiscuous is set to true or the system property
- * php.java.bridge.no_pipe_server is set to true.
- * <p>
- * A ContextServer instance represents the current web context. 
- * When the PipeContextServer is used, there can be more than one PipeContextServer instance per classloader, the ContextFactory.get() checks
- * if it is called with the same ContextServer and throws a SecurityException otherwise. So one cannot access contexts belonging to other web contexts.
- * </p><p>
- * The SocketContextServer uses only one server socket for all shared web contexts and cannot do any security checks.
- * </p>
- * @author jostb
- * @see php.java.bridge.http.SocketContextServer
- */
 public final class ContextServer {
     private String contextName;
     private boolean promiscuous;

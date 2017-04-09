@@ -98,12 +98,12 @@ public class SimpleContextFactory implements IContextFactoryVisitor {
      * @throws InterruptedException 
      */
     public synchronized void releaseManaged() throws InterruptedException {
-	if(Logger.logLevel>4) Logger.logDebug("contextfactory: servlet is waiting for ContextRunner " +System.identityHashCode(this));
+	if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: servlet is waiting for ContextRunner " +System.identityHashCode(this));
 	if (isContextRunnerRunning) {
 	    while(isValid) wait();
-	    if(Logger.logLevel>4) Logger.logDebug("contextfactory: servlet done waiting for ContextRunner " +System.identityHashCode(this));
+	    if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: servlet done waiting for ContextRunner " +System.identityHashCode(this));
 	} else {
-	    if(Logger.logLevel>4) Logger.logDebug("contextfactory: servlet done w/o ContextRunner " +System.identityHashCode(this));
+	    if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: servlet done w/o ContextRunner " +System.identityHashCode(this));
 	    if (isManaged)
 		destroy();
 	    else
@@ -116,11 +116,11 @@ public class SimpleContextFactory implements IContextFactoryVisitor {
      * @throws InterruptedException 
      */
     public synchronized void waitFor(long timeout) throws InterruptedException {
-	if(Logger.logLevel>4) Logger.logDebug("contextfactory: servlet waitFor() ContextFactory " +System.identityHashCode(this) + " for " +timeout+" ms");
+	if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: servlet waitFor() ContextFactory " +System.identityHashCode(this) + " for " +timeout+" ms");
 	if (isValid) wait(timeout);
-	if(Logger.logLevel>4) Logger.logDebug("contextfactory: servlet waitFor() ContextRunner " +System.identityHashCode(this));
+	if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: servlet waitFor() ContextRunner " +System.identityHashCode(this));
 	if (isContextRunnerRunning && isValid) wait();
-	if(Logger.logLevel>4) Logger.logDebug("contextfactory: servlet done waitFor() ContextRunner " +System.identityHashCode(this));
+	if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: servlet done waitFor() ContextRunner " +System.identityHashCode(this));
     }    
     /**{@inheritDoc}*/
     public String getId() { 

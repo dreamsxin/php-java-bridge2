@@ -119,7 +119,7 @@ public final class ContextFactory extends SessionFactory implements IContextFact
     }
     private static synchronized void remove(String id) {
 	ContextFactory ob = (ContextFactory) liveContexts.remove(id);
-        if(Logger.logLevel>4) Logger.logDebug("contextfactory: removed context: " + (ob==null?"already handled":String.valueOf(ob.visitor)) + ", # of contexts: " + contexts.size());
+        if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: removed context: " + (ob==null?"already handled":String.valueOf(ob.visitor)) + ", # of contexts: " + contexts.size());
     }
     private static synchronized ContextFactory moveContext(String id) {
         Object o;
@@ -137,7 +137,7 @@ public final class ContextFactory extends SessionFactory implements IContextFact
       super();
       timestamp = System.currentTimeMillis();
       id=addNext(webContext, this, isManaged);
-      if(Logger.logLevel>4) Logger.logDebug("contextfactory: new context: " + id + " for web context" + webContext + ", # of contexts: " + contexts.size());
+      if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: new context: " + id + " for web context" + webContext + ", # of contexts: " + contexts.size());
     }
 
     /**
@@ -190,7 +190,7 @@ public final class ContextFactory extends SessionFactory implements IContextFact
 	JavaBridge newBridge = factory.checkBridge();
 	if(newBridge == null) throw new IllegalStateException("recycle empty context");
 
-	if(Logger.logLevel>4) Logger.logDebug("contextfactory: setting new bridge. visited: " + bridge.getFactory() + " <= visitor: " + newBridge.getFactory()); 
+	if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: setting new bridge. visited: " + bridge.getFactory() + " <= visitor: " + newBridge.getFactory()); 
 
 	// For historical and performance reasons the bridge keeps direct references to the threadContextClassLoader
 	// and the i/o channels, so we have to keep it.
@@ -209,9 +209,9 @@ public final class ContextFactory extends SessionFactory implements IContextFact
 	thiz.accept(factory.visitor);
 	thiz.visitor.initialize();
 	
-	if(Logger.logLevel>4) Logger.logDebug("contextfactory: " +thiz + " is swiching thread context" );
+	if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: " +thiz + " is swiching thread context" );
 
-	if(Logger.logLevel>4) Logger.logDebug("contextfactory: accepted visitor: " + factory.visitor);
+	if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: accepted visitor: " + factory.visitor);
     }
 
     /**{@inheritDoc}*/  
@@ -222,13 +222,13 @@ public final class ContextFactory extends SessionFactory implements IContextFact
      * Called before destroy()
      */    
     public void recycle() {
-	if(Logger.logLevel>=4) Logger.logDebug("contextfactory: finish context called (recycle context factory) " + this.visitor);
+	if(Logger.getLogLevel()>=4) Logger.logDebug("contextfactory: finish context called (recycle context factory) " + this.visitor);
 	super.recycle();
     }
     
     /**{@inheritDoc}*/  
     public void destroy() {
-	if(Logger.logLevel>4) Logger.logDebug("contextfactory: context destroyed (remove context factory): " +visitor);
+	if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: context destroyed (remove context factory): " +visitor);
 	remove(getId());
 	super.destroy();
 	visitor.invalidate();
@@ -266,7 +266,7 @@ public final class ContextFactory extends SessionFactory implements IContextFact
         for(Iterator ii=contexts.values().iterator(); ii.hasNext();) {
 	    ContextFactory ctx = ((ContextFactory)ii.next());
 	    ctx.visitor.invalidate();
-	    if(Logger.logLevel>4) Logger.logDebug("contextfactory: Orphaned context: " + ctx.visitor + " removed.");
+	    if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: Orphaned context: " + ctx.visitor + " removed.");
 	    ii.remove();
 	}
 	for(Iterator ii=contexts.values().iterator(); ii.hasNext();) {
@@ -343,7 +343,7 @@ public final class ContextFactory extends SessionFactory implements IContextFact
     /**{@inheritDoc}*/  
     public synchronized void release() {
 	ContextFactory ob = (ContextFactory) contexts.remove(id);
-        if(Logger.logLevel>4) Logger.logDebug("contextfactory: released empty context: " + (ob!=null?String.valueOf(ob.visitor):"<already handled>") + ", # of contexts: " + contexts.size()+", # of live contexts: "+ liveContexts.size());
+        if(Logger.getLogLevel()>4) Logger.logDebug("contextfactory: released empty context: " + (ob!=null?String.valueOf(ob.visitor):"<already handled>") + ", # of contexts: " + contexts.size()+", # of live contexts: "+ liveContexts.size());
     }
     /**{@inheritDoc}*/  
     public void initialize() {
