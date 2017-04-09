@@ -142,7 +142,7 @@ public class SessionFactory extends JavaBridgeFactory {
             jobs.add(r);
         }
         public void interrupt () {
-	    if (Logger.logLevel>5)
+	    if (Logger.getLogLevel()>5)
 		    System.out.println ("lifecycle: sending session timer interrupt " + +System.identityHashCode(SessionFactory.class));
 
 	    thread.interrupt();
@@ -159,10 +159,10 @@ public class SessionFactory extends JavaBridgeFactory {
                     }
                 }
             } catch (InterruptedException e) {
-		if (Logger.logLevel>5) 
+		if (Logger.getLogLevel()>5) 
 		    System.out.println ("lifecycle: session timer got interrupt"+System.identityHashCode(SessionFactory.class));
 	    }
-	    if (Logger.logLevel>5) 
+	    if (Logger.getLogLevel()>5) 
 		    System.out.println ("lifecycle: session timer terminating"+System.identityHashCode(SessionFactory.class));
         }
     }

@@ -105,7 +105,7 @@ public class ContextRunner implements Runnable {
     }
 
     protected boolean init() throws IOException {
-	if(Logger.logLevel>4) Logger.logDebug("starting a new ContextRunner " + this);
+	if(Logger.getLogLevel()>4) Logger.logDebug("starting a new ContextRunner " + this);
 	out = channel.getOuptutStream();
 	in = channel.getInputStream();
 
@@ -123,7 +123,7 @@ public class ContextRunner implements Runnable {
     	if(ctx == null) 
     	    throw new IOException("No context available for: " + name + ". Please make sure that your script does not exceed php.java.bridge.max_wait, currently set to: "+Util.MAX_WAIT);
     	JavaBridge bridge = ctx.getBridge();
-	if(Logger.logLevel>4) Logger.logDebug(ctx + " created new thread" );
+	if(Logger.getLogLevel()>4) Logger.logDebug(ctx + " created new thread" );
 	
 	if (shortPathHeader != (byte) 0xFF) { // short path S1: no PUT request
 	    bridge.request = new Request(bridge);
@@ -145,7 +145,7 @@ public class ContextRunner implements Runnable {
 	    else
 		Logger.warn("context runner init failed");
 	} catch (IOException e) {
-	    if(Logger.logLevel>4) Logger.printStackTrace(e);
+	    if(Logger.getLogLevel()>4) Logger.printStackTrace(e);
         } catch (Exception e) {
     	    Logger.printStackTrace(e);
         } finally {

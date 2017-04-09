@@ -302,7 +302,7 @@ public final class Request implements IDocHandler {
 
 	case 'U': {
 	    int i=st[0].getIntValue();
-	    if(Logger.logLevel>4) {
+	    if(Logger.getLogLevel()>4) {
 		Object obj = bridge.getGlobalRef().get(i);
 		if (!(obj instanceof java.lang.reflect.Proxy))
 		    Logger.logDebug("unref: " + obj);

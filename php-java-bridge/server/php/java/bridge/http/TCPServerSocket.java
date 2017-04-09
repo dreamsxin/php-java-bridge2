@@ -31,9 +31,9 @@ import java.net.Socket;
 
 // Note: Make sure that classes like Util or JavaBridge are only accessed if something fails
 // The default path should only load the Standalone and the Socket classes
-class TCPServerSocket implements ISocketFactory {
+public class TCPServerSocket implements ISocketFactory {
 
-    static int TCP_PORT_BASE=9267; //try to find a free port in the range 9267, ..., 9366
+    public static int TCP_PORT_BASE=9267; //try to find a free port in the range 9267, ..., 9366
     private ServerSocket sock;
     private int port;
     boolean local;

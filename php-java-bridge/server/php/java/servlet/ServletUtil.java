@@ -168,7 +168,7 @@ public class ServletUtil {
         	     return Integer.parseInt(String.valueOf(result));
              }
 	} catch (Exception t) {
-		if (Logger.logLevel>5) Logger.printStackTrace(t);
+		if (Logger.getLogLevel()>5) Logger.printStackTrace(t);
 	}
 	return 0;
    }

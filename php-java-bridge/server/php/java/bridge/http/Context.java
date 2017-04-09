@@ -330,7 +330,6 @@ public class Context implements IManaged, Invocable, IContext {
     @Override
     public void setExitCode(int exitCode) {
 	this.exitCode = exitCode;
-	
     }
     @Override
     public int getExitCode() {

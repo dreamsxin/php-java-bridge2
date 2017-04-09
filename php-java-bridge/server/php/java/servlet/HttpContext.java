@@ -137,12 +137,12 @@ public class HttpContext extends php.java.bridge.http.Context {
        }
        /**{@inheritDoc}*/
        public Object init(Object callable) throws Exception {
-	 if(Logger.logLevel>3) Logger.logDebug("calling servlet context init");
+	 if(Logger.getLogLevel()>3) Logger.logDebug("calling servlet context init");
 	 return php.java.bridge.http.Context.getManageable(callable);
        }
        /**{@inheritDoc}*/
        public void onShutdown(Object closeable) {
-	 if(Logger.logLevel>3) Logger.logDebug("calling servlet context register shutdown ");
+	 if(Logger.getLogLevel()>3) Logger.logDebug("calling servlet context register shutdown ");
 	 handleManaged(closeable, context);
        }
 

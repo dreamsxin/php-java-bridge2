@@ -236,7 +236,7 @@ public /*singleton*/ class PhpJavaServlet extends HttpServlet {
     protected void handlePut (HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
 
-    	if(Logger.logLevel>3) Logger.logDebug("doPut:"+req.getRequestURL()); 
+    	if(Logger.getLogLevel()>3) Logger.logDebug("doPut:"+req.getRequestURL()); 
     	boolean isLocal = LOCAL_ADDR.equals(req.getRemoteAddr());
     	boolean isHttps = req.isSecure();
     	if(contextServer!=null && contextServer.isAvailable(null) && (isLocal || (!isLocal && promiscuous)) && !isHttps) 

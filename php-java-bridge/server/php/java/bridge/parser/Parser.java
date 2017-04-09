@@ -99,10 +99,10 @@ class Parser {
 	    return in.read(buf, 0, RECV_SIZE);
 	} catch (SocketException e) {
 	    // may happen if we reload the context and destroy the socket
-	    if(Logger.logLevel>5) Logger.printStackTrace(e);
+	    if(Logger.getLogLevel()>5) Logger.printStackTrace(e);
 	    return -1;
 	} catch (InterruptedIOException e) {
-	    if(Logger.logLevel>5) Logger.printStackTrace(e);
+	    if(Logger.getLogLevel()>5) Logger.printStackTrace(e);
 	    return -1;
 	} catch (IOException e) {
 	    Logger.printStackTrace(e);

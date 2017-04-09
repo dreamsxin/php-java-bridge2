@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import php.java.bridge.JavaBridge;
+import php.java.bridge.Standalone;
 import php.java.bridge.Util;
 import php.java.bridge.util.Logger;
 
@@ -343,7 +344,7 @@ public class JavaBridgeRunner extends HttpServer {
 	byte[] buf;
 	OutputStream out;
 	int c;
-	if(Logger.logLevel>4) Logger.logDebug("web server: show text file:" + name);
+	if(Logger.getLogLevel()>4) Logger.logDebug("web server: show text file:" + name);
 	res.addHeader("Last-Modified", Util.formatDateTime(f.lastModified()));
 	if(show) res.addHeader("Content-Type", "text/plain");
 	res.setContentLength(length);
@@ -380,7 +381,7 @@ public class JavaBridgeRunner extends HttpServer {
 	String name =req.getRequestURI();
 
 	if(name==null) { super.doGet(req, res); return; }
-	if(!name.startsWith("/JavaBridge")) {
+	if(!name.startsWith("/JavaBridge/")) {
 	    if(name.startsWith("/")) name = name.substring(1);
 	    String params = null;
 	    int idx = name.indexOf('?');
@@ -427,7 +428,7 @@ public class JavaBridgeRunner extends HttpServer {
 		res.setContentLength(ERROR.length); res.getOutputStream().write(ERROR); 
 		return;
 	    } else {
-		if(Logger.logLevel>4) 
+		if(Logger.getLogLevel()>4) 
 		    Logger.logDebug("Java.inc not found, using JavaBridge.inc instead");
 	    }
 	 }

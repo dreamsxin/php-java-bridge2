@@ -1,0 +1,5 @@
+# list of script engine factories 
+#
+# php             => php.java.script.PhpScriptEngineFactory
+
+php.java.script.PhpScriptEngineFactory
