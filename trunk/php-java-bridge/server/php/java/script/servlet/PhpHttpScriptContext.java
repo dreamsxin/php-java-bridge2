@@ -20,11 +20,13 @@ import php.java.bridge.http.ContextServer;
 import php.java.bridge.http.WriterOutputStream;
 import php.java.bridge.util.Logger;
 import php.java.bridge.util.NotImplementedException;
-import php.java.fastcgi.ConnectException;
+import php.java.fastcgi.FCGIProcessException;
+import php.java.fastcgi.ConnectionException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;
 import php.java.script.IPhpScriptContext;
 import php.java.script.PhpScriptContextDecorator;
+import php.java.script.PhpScriptLogWriter;
 import php.java.script.PhpScriptWriter;
 import php.java.servlet.ContextLoaderListener;
 import php.java.servlet.ServletUtil;
@@ -85,7 +87,7 @@ public class PhpHttpScriptContext extends PhpScriptContextDecorator {
 	listener.getThreadPool().start(getContinuation());
     }
     public Continuation createContinuation(String[] args, Map env,
-            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws ConnectException {
+            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws FCGIProcessException, ConnectionException {
 	ContextLoaderListener listener = ContextLoaderListener.getContextLoaderListener((ServletContext) getServletContext());
 	return listener.createContinuation(args, env, out, err, headerParser);
     }

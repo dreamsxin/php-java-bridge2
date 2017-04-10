@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 
 import php.java.bridge.Util;
+import php.java.bridge.util.Logger;
 
 public class FCGIHelper {
     protected int phpFcgiConnectionPoolSize;
@@ -85,7 +86,7 @@ public class FCGIHelper {
 	File javaIncFile = new File(cgiOsDir, "launcher.sh");
 	if (Util.USE_SH_WRAPPER) {
 	    try {
-		if (!javaIncFile.exists()) {
+		if (!javaIncFile.exists() || javaIncFile.length()==0) {
 		    Field f = Util.LAUNCHER_UNIX.getField("bytes");
 		    byte[] buf = (byte[]) f.get(Util.LAUNCHER_UNIX);
 		    OutputStream out = new FileOutputStream(javaIncFile);
@@ -93,13 +94,13 @@ public class FCGIHelper {
 		    out.close();
 		}
 	    } catch (Exception e) {
-		e.printStackTrace();
+		Logger.printStackTrace(e);
 	    }
 	}
 	File javaProxyFile = new File(cgiOsDir, "launcher.exe");
 	if (!Util.USE_SH_WRAPPER) {
 	    try {
-		if (!javaProxyFile.exists()) {
+		if (!javaProxyFile.exists() || javaProxyFile.length()==0) {
 		    OutputStream out = new FileOutputStream(javaProxyFile);
 		    for (Class c : new Class[] { Util.LAUNCHER_WINDOWS,
 		            Util.LAUNCHER_WINDOWS2, Util.LAUNCHER_WINDOWS3,
@@ -112,9 +113,10 @@ public class FCGIHelper {
 			}
 		    }
 		    out.close();
+		    if (javaProxyFile.length()==0) throw new IllegalStateException("LAUNCHEE_WINDOWS class missing");
 		}
 	    } catch (Exception e) {
-		e.printStackTrace();
+		Logger.printStackTrace(e);
 	    }
 	}
     }

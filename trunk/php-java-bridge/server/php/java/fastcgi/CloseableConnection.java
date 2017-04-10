@@ -38,6 +38,6 @@ package php.java.fastcgi;
 
 public interface CloseableConnection {
 
-    void closeConnection(Connection connection) throws ConnectException;
+    void closeConnection(Connection connection) throws FCGIProcessException;
 
 }

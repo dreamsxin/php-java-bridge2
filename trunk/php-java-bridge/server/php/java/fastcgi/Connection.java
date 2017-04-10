@@ -58,7 +58,7 @@ public abstract class Connection {
 	init();
     }
 
-    public void setIsClosed() throws ConnectException {
+    public void setIsClosed() throws FCGIProcessException {
 	init();
 	isClosed = true;
     }

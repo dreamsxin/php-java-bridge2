@@ -34,7 +34,8 @@ import javax.script.Bindings;
 
 import php.java.bridge.http.ContextServer;
 import php.java.bridge.util.NotImplementedException;
-import php.java.fastcgi.ConnectException;
+import php.java.fastcgi.FCGIProcessException;
+import php.java.fastcgi.ConnectionException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;
 
@@ -194,9 +195,10 @@ public abstract class PhpScriptContextDecorator implements IPhpScriptContext {
     public void remove(String key) {
 	ctx.remove(key);
     }
-    /**{@inheritDoc}*/
+    /**{@inheritDoc}
+     * @throws ConnectionException */
     public Continuation createContinuation(String[] args, Map env,
-            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws ConnectException {
+            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws FCGIProcessException, ConnectionException {
 	return ctx.createContinuation(args, env, out, err, headerParser);
     }
     /**@deprecated*/

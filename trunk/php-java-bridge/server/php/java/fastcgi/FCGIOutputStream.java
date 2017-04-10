@@ -172,7 +172,7 @@ public class FCGIOutputStream extends OutputStream {
     /**
      * {@inheritDoc}
      * 
-     * @throws ConnectException
+     * @throws FCGIProcessException
      */
     public void close() throws ConnectionException {
 	flush();

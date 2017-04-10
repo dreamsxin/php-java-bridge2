@@ -42,7 +42,7 @@ public class FCGIInputStream extends InputStream {
 	}
     }
 
-    public void close() throws ConnectionException, ConnectException {
+    public void close() throws ConnectionException, FCGIProcessException {
 	// ignore
     }
 

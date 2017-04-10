@@ -33,7 +33,8 @@ import php.java.bridge.IManaged;
 import php.java.bridge.http.ContextServer;
 import php.java.bridge.http.IContext;
 import php.java.bridge.parser.Invocable;
-import php.java.fastcgi.ConnectException;
+import php.java.fastcgi.FCGIProcessException;
+import php.java.fastcgi.ConnectionException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;
 
@@ -64,9 +65,10 @@ public interface IPhpScriptContext extends IManaged, Invocable, IContext, Script
      * @param err the fcgi error stream
      * @param headerParser fcgi header parser
      * @return the Continuation
-     * @throws ConnectException 
+     * @throws FCGIProcessException 
+     * @throws ConnectionException 
      */
-    public Continuation createContinuation(String[] args, Map env, OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws ConnectException;
+    public Continuation createContinuation(String[] args, Map env, OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws FCGIProcessException, ConnectionException;
     
     /**
      * Start the current continuation using a context-specific thread pool

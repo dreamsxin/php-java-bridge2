@@ -2,11 +2,8 @@
 
 package php.java.servlet;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,12 +18,12 @@ import php.java.bridge.Util;
 import php.java.bridge.http.ContextServer;
 import php.java.bridge.util.Logger;
 import php.java.bridge.util.ThreadPool;
-import php.java.fastcgi.ConnectException;
+import php.java.fastcgi.ConnectionException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIConnectionPool;
 import php.java.fastcgi.FCGIHeaderParser;
+import php.java.fastcgi.FCGIProcessException;
 import php.java.fastcgi.FCGIProxy;
-import php.java.fastcgi.FCGIUtil;
 
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier
@@ -170,7 +167,7 @@ public class ContextLoaderListener
     private FCGIConnectionPool fcgiConnectionPool = null;
 
     protected void setupFastCGIServer(String[] args, Map env)
-            throws ConnectException {
+            throws FCGIProcessException, ConnectionException {
 	synchronized (globalCtxLock) { // FIXME refactor
 	    if (null == fcgiConnectionPool) {
 		fcgiConnectionPool = FCGIConnectionPool
@@ -180,22 +177,23 @@ public class ContextLoaderListener
 
     }
 
-    public FCGIConnectionPool getConnectionPool() {
+    public FCGIConnectionPool getConnectionPool() throws FCGIProcessException {
 	String[] args = new String[] { helper.getPhp() };
 	HashMap env = new HashMap();
 	env.put("REDIRECT_STATUS", "200");
 	try {
 	    setupFastCGIServer(args, env);
-	} catch (ConnectException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	} catch (FCGIProcessException e) {
+	    throw e;
+	} catch (ConnectionException e) {
+	    Logger.printStackTrace(e);
 	}
 	return fcgiConnectionPool;
     }
 
     public Continuation createContinuation(String[] args, Map env,
             OutputStream out, OutputStream err, FCGIHeaderParser headerParser)
-            throws ConnectException {
+            throws FCGIProcessException, ConnectionException {
 	setupFastCGIServer(args, env);
 	return new FCGIProxy(args, env, out, err, headerParser,
 	        fcgiConnectionPool);

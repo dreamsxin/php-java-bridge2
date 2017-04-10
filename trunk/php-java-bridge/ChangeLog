@@ -1,4 +1,17 @@
-2017-02-25  <jostb@intern>
+2017-04-10  <jostb@intern>
+
+    * jar-in-jar-loader.zip: moved to unsupported
+    
+    * server/php/java/bridge/TestInstallation.java: Rewritten to use jar-in-jar loader (for script engine check with: java -jar JavaBridge.war)
+    
+    * server/php/java/script/PhpScriptLogWriter.java: Moved here
+    
+    * server/php/java/servlet/fastcgi/FastCGIServlet.java, server/php/java/bridge/Standalone.java: Show process exception "php not found..."
+    
+    * server/php/java/fastcgi/FCGIProcessException.java: new from ConnectExcetpion.java
+
+
+2017-04-09  <jostb@intern>
 
     * WebContent: Resources moved here
     

@@ -1,6 +1,6 @@
 /*-*- mode: Java; tab-width:8 -*-*/
 
-package php.java.script.servlet;
+package php.java.script;
 
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier

@@ -64,7 +64,7 @@ public abstract class FCGIFactory {
     protected FCGIProcess proc = null;
     private boolean fcgiStarted = false;
     private final Object fcgiStartLock = new Object();
-    protected Exception lastException;
+    protected Exception fcgiProcessStartException;
 
     protected Map env;
     protected String[] args;
@@ -86,7 +86,7 @@ public abstract class FCGIFactory {
 	this.helper = helper;
     }
 
-    public void startFCGIServer() throws ConnectException {
+    public void startFCGIServer() throws FCGIProcessException, ConnectionException {
 
 	findFreePort(!helper.isExternalFCGIPool());
 	initialize();
@@ -126,10 +126,11 @@ public abstract class FCGIFactory {
     /**
      * Test the FastCGI server.
      * 
-     * @throws ConnectException
+     * @throws FCGIProcessException
      *             thrown if a IOException occured.
+     * @throws ConnectionException 
      */
-    public abstract void test() throws ConnectException;
+    public abstract void test() throws FCGIProcessException, ConnectionException;
 
     protected abstract void waitForDaemon()
             throws UnknownHostException, InterruptedException;
@@ -150,7 +151,7 @@ public abstract class FCGIFactory {
 	    try { while((c=in.read(buf))!=-1) Logger.logError(new String(buf, 0, c)); } finally { try { in.close(); } catch (IOException e) {/*ignore*/} }
 	} catch (Exception e) {
 	    Logger.printStackTrace(e);
-	    lastException = e;
+	    fcgiProcessStartException = e;
 	    Logger.logError("Could not start FCGI server: " + e);
 	}
 	
@@ -209,10 +210,10 @@ public abstract class FCGIFactory {
      * Connect to the FastCGI server and return the connection handle.
      * 
      * @return The FastCGI Channel
-     * @throws ConnectException
+     * @throws FCGIProcessException
      *             thrown if a IOException occured.
      */
-    public abstract Connection connect() throws ConnectException;
+    public abstract Connection connect() throws FCGIProcessException;
 
     /**
      * For backward compatibility the "JavaBridge" context uses the port 9667
