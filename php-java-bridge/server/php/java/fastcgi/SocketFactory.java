@@ -61,16 +61,16 @@ class SocketFactory extends FCGIFactory {
 	super(args, env, fcgiConnectionPool, helper);
     }
     @Override
-    public void test() throws ConnectException {
+    public void test() throws FCGIProcessException, ConnectionException {
         Socket testSocket;
 	try {
 	    testSocket = new Socket(InetAddress.getByName(getName()), port);
 	    testSocket.close();
 	} catch (IOException e) {
-	    if (lastException != null) {
-		throw new ConnectException(e);
+	    if (fcgiProcessStartException != null) {
+		throw new FCGIProcessException(fcgiProcessStartException);
 	    }
-	    throw new ConnectException(e);
+	    throw new ConnectionException(e);
 	}
     }
     /**
@@ -82,12 +82,12 @@ class SocketFactory extends FCGIFactory {
      * @throws UnknownHostException
      * @throws ConnectionException
      */
-    private Socket doConnect(String host, int port) throws ConnectException {
+    private Socket doConnect(String host, int port) throws FCGIProcessException {
         Socket s = null;
 	try {
             s = new Socket(InetAddress.getByName(host), port);
 	} catch (IOException e) {
-	    throw new ConnectException(e);
+	    throw new FCGIProcessException(e);
 	}
 	try {
 	    s.setTcpNoDelay(true);
@@ -97,7 +97,7 @@ class SocketFactory extends FCGIFactory {
 	return s;
     }
     @Override
-    public Connection connect() throws ConnectException {
+    public Connection connect() throws FCGIProcessException {
 	Socket s = doConnect(getName(), getPort());
 	return new SocketConnection(helper.getPhpFcgiMaxRequests(), s); 	
     }

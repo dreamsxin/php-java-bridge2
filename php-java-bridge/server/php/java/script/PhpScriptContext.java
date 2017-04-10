@@ -36,7 +36,8 @@ import php.java.bridge.http.IContext;
 import php.java.bridge.http.JavaBridgeRunner;
 import php.java.bridge.util.Logger;
 import php.java.bridge.util.NotImplementedException;
-import php.java.fastcgi.ConnectException;
+import php.java.fastcgi.FCGIProcessException;
+import php.java.fastcgi.ConnectionException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIConnectionPool;
 import php.java.fastcgi.FCGIHeaderParser;
@@ -133,7 +134,7 @@ public final class PhpScriptContext extends AbstractPhpScriptContext {
     
     private static final Object globalCtxLock = new Object();
     private static FCGIConnectionPool fcgiConnectionPool = null;
-    protected void setupFastCGIServer(String[] args, Map env) throws ConnectException {
+    protected void setupFastCGIServer(String[] args, Map env) throws FCGIProcessException, ConnectionException {
 	synchronized(globalCtxLock) { //FIXME refactor
 	    if(null == fcgiConnectionPool) {
 		fcgiConnectionPool = FCGIConnectionPool.createConnectionPool(args, env, helper);
@@ -143,9 +144,10 @@ public final class PhpScriptContext extends AbstractPhpScriptContext {
     }
  
 
-    /**{@inheritDoc}*/
+    /**{@inheritDoc}
+     * @throws ConnectionException */
     public Continuation createContinuation(String[] args, Map env,
-            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws ConnectException {
+            OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws FCGIProcessException, ConnectionException {
 	setupFastCGIServer(args, env); 
 	return new FCGIProxy(args, env, out,  err, headerParser, fcgiConnectionPool); 
     }

@@ -42,7 +42,6 @@ import php.java.bridge.http.HttpRequest;
 import php.java.bridge.http.HttpResponse;
 import php.java.bridge.http.JavaBridgeRunner;
 import php.java.bridge.util.Logger;
-import php.java.script.servlet.PhpScriptLogWriter;
 
 /**
  * This is the main entry point for the PHP/Java Bridge library.

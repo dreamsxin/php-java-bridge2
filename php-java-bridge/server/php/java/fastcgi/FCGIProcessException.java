@@ -40,13 +40,13 @@ package php.java.fastcgi;
 import java.io.IOException;
 
 /** Thrown when the server is not available anymore */
-public class ConnectException extends IOException {
+public class FCGIProcessException extends IOException {
     private static final long serialVersionUID = 5242564093021250550L;
-    protected ConnectException(IOException ex) {
-        super("Could not connect to server");
+    protected FCGIProcessException(Exception ex) {
+        super("Could not run PHP");
         initCause(ex);
     }
-    protected ConnectException(String reason) {
-        super("Could not connect to server: "+reason);
+    protected FCGIProcessException(String reason) {
+        super("Could not run PHP: "+reason);
     }
 }

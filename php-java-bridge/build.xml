@@ -225,7 +225,7 @@
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Rsrc-Class-Path" value="./ JavaBridge.jar"/>
             </manifest>
-            <zipfileset src="jar-in-jar-loader.zip"/>
+            <zipfileset src="unsupported/jar-in-jar-loader.zip"/>
 			<zipfileset prefix="WEB-INF/lib" dir="${distDir}" />
 		    
 						<fileset dir="${webContentDir}">

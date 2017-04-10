@@ -57,7 +57,7 @@ public class FCGIConnectionPool implements CloseableConnection {
     }
 
     /* helper for openConnection() */
-    private Connection createNewConnection() throws ConnectException {
+    private Connection createNewConnection() throws FCGIProcessException {
 	Connection connection = factory.connect();
 	connectionList.add(connection);
 	connection.setId(connections++);
@@ -69,10 +69,10 @@ public class FCGIConnectionPool implements CloseableConnection {
      * 
      * @return The connection
      * @throws InterruptedException
-     * @throws ConnectException
+     * @throws FCGIProcessException
      */
     public synchronized Connection openConnection()
-            throws InterruptedException, ConnectException {
+            throws InterruptedException, FCGIProcessException {
 	Connection connection;
 	if (freeList.isEmpty()
 	        && connections < helper.getPhpFcgiConnectionPoolSize()) {
@@ -85,7 +85,7 @@ public class FCGIConnectionPool implements CloseableConnection {
 		    long t2 = System.currentTimeMillis();
 		    long t = t2 - t1;
 		    if (t >= helper.getPhpFcgiConnectionPoolTimeout())
-			throw new ConnectException(
+			throw new FCGIProcessException(
 			        new IOException("pool timeout "
 			                + helper.getPhpFcgiConnectionPoolTimeout()
 			                + " exceeded: " + t));
@@ -98,7 +98,7 @@ public class FCGIConnectionPool implements CloseableConnection {
 	return connection;
     }
 
-    private synchronized Connection reopen(Connection connection) throws ConnectException {
+    private synchronized Connection reopen(Connection connection) throws FCGIProcessException {
 	if (connection.decrementCounter()) {
 	    connection.setIsClosed();
 	}
@@ -117,7 +117,7 @@ public class FCGIConnectionPool implements CloseableConnection {
     }
 
     public synchronized void closeConnection(Connection connection)
-            throws ConnectException {
+            throws FCGIProcessException {
 	freeList.add(reopen(connection));
 	notify();
     }
@@ -140,7 +140,7 @@ public class FCGIConnectionPool implements CloseableConnection {
     }
 
     public static FCGIConnectionPool createConnectionPool(String[] args,
-            Map env, FCGIHelper helper) throws ConnectException {
+            Map env, FCGIHelper helper) throws FCGIProcessException, ConnectionException {
 	FCGIConnectionPool pool = new FCGIConnectionPool(helper);
 	pool.factory = FCGIFactory.createConnectionFactory(args, env, pool,
 	        helper);

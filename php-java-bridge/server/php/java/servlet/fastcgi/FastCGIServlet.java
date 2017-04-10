@@ -367,6 +367,7 @@ public class FastCGIServlet extends HttpServlet {
 	try {
 	    connection = contextLoaderListener.getConnectionPool()
 	            .openConnection();
+	    
 	    natIn = (FCGIInputStream) connection.getInputStream();
 	    natOut = (FCGIOutputStream) connection.getOutputStream();
 	    natOut.setId(connection.getId());
@@ -435,7 +436,8 @@ public class FastCGIServlet extends HttpServlet {
 	    // so that the PHP side doesn't keep unsent data
 	    // A more elegant approach would be to use the FCGI ABORT request.
 	    if (natIn != null) connection.setIsClosed();
-	    contextLoaderListener.getConnectionPool().closeConnection(connection);
+	    if (connection!=null)
+		contextLoaderListener.getConnectionPool().closeConnection(connection);
 	}
 
     }
