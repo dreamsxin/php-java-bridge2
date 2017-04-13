@@ -2,6 +2,9 @@
 
 package php.java.script;
 
+import java.io.File;
+import java.io.IOException;
+
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier
  *
@@ -241,6 +244,10 @@ public abstract class PhpScriptContextDecorator implements IPhpScriptContext {
     @Override
     public void destroy() {
 	ctx.destroy();
+    }
+    @Override
+    public File compile(Reader reader) throws IOException {
+	return ctx.compile(reader);
     }
 
  }

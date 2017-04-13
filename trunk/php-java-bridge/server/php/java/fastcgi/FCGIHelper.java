@@ -113,7 +113,7 @@ public class FCGIHelper {
 			}
 		    }
 		    out.close();
-		    if (javaProxyFile.length()==0) throw new IllegalStateException("LAUNCHEE_WINDOWS class missing");
+		    if (javaProxyFile.length()==0) throw new IllegalStateException("LAUNCHER_WINDOWS class missing");
 		}
 	    } catch (Exception e) {
 		Logger.printStackTrace(e);

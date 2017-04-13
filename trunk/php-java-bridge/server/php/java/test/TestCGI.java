@@ -58,7 +58,7 @@ public class TestCGI  {
 	ByteArrayOutputStream err = new ByteArrayOutputStream();
 	setupFastCGIServer(args, env); 
 
-	FCGIProxy fastCGIProxy = new FCGIProxy(args, env, out, err,
+	FCGIProxy fastCGIProxy = new FCGIProxy(env, out, err,
 	        FCGIHeaderParser.DEFAULT_HEADER_PARSER, fcgiConnectionPool);
 
 	new Thread(fastCGIProxy).start();

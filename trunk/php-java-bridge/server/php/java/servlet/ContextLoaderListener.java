@@ -195,7 +195,7 @@ public class ContextLoaderListener
             OutputStream out, OutputStream err, FCGIHeaderParser headerParser)
             throws FCGIProcessException, ConnectionException {
 	setupFastCGIServer(args, env);
-	return new FCGIProxy(args, env, out, err, headerParser,
+	return new FCGIProxy(env, out, err, headerParser,
 	        fcgiConnectionPool);
     }
 

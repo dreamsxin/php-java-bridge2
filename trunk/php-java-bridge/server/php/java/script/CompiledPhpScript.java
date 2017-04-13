@@ -32,34 +32,22 @@ import javax.script.ScriptException;
  * A cloneable CompiledScript
  */
 public class CompiledPhpScript extends CompiledScript {
-    /**
-     * 
-     */
-    private final AbstractPhpScriptEngine abstractPhpScriptEngine;
+
+    private final CompileablePhpScriptEngine scriptEngine;
 
     protected CompiledPhpScript(
-            AbstractPhpScriptEngine abstractPhpScriptEngine) {
+	    CompileablePhpScriptEngine scriptEngine) {
 	super();
-	this.abstractPhpScriptEngine = abstractPhpScriptEngine;
+	this.scriptEngine = scriptEngine;
     }
 
     /** {@inheritDoc} */
     public Object eval(ScriptContext context) throws ScriptException {
-	if (abstractPhpScriptEngine.isCompiled()) {
-	    return this.abstractPhpScriptEngine.resultProxy;
-	}
-
-	try {
-	    return this.abstractPhpScriptEngine.doEvalPhp(
-	            this.abstractPhpScriptEngine.getLocalReader(), context);
-
-	} catch (Exception e) {
-	    throw new ScriptException(e);
-	}
+	return scriptEngine.evalCompiled(context);
     }
 
     /** {@inheritDoc} */
     public ScriptEngine getEngine() {
-	return this.abstractPhpScriptEngine;
+	return this.scriptEngine;
     }
 }

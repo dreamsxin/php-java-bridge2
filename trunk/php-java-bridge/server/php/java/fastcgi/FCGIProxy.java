@@ -45,63 +45,73 @@ import php.java.bridge.util.Logger;
  */
 
 public class FCGIProxy extends Continuation {
-//    private static final String PROCESSES = Util.THREAD_POOL_MAX_SIZE; // PROCESSES must == Util.THREAD_POOL_MAX_SIZE
-//    private static final String MAX_REQUESTS = FCGIUtil.PHP_FCGI_MAX_REQUESTS;
-    
+    // private static final String PROCESSES = Util.THREAD_POOL_MAX_SIZE; //
+    // PROCESSES must == Util.THREAD_POOL_MAX_SIZE
+    // private static final String MAX_REQUESTS =
+    // FCGIUtil.PHP_FCGI_MAX_REQUESTS;
+
     protected Map env;
     protected OutputStream out;
     private OutputStream err;
     protected FCGIHeaderParser headerParser;
     private FCGIConnectionPool fcgiConnectionPool;
-    public FCGIProxy(String[] args, Map env, OutputStream out,
-            OutputStream err, FCGIHeaderParser headerParser, FCGIConnectionPool fcgiConnectionPool) {
+
+    public FCGIProxy(Map env, OutputStream out, OutputStream err,
+            FCGIHeaderParser headerParser,
+            FCGIConnectionPool fcgiConnectionPool) {
 	super();
 	this.env = env;
+	if (env == null)
+	    throw new NullPointerException("env");
+	if (env.get("SCRIPT_FILENAME") == null)
+	    throw new IllegalArgumentException(
+	            "SCRIPT_FILENAME missing in env");
 	this.out = out;
 	this.err = err;
 	this.headerParser = headerParser;
 	this.fcgiConnectionPool = fcgiConnectionPool;
     }
 
+    Connection connection = null;
 
-	Connection connection = null;
     protected void doRun() throws IOException, PhpException {
 	byte[] buf = new byte[FCGIUtil.FCGI_BUF_SIZE];
-	
+
 	FCGIInputStream natIn = null;
 	FCGIOutputStream natOut = null;
 
-	
 	try {
 	    connection = fcgiConnectionPool.openConnection();
 	    natIn = (FCGIInputStream) connection.getInputStream();
 	    natOut = (FCGIOutputStream) connection.getOutputStream();
 	    natOut.setId(connection.getId());
-	    
+
 	    natOut.writeBegin(connection.isLast());
 	    natOut.writeParams(env);
 	    natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
-	    natOut.close(); natOut = null;
-	    
+	    natOut.close();
+	    natOut = null;
+
 	    headerParser.parseBody(buf, natIn, out, err);
-	    
-	    natIn.close(); natIn = null;
+
+	    natIn.close();
+	    natIn = null;
 	} catch (InterruptedException e) {
-	    /*ignore*/
+	    /* ignore */
 	} catch (Throwable t) {
-            Logger.printStackTrace(t);
-        } finally {
-	    if(natIn!=null) connection.setIsClosed(); 
-	    fcgiConnectionPool.closeConnection(connection); connection = null;
-        }
+	    Logger.printStackTrace(t);
+	} finally {
+	    if (natIn != null)
+		connection.setIsClosed();
+	    fcgiConnectionPool.closeConnection(connection);
+	    connection = null;
+	}
     }
 
     /** {@inheritDoc} */
     public boolean canStartFCGI() {
 	return true;
     }
-
-
 
     /** {@inheritDoc} */
     public void log(String msg) {
