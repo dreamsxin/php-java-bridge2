@@ -2,6 +2,9 @@
 
 package php.java.script;
 
+import java.io.File;
+import java.io.IOException;
+
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier
  *
@@ -25,6 +28,7 @@ package php.java.script;
  */
 
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.Map;
 
 import javax.script.ScriptContext;
@@ -33,10 +37,10 @@ import php.java.bridge.IManaged;
 import php.java.bridge.http.ContextServer;
 import php.java.bridge.http.IContext;
 import php.java.bridge.parser.Invocable;
-import php.java.fastcgi.FCGIProcessException;
 import php.java.fastcgi.ConnectionException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;
+import php.java.fastcgi.FCGIProcessException;
 
 /**
  * Common methods for all PHP ScriptContexts
@@ -86,4 +90,6 @@ public interface IPhpScriptContext extends IManaged, Invocable, IContext, Script
      * @return the ContextServer
      */
     public ContextServer getContextServer();
+   
+    public File compile(Reader reader) throws IOException;
 }

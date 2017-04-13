@@ -53,7 +53,11 @@ public class ResultProxy extends Number {
      * @return the result code from PHP
      */
     public int getResult() {
-	engine.release();
+	try {
+	    close();
+	} catch (IOException e) {
+	    Logger.printStackTrace(e); //FIXME
+	}
 	return result;
     }
     /**
@@ -102,6 +106,6 @@ public class ResultProxy extends Number {
      * @throws IOException 
      */
     public void close() throws IOException {
-	engine.release();
+	    engine.close();
     }
 }

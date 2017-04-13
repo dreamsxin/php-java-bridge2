@@ -2,7 +2,10 @@
 
 package php.java.script;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.util.Map;
 
 import php.java.fastcgi.Continuation;
@@ -47,4 +50,5 @@ public class PhpCompiledScriptContext extends PhpScriptContextDecorator {
     public PhpCompiledScriptContext(IPhpScriptContext ctx) {
 	super(ctx);
     }
+
 }

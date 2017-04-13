@@ -40,7 +40,7 @@ public class PhpScriptEngineFactory implements ScriptEngineFactory {
 	public Factory () {
 	}
 	public ScriptEngine create () {
-		return new PhpScriptEngine(PhpScriptEngineFactory.this);
+		return new CompileablePhpScriptEngine(PhpScriptEngineFactory.this);
 	}
     }
     protected Factory factory;

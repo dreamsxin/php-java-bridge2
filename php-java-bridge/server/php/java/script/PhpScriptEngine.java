@@ -2,75 +2,129 @@
 
 package php.java.script;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 
+import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
+import javax.script.Invocable;
 import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import javax.script.SimpleScriptContext;
 
 import php.java.bridge.Util;
+import php.java.bridge.http.AbstractChannelName;
+import php.java.bridge.http.ContextServer;
+import php.java.bridge.http.IContext;
+import php.java.bridge.http.IContextFactory;
+import php.java.bridge.http.WriterOutputStream;
 import php.java.bridge.parser.PhpProcedure;
 import php.java.bridge.parser.Request;
 import php.java.bridge.util.Logger;
+import php.java.fastcgi.Continuation;
+import php.java.fastcgi.FCGIHeaderParser;
 
 /**
  * This class implements the ScriptEngine.
  * <p>
- * Example:
- * <p>
- * <code>
- * ScriptEngine e = (new ScriptEngineManager()).getEngineByName("php");<br>
- * try { e.eval(&lt;?php foo() ?&gt;"); } catch (ScriptException e) { ... }<br>
- * </code>
  * 
- * @author jostb
- *
+ * @see php.java.script.PhpScriptEngine
  */
-public class PhpScriptEngine extends AbstractPhpScriptEngine {
-    private static final String X_JAVABRIDGE_INCLUDE = Util.X_JAVABRIDGE_INCLUDE;
-    protected static final Object EMPTY_INCLUDE = "@";
-    private static final List engines = new LinkedList();
+public abstract class PhpScriptEngine extends AbstractScriptEngine
+        implements IPhpScriptEngine, java.io.Closeable, Invocable {
+
+    protected static final HashSet engines = new HashSet();
     private static boolean registeredHook = false;
     private static final String PHP_EMPTY_SCRIPT = "<?php ?>";
 
+    private static final String[] STANDARD_BINDING_KEYS = new String[] {
+            ScriptEngine.ARGV, ScriptEngine.ENGINE, ScriptEngine.ENGINE_VERSION,
+            ScriptEngine.FILENAME, ScriptEngine.LANGUAGE,
+            ScriptEngine.LANGUAGE_VERSION, ScriptEngine.NAME };
+
     /**
-     * Create a new ScriptEngine with a default context.
+     * The allocated script
      */
-    public PhpScriptEngine() {
-	super(new PhpScriptEngineFactory());
+    protected Object script = null;
+    protected Object scriptClosure = null;
+
+    /**
+     * The continuation of the script
+     */
+    protected Continuation continuation = null;
+    protected Map env = null;
+    protected IContextFactory ctx = null;
+
+    protected ScriptEngineFactory factory = null;
+
+    private File scriptFile;
+    protected Reader localReader;
+    protected ResultProxy resultProxy;
+
+    static HashMap getProcessEnvironment() {
+	return Util.COMMON_ENVIRONMENT;
+    }
+
+    protected void setStandardBindings() {
+	int i = 0;
+	for (String s : STANDARD_BINDING_KEYS) {
+	    switch (i++) {
+	    case 0:
+		getBindings(ScriptContext.ENGINE_SCOPE).put(s, new String[] {
+		        Util.PHP_EXEC == null ? "php-cgi" : Util.PHP_EXEC });
+		break;
+	    case 1:
+		getBindings(ScriptContext.ENGINE_SCOPE).put(s,
+		        factory.getEngineName());
+		break;
+	    case 2:
+		getBindings(ScriptContext.ENGINE_SCOPE).put(s,
+		        factory.getEngineVersion());
+		break;
+	    case 4:
+		getBindings(ScriptContext.ENGINE_SCOPE).put(s,
+		        factory.getLanguageName());
+		break;
+	    case 5:
+		getBindings(ScriptContext.ENGINE_SCOPE).put(s,
+		        factory.getLanguageVersion());
+		break;
+	    case 6:
+		getBindings(ScriptContext.ENGINE_SCOPE).put(s,
+		        factory.getEngineName());
+		break;
+	    }
+	}
     }
 
     /**
-     * Create a new ScriptEngine from a factory.
+     * Set the context id (X_JAVABRIDGE_CONTEXT) and the override flag
+     * (X_JAVABRIDGE_OVERRIDE_HOSTS) into env
      * 
-     * @param factory
-     *            The factory
-     * @see #getFactory()
+     * @param env
+     *            the environment which will be passed to PHP
      */
-    public PhpScriptEngine(PhpScriptEngineFactory factory) {
-	super(factory);
+    protected void setStandardEnvironmentValues(Map env) {
+	/*
+	 * send the session context now, otherwise the client has to call
+	 * handleRedirectConnection
+	 */
+	env.put(Util.X_JAVABRIDGE_CONTEXT, ctx.getId());
+	getBindings(ScriptContext.ENGINE_SCOPE).put(STANDARD_BINDING_KEYS[3],
+	        env.get("SCRIPT_FILENAME"));
     }
 
-    /**
-     * Create a new ScriptEngine with bindings.
-     * 
-     * @param n
-     *            the bindings
-     */
-    public PhpScriptEngine(Bindings n) {
-	this();
-	setBindings(n, ScriptContext.ENGINE_SCOPE);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.script.Invocable#call(java.lang.String, java.lang.Object[])
-     */
     protected Object invoke(String methodName, Object[] args)
             throws ScriptException, NoSuchMethodException {
 	if (methodName == null) {
@@ -106,12 +160,6 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	            "PHP script did not pass its continuation to us!. Please check if the previous call to eval() reported any errors. Or else check if it called OUR continuation.");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.script.Invocable#call(java.lang.String, java.lang.Object,
-     * java.lang.Object[])
-     */
     protected Object invoke(Object thiz, String methodName, Object[] args)
             throws ScriptException, NoSuchMethodException {
 	checkPhpClosure(thiz);
@@ -133,19 +181,11 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	}
     }
 
-    /** {@inheritDoc} */
-    public Object invokeMethod(Object thiz, String methodName, Object... args)
-            throws ScriptException, NoSuchMethodException {
-	return invoke(thiz, methodName, args);
-    }
-
-    /** {@inheritDoc} */
     public Object getInterface(Class clasz) {
 	checkPhpClosure(script);
 	return getInterface(script, clasz);
     }
 
-    /** {@inheritDoc} */
     public Object getInterface(Object thiz, Class clasz) {
 	checkPhpClosure(thiz);
 	Class[] interfaces = clasz == null ? Util.ZERO_PARAM
@@ -154,18 +194,18 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	        (PhpProcedure) Proxy.getInvocationHandler(thiz));
     }
 
-    protected Object doEvalPhp(Reader reader, ScriptContext context)
+    protected Object evalPhp(Reader reader)
             throws ScriptException {
 	if ((continuation != null) || (reader == null))
 	    release();
 	if (reader == null)
 	    return null;
 
-	setNewContextFactory();
-	env.put(X_JAVABRIDGE_INCLUDE, EMPTY_INCLUDE);
+	setNewContextFactory((Map) getProcessEnvironment().clone());
+	compileScript(reader);
 
 	try {
-	    this.script = doEval(getArgs(reader), context);
+	    this.script = doEvalPhp(getArgs());
 	    if (this.script != null) {
 		/*
 		 * get the proxy, either the one from the user script or our
@@ -189,6 +229,216 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	return resultProxy;
     }
 
+    protected String[] getArgs() {
+	String[] args = (String[]) get(ScriptEngine.ARGV);
+	if (args == null)
+	    throw new NullPointerException(
+	            "ScriptEngine.ARGV must not be null");
+	return args;
+    }
+
+    public Object invokeMethod(Object thiz, String methodName, Object... args)
+            throws ScriptException, NoSuchMethodException {
+	return invoke(thiz, methodName, args);
+    }
+
+    protected void addNewContextFactory() {
+	ctx = PhpScriptContextFactory.addNew((IContext) getContext());
+    }
+
+    protected ContextServer getContextServer() {
+	return ((IPhpScriptContext) getContext()).getContextServer();
+    }
+
+    protected void setNewContextFactory(Map env) {
+	resultProxy = null;
+	this.env = env;
+
+	addNewContextFactory();
+
+	// short path S1: no PUT request
+	ContextServer contextServer = getContextServer();
+	AbstractChannelName channelName = contextServer.getChannelName(ctx);
+	if (channelName != null) {
+	    env.put("X_JAVABRIDGE_REDIRECT", channelName.getName());
+	    ctx.getBridge();
+	    contextServer.start(channelName);
+	}
+
+	setStandardEnvironmentValues(env);
+    }
+
+    protected void compileScript(Reader reader) throws ScriptException {
+	IPhpScriptContext phpScriptContext = (IPhpScriptContext) getContext();
+	try {
+	    if (scriptFile == null) {
+	    scriptFile = phpScriptContext.compile(reader);
+	    }
+	    if (env != null) {
+		env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
+	    }
+	} catch (IOException e) {
+	    throw new ScriptException(e);
+	}
+    }
+
+    public Object eval(Reader reader, ScriptContext context)
+            throws ScriptException {
+
+	ScriptContext current = getContext();
+	if (current != context)
+	    try {
+		setContext(context);
+		return evalPhp(reader);
+	    } finally {
+		setContext(current);
+	    }
+	else
+	    return evalPhp(reader);
+    }
+
+    private final class SimpleHeaderParser extends FCGIHeaderParser {
+	private WriterOutputStream writer;
+
+	public SimpleHeaderParser(WriterOutputStream writer) {
+	    this.writer = writer;
+	}
+
+	public void parseHeader(String header) {
+	    if (header == null)
+		return;
+	    int idx = header.indexOf(':');
+	    if (idx == -1)
+		return;
+	    String key = header.substring(0, idx).trim().toLowerCase();
+	    String val = header.substring(idx + 1).trim();
+	    addHeader(key, val);
+	}
+
+	public void addHeader(String key, String val) {
+	    if (val != null && key.equals("content-type")) {
+		int idx = val.indexOf(';');
+		if (idx == -1)
+		    return;
+		String enc = val.substring(idx + 1).trim();
+		idx = enc.indexOf('=');
+		if (idx == -1)
+		    return;
+		enc = enc.substring(idx + 1);
+		writer.setEncoding(enc);
+	    }
+	}
+    }
+
+    protected Continuation getContinuation(String[] args)
+            throws IOException {
+	FCGIHeaderParser headerParser = FCGIHeaderParser.DEFAULT_HEADER_PARSER; // ignore
+	                                                                        // encoding,
+	                                                                        // we
+	                                                                        // pass
+	                                                                        // everything
+	                                                                        // directly
+	IPhpScriptContext phpScriptContext = (IPhpScriptContext) getContext();
+	OutputStream out = ((PhpScriptWriter) (getContext().getWriter()))
+	        .getOutputStream();
+	OutputStream err = ((PhpScriptWriter) (getContext().getErrorWriter()))
+	        .getOutputStream();
+
+	/*
+	 * encode according to content-type charset
+	 */
+	if (out instanceof WriterOutputStream)
+	    headerParser = new SimpleHeaderParser((WriterOutputStream) out);
+
+	Continuation kont = phpScriptContext.createContinuation(args, env, out,
+	        err, headerParser);
+
+	phpScriptContext.setContinuation(kont);
+	phpScriptContext.startContinuation();
+	return kont;
+    }
+
+    final protected Object doEvalPhp(String[] args)
+            throws Exception {
+	continuation = getContinuation(args);
+	return continuation.getPhpScript();
+    }
+
+    public Object eval(String script, ScriptContext context)
+            throws ScriptException {
+	if (script == null)
+	    return evalPhp(null);
+
+	script = script.trim();
+	Reader localReader = new StringReader(script);
+	try {
+	    return eval(localReader, context);
+	} finally {
+	    try {
+		localReader.close();
+	    } catch (IOException e) {
+		Logger.printStackTrace(e);
+	    }
+	}
+    }
+
+    /** @inheritDoc */
+    public ScriptEngineFactory getFactory() {
+	return this.factory;
+    }
+
+     public Bindings createBindings() {
+	return new SimpleBindings();
+    }
+
+    static final void throwNoOutputFile() {
+	throw new IllegalStateException(
+	        "No compilation output file has been set!");
+    }
+
+    static final Reader DUMMY_READER = new Reader() {
+	/** {@inheritDoc} */
+	public void close() throws IOException {
+	    throwNoOutputFile();
+	}
+
+	/** {@inheritDoc} */
+	public int read(char[] cbuf, int off, int len) throws IOException {
+	    throwNoOutputFile();
+	    return 0;
+	}
+    };
+
+    private ScriptContext ctxCache;
+
+    /** {@inheritDoc} */
+    protected ScriptContext getScriptContext(Bindings bindings) {
+	return new PhpScriptContext(super.getScriptContext(bindings));
+    }
+
+    /** {@inheritDoc} */
+    public ScriptContext getContext() {
+	if (ctxCache == null) {
+	    ctxCache = super.getContext();
+	    if (!(ctxCache instanceof IPhpScriptContext)) {
+		if (ctxCache == null)
+		    ctxCache = new SimpleScriptContext();
+		ctxCache = new PhpScriptContext(ctxCache);
+		super.setContext(ctxCache);
+	    }
+	}
+	return ctxCache;
+    }
+
+    /** {@inheritDoc} */
+    public void setContext(ScriptContext context) {
+	super.setContext(context);
+	this.ctxCache = null;
+	getContext();
+    }
+
+
+
     protected void handleRelease() {
 	// make sure to properly release them upon System.exit().
 	synchronized (engines) {
@@ -204,10 +454,16 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 				                        .remove()) {
 				            PhpScriptEngine e = (PhpScriptEngine) ii
 				                    .next();
-				            e.releaseInternal();
-				            ctx.destroy(); // FIXME: necessary? shut down the SocketContextServer
+				            e.releaseInternal(true);
+				            ctx.destroy(); // FIXME: necessary?
+				                           // shut down the
+				                           // SocketContextServer
 				        }
-					((IPhpScriptContext) context).destroy(); // shut down the FastCGI Server
+				        ((IPhpScriptContext) getContext()).destroy(); // shut
+				                                                 // down
+				                                                 // the
+				                                                 // FastCGI
+				                                                 // Server
 			            }
 			        }
 		            });
@@ -218,16 +474,55 @@ public class PhpScriptEngine extends AbstractPhpScriptEngine {
 	}
     }
 
-    private void releaseInternal() {
-	super.release();
-    }
-
-    /** {@inheritDoc} */
-    public void release() {
+    protected void release() {
 	synchronized (engines) {
-	    releaseInternal();
+	    releaseInternal(true);
 	    engines.remove(this);
 	}
     }
 
+    protected void deleteScript() {
+	if (scriptFile != null) {
+	    try {
+		scriptFile.delete();
+	    } catch (Exception e) {
+		Logger.printStackTrace(e);
+	    }
+	    scriptFile = null;
+	}
+    }
+
+    /**
+     * Release the continuation
+     */
+    protected void releaseInternal(boolean deleteScript) {
+	if (continuation != null) {
+	    try {
+		continuation.release();
+		ctx.releaseManaged();
+
+		resultProxy.setResult(ctx.getContext().getExitCode());
+	    } catch (InterruptedException e) {
+		return;
+	    }
+	    ctx = null;
+
+	    continuation = null;
+	    script = null;
+	    scriptClosure = null;
+
+	    try {
+		getContext().getWriter().flush();
+	    } catch (Exception e) {
+		Logger.printStackTrace(e);
+	    }
+	    try {
+		getContext().getErrorWriter().flush();
+	    } catch (Exception e) {
+		Logger.printStackTrace(e);
+	    }
+	    if (deleteScript)
+		deleteScript();
+	}
+    }
 }

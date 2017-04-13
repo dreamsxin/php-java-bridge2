@@ -81,6 +81,8 @@ public abstract class FCGIFactory {
             CloseableConnection fcgiConnectionPool, FCGIHelper helper) {
 	if (args==null) throw new NullPointerException("args");
 	this.args = args;
+	if (env==null) 
+	    throw new NullPointerException("env");
 	this.env = env;
 	this.fcgiConnectionPool = fcgiConnectionPool;
 	this.helper = helper;

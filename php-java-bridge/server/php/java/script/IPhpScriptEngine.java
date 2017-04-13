@@ -26,7 +26,6 @@ package php.java.script;
 
 import java.io.IOException;
 
-import javax.script.Compilable;
 import javax.script.ScriptEngine;
 
 /**
@@ -34,16 +33,11 @@ import javax.script.ScriptEngine;
  * @author jostb
  *
  */
-public interface IPhpScriptEngine extends ScriptEngine, Compilable {
+public interface IPhpScriptEngine extends ScriptEngine {
     /**
      * free all resources associated with the script engine. Must be called explicitly.
      * @throws IOException
      */
     public void close() throws IOException;
  
-    /**
-     * alias for {@link #close()}
-     * @throws IOException
-     */
-    public void release();
-}
+ }
