@@ -6,6 +6,7 @@ $session = java_session();
 if(java_is_null($numguess=$session->get("bean"))) {
   $session->put("bean", $numguess=new Java("num.NumberGuessBean"));
 }
+print_r($_POST); //FIXME
 if($_POST['guess']) {
   $numguess->setGuess($_POST['guess']);
 }
