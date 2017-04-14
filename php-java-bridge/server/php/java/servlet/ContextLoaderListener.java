@@ -117,7 +117,7 @@ public class ContextLoaderListener
 
 	if (contextServer != null)
 	    contextServer.destroy();
-	synchronized (globalCtxLock) { // FIXME clean this up!
+	synchronized (globalCtxLock) {
 	    if (fcgiConnectionPool != null)
 		fcgiConnectionPool.destroy();
 	    fcgiConnectionPool = null;
@@ -137,19 +137,29 @@ public class ContextLoaderListener
 
 	    @Override
 	    public void log(int level, String msg) {
-		switch(level) {
-		case ILogger.FATAL: ctx.log("fatal:" + msg); break;
-		case ILogger.ERROR: ctx.log("error:" + msg); break;
-		case ILogger.INFO: ctx.log("info:" + msg); break;
-		case ILogger.DEBUG: ctx.log("debug:" + msg); break;
-		default: ctx.log(msg);
+		switch (level) {
+		case ILogger.FATAL:
+		    ctx.log("fatal:" + msg);
+		    break;
+		case ILogger.ERROR:
+		    ctx.log("error:" + msg);
+		    break;
+		case ILogger.INFO:
+		    ctx.log("info:" + msg);
+		    break;
+		case ILogger.DEBUG:
+		    ctx.log("debug:" + msg);
+		    break;
+		default:
+		    ctx.log(msg);
 		}
 	    }
 
 	    @Override
 	    public void warn(String msg) {
 		ctx.log("WARNING: " + msg);
-	    }});
+	    }
+	});
 
 	ctx.setAttribute(CONTEXT_LOADER_LISTENER, this);
 	this.context = ctx;
@@ -189,37 +199,37 @@ public class ContextLoaderListener
     private final Object globalCtxLock = new Object();
     private FCGIConnectionPool fcgiConnectionPool = null;
 
-    protected void setupFastCGIServer(String[] args, Map env)
+    public FCGIConnectionPool getConnectionPool()
             throws FCGIProcessException, ConnectionException {
-	synchronized (globalCtxLock) { // FIXME refactor
-	    if (null == fcgiConnectionPool) {
-		fcgiConnectionPool = FCGIConnectionPool
-		        .createConnectionPool(args, env, helper);
-	    }
+	
+	synchronized (globalCtxLock) {
+	    if (fcgiConnectionPool != null)
+		return fcgiConnectionPool;
+	    String[] args = new String[] { helper.getPhp() };
+	    HashMap env = new HashMap();
+	    env.put("REDIRECT_STATUS", "200");
+	    return getConnectionPool(args, env);
 	}
-
     }
 
-    public FCGIConnectionPool getConnectionPool() throws FCGIProcessException {
-	String[] args = new String[] { helper.getPhp() };
-	HashMap env = new HashMap();
-	env.put("REDIRECT_STATUS", "200");
-	try {
-	    setupFastCGIServer(args, env);
-	} catch (FCGIProcessException e) {
-	    throw e;
-	} catch (ConnectionException e) {
-	    Logger.printStackTrace(e);
+    private FCGIConnectionPool getConnectionPool(String[] args, Map env)
+            throws FCGIProcessException, ConnectionException {
+	
+	synchronized (globalCtxLock) {
+	    if (fcgiConnectionPool != null)
+		return fcgiConnectionPool;
+	    return fcgiConnectionPool = FCGIConnectionPool
+	            .createConnectionPool(args, env, helper);
+
 	}
-	return fcgiConnectionPool;
     }
 
     public Continuation createContinuation(String[] args, Map env,
             OutputStream out, OutputStream err, FCGIHeaderParser headerParser)
             throws FCGIProcessException, ConnectionException {
-	if (args!=null) setupFastCGIServer(args, env);
-	return new FCGIProxy(env, out, err, headerParser,
-	        fcgiConnectionPool);
+
+	return new FCGIProxy(env, out, err, headerParser, args == null
+	        ? fcgiConnectionPool : getConnectionPool(args, env));
     }
 
     public FCGIServletHelper getHelper() {

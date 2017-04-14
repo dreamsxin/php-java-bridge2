@@ -10,7 +10,7 @@ import php.java.bridge.util.NotImplementedException;
 public class FCGIInputStream extends InputStream {
     private InputStream in;
 
-    public FCGIInputStream(Connection connection, InputStream in) {
+    public FCGIInputStream(InputStream in) {
 	super();
 	this.in = in;
     }
