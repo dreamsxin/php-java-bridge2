@@ -70,6 +70,7 @@ public class FCGIProxy extends Continuation {
 	this.err = err;
 	this.headerParser = headerParser;
 	this.fcgiConnectionPool = fcgiConnectionPool;
+	if (fcgiConnectionPool==null) throw new NullPointerException("fcgiConnectionPool");
     }
 
     Connection connection = null;
@@ -88,6 +89,7 @@ public class FCGIProxy extends Continuation {
 
 	    natOut.writeBegin(connection.isLast());
 	    natOut.writeParams(env);
+
 	    natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
 	    natOut.close();
 	    natOut = null;

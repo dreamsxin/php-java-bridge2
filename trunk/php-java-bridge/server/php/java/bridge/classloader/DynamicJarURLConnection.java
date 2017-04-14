@@ -122,7 +122,7 @@ class DynamicJarURLConnection extends JarURLConnection {
 	if(Logger.getLogLevel()>4) Logger.logDebug("tempfile getJarFile for " + handler);
 	InputStream is = jarFileURLConnection.getInputStream();
 	byte[] buf = new byte[Util.BUF_SIZE];
-	File f = File.createTempFile("cache", "jar");
+	File f = File.createTempFile("pjbcache", "jar");
 	f.deleteOnExit();
 	FileOutputStream fos = new FileOutputStream(f);
 	int len = 0;

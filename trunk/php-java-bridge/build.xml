@@ -27,7 +27,7 @@
 		<property name="distDir" value="${basedir}/dist" />
 		<property name="libDir" value="${basedir}/unsupported" />
 		<property name="cgiDir" value="${webContentDir}/WEB-INF/cgi" />
-		<property name="sampleWebDir" value="${basedir}/examples/php+jsp" />
+		<property name="sampleWebDir" value="${webContentDir}" />
 
 		<path id="compilePath">
 			<fileset dir="${libDir}">

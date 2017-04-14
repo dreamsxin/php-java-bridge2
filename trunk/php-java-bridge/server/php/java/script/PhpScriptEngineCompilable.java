@@ -1,5 +1,6 @@
 package php.java.script;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -12,19 +13,19 @@ import javax.script.ScriptException;
 
 import php.java.bridge.util.Logger;
 
-public class CompileablePhpScriptEngine extends PhpScriptEngine
+public class PhpScriptEngineCompilable extends PhpScriptEngine
         implements Compilable {
 
-    public CompileablePhpScriptEngine(Bindings n) {
+    public PhpScriptEngineCompilable(Bindings n) {
 	this();
 	setBindings(n, ScriptContext.ENGINE_SCOPE);
     }
 
-    public CompileablePhpScriptEngine() {
+    public PhpScriptEngineCompilable() {
 	this(new PhpScriptEngineFactory());
     }
 
-    public CompileablePhpScriptEngine(PhpScriptEngineFactory factory) {
+    public PhpScriptEngineCompilable(PhpScriptEngineFactory factory) {
 	super();
 	this.factory = factory;
 	getContext(); // update context in parent as a side effect
@@ -53,15 +54,15 @@ public class CompileablePhpScriptEngine extends PhpScriptEngine
 	}
     }
 
-    private Object evalCompiledPhp()
-            throws ScriptException {
+    private Object evalCompiledPhp() throws ScriptException {
 	if ((continuation != null))
 	    releaseCompiled();
 
 	setNewContextFactory(env);
+	env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
 
 	try {
-	    this.script = doEvalPhp(getArgs());
+	    this.script = doEvalPhp(null);
 	    if (this.script != null) {
 		/*
 		 * get the proxy, either the one from the user script or our
@@ -85,19 +86,34 @@ public class CompileablePhpScriptEngine extends PhpScriptEngine
 	return resultProxy;
     }
 
-    private boolean isCompiled;
+    private boolean compiled;
+    private boolean compile;
+    private File emptyScriptFile;
 
     public boolean isCompiled() {
-	return isCompiled && continuation != null;
+	return compiled && continuation != null;
     }
 
     protected void compilePhp(Reader reader)
             throws IOException, ScriptException {
+	compile = true;
 	evalPhp(reader);
-	this.isCompiled = true;
+	compiled = true;
     }
 
-    /** {@inheritDoc} */
+    protected void compileScript(Reader reader) throws ScriptException {
+	super.compileScript(reader);
+	if (compile) {
+	    try {
+		emptyScriptFile = File.createTempFile("pjbempty", ".php");
+	    } catch (IOException e) {
+		throw new ScriptException(e);
+	    }
+
+	    env.put("SCRIPT_FILENAME", emptyScriptFile.getAbsolutePath());
+	}
+    }
+
     public CompiledScript compile(String script) throws ScriptException {
 	Reader reader = new StringReader(script);
 	try {
@@ -111,6 +127,18 @@ public class CompileablePhpScriptEngine extends PhpScriptEngine
 	}
     }
 
+    protected void deleteScript() {
+	super.deleteScript();
+	if (emptyScriptFile != null) {
+	    try {
+		emptyScriptFile.delete();
+	    } catch (Exception e) {
+		Logger.printStackTrace(e);
+	    }
+	    emptyScriptFile = null;
+	}
+    }
+
     protected void releaseCompiled() {
 	synchronized (engines) {
 	    releaseInternal(false);
@@ -119,7 +147,7 @@ public class CompileablePhpScriptEngine extends PhpScriptEngine
     }
 
     public void close() throws IOException {
-	if (!isCompiled)
+	if (!compiled)
 	    release();
 	else
 	    releaseCompiled();

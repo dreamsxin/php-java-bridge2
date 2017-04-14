@@ -31,7 +31,7 @@ public class TestCGI  {
 	                .getAbsolutePath() };
 	env = new HashMap();
 	env.put("REDIRECT_STATUS", "200");
-	File scriptFile = File.createTempFile("tmp", "php").getAbsoluteFile();
+	File scriptFile = File.createTempFile("pjb_test_tmp", "php").getAbsoluteFile();
 	FileOutputStream fos = new FileOutputStream(scriptFile);
 	fos.write(CODE.getBytes());
 	fos.close();

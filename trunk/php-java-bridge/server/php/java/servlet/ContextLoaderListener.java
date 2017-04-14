@@ -194,7 +194,7 @@ public class ContextLoaderListener
     public Continuation createContinuation(String[] args, Map env,
             OutputStream out, OutputStream err, FCGIHeaderParser headerParser)
             throws FCGIProcessException, ConnectionException {
-	setupFastCGIServer(args, env);
+	if (args!=null) setupFastCGIServer(args, env);
 	return new FCGIProxy(env, out, err, headerParser,
 	        fcgiConnectionPool);
     }

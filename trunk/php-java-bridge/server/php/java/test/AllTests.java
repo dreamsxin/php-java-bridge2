@@ -11,7 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
         TestGetResult.class, TestError.class,
         TestInvocable.class, TestInvocablePhpScriptEngine.class,
         TestPhpScriptEngine.class, TestScript.class, TestSetWriter.class,
-        TestSimpleCompileable.class, TestSimpleInvocation.class })
+        TestSimpleCompileable.class, TestSimpleInvocation.class, TestConnectionPool.class })
 public class AllTests {
 
 }
