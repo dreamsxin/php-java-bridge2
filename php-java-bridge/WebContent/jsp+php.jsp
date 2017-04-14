@@ -13,7 +13,7 @@ private static synchronized CompiledScript getScript(Servlet servlet, ServletCon
 	engine.setContext(new PhpServletScriptContext(engine.getContext(),servlet,application,request,response));
 	
 	// compile and return a handle to it
-	return ((Compilable)engine).compile("<?php echo 'Hello '.java_context()->get('hello').'!<br>\n'; ?>");
+	return ((Compilable)engine).compile("<?php echo 'Hello '.java_context()->get('hello').'!<br>\n'; function f($v){return (string)$v+1;};?>");
 }
 %>
 
