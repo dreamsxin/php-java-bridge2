@@ -2,7 +2,6 @@
 
 package php.java.servlet;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import javax.servlet.ServletContextEvent;
 
 import php.java.bridge.Util;
 import php.java.bridge.http.ContextServer;
+import php.java.bridge.util.ILogger;
 import php.java.bridge.util.Logger;
 import php.java.bridge.util.ThreadPool;
 import php.java.fastcgi.ConnectionException;
@@ -127,7 +127,30 @@ public class ContextLoaderListener
 
     /** {@inheritDoc} */
     public void contextInitialized(ServletContextEvent event) {
-	ServletContext ctx = event.getServletContext();
+	final ServletContext ctx = event.getServletContext();
+	Logger.setLogger(new ILogger() {
+
+	    @Override
+	    public void printStackTrace(Throwable t) {
+		ctx.log(String.valueOf(t), t);
+	    }
+
+	    @Override
+	    public void log(int level, String msg) {
+		switch(level) {
+		case ILogger.FATAL: ctx.log("fatal:" + msg); break;
+		case ILogger.ERROR: ctx.log("error:" + msg); break;
+		case ILogger.INFO: ctx.log("info:" + msg); break;
+		case ILogger.DEBUG: ctx.log("debug:" + msg); break;
+		default: ctx.log(msg);
+		}
+	    }
+
+	    @Override
+	    public void warn(String msg) {
+		ctx.log("WARNING: " + msg);
+	    }});
+
 	ctx.setAttribute(CONTEXT_LOADER_LISTENER, this);
 	this.context = ctx;
 	helper.init(context);
