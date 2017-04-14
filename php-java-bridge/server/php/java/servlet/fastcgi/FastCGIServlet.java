@@ -209,12 +209,7 @@ public class FastCGIServlet extends HttpServlet {
 	    envp.put("PATH_TRANSLATED", documentRoot + pathInfo);
 	}
 
-	if (env.includedDebugger || env.includedJava)
-	    envp.put("SCRIPT_FILENAME",
-	            ServletUtil.getRealPath(context, "java/JavaProxy.php"));
-	else
-	    envp.put("SCRIPT_FILENAME",
-	            ServletUtil.getRealPath(context, env.servletPath));
+	envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, env.servletPath));
 
     }
 

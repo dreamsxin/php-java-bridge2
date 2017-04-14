@@ -65,18 +65,6 @@ public class FCGIServletHelper extends FCGIHelper {
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }
-	    File javaProxyFile = new File(javaDir, "JavaProxy.php");
-	    try {
-		if (!javaProxyFile.exists()) {
-		    Field f = Util.JAVA_PROXY.getField("bytes");
-		    byte[] buf = (byte[]) f.get(Util.JAVA_PROXY);
-		    OutputStream out = new FileOutputStream(javaProxyFile);
-		    out.write(buf);
-		    out.close();
-		}
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
 	}
 	String pearDir = getRealPath(context, PEAR_DIR);
 	if (pearDir != null) {

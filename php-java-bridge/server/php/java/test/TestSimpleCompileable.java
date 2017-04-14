@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
+import javax.script.ScriptEngine;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,5 +41,16 @@ public class TestSimpleCompileable {
 	((Closeable) script.getEngine()).close();
 	assertEquals("567", out.toString());
 //	assertEquals(3, ((Number) o).intValue());
+    }
+    @Test
+    public void testEngine() throws Exception {
+	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
+	ByteArrayOutputStream out = new ByteArrayOutputStream();
+	e.getContext().setWriter(new OutputStreamWriter(out));
+	  e.eval("<?php echo 1+2");
+	  e.eval("<?php echo 3+4");
+	  
+	  ((Closeable)(script.getEngine())).close();
+	  assertEquals("37", out.toString());
     }
 }
