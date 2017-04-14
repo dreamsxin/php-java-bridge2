@@ -40,6 +40,7 @@
 	</target>
 
 	<target name="compile" depends="init,JavaIncJava,PhpDebuggerPHPJava,LauncherUnix,LauncherWindows">
+		<!--- If you get a Class not found: org.eclipse.jdt.core.JDTCompilerAdapter, do a right-click -> run as -> ant build ... -> JRE tab -> select "run in the same jre as the workspace" --> 
 		<javac srcdir="${javaSourceDir}" source="1.6" target="1.6" destdir="${javaClassDir}" debug="true" deprecation="false" nowarn="true">
 			<exclude name="php/java/test/**/*.java" />
 			<classpath refid="compilePath" />
