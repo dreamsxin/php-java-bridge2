@@ -69,8 +69,6 @@ public final class Util {
     public static Class JAVA_INC;
     /** The java/Java.inc code */
     public static Class PHPDEBUGGER_PHP;
-    /** The java/JavaProxy.php code */
-    public static Class JAVA_PROXY;
     /** The launcher.sh code */
     public static Class LAUNCHER_UNIX;
     /** The launcher.exe code */
@@ -242,9 +240,6 @@ public final class Util {
 	} catch (Exception e) {/*ignore*/}
 	try {
 	    PHPDEBUGGER_PHP = Class.forName("php.java.bridge.generated.PhpDebuggerPHP");
-	} catch (Exception e) {/*ignore*/}
-	try {
-	    JAVA_PROXY = Class.forName("php.java.bridge.generated.JavaProxy");
 	} catch (Exception e) {/*ignore*/}
 	try {
 	    LAUNCHER_UNIX = Class.forName("php.java.bridge.generated.LauncherUnix");

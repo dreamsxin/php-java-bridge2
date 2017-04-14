@@ -6,10 +6,6 @@ The Java.inc can be used by PHP libraries to call
 Java or .NET methods or procedures of a running 
 Java/.NET virtual machine.
 
-The JavaProxy.php can be used by Java to call PHP
-methods or procedures of a running HTTP server.
-
-
 Usage
 -----
 

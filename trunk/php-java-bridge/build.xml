@@ -6,9 +6,7 @@
 		<delete dir="dist" />
 		<delete dir="bin" />
 		<delete file="WebContent/META-INF/java/Java.inc" />
-		<delete file="WebContent/META-INF/java/JavaProxy.php" />
 		<delete file="server/php/java/bridge/generated/JavaInc.java" />
-		<delete file="server/php/java/bridge/generated/JavaProxy.java" />
 		<delete file="server/php/java/bridge/generated/PhpDebuggerPHP.java" />
 		<delete file="server/php/java/bridge/generated/LauncherUnix.java" />
 		<delete file="server/php/java/bridge/generated/LauncherWindows.java" />
@@ -41,13 +39,13 @@
 		<mkdir dir="${javaClassDir}" />
 	</target>
 
-	<target name="compile" depends="init,JavaIncJava,JavaProxyPhpJava,PhpDebuggerPHPJava,LauncherUnix,LauncherWindows">
+	<target name="compile" depends="init,JavaIncJava,PhpDebuggerPHPJava,LauncherUnix,LauncherWindows">
 		<javac srcdir="${javaSourceDir}" source="1.6" target="1.6" destdir="${javaClassDir}" debug="true" deprecation="false" nowarn="true">
 			<exclude name="php/java/test/**/*.java" />
 			<classpath refid="compilePath" />
 		</javac>
 	</target>
-	<target name="SrcZip" depends="init,JavaBridgeProperties,JavaInc,JavaProxyPhp">
+	<target name="SrcZip" depends="init,JavaBridgeProperties,JavaInc">
 		<zip zipfile="${distDir}/src.zip" compress="true">
 			<fileset dir="${javaSourceDir}">
 				<include name="php/java/**/*.java" />
@@ -67,7 +65,7 @@
 			</fileset>
 		</zip>
 	</target>
-	<target name="JavaBridgeJar" depends="init,compile,JavaInc,JavaProxyPhp,JavaBridgeProperties">
+	<target name="JavaBridgeJar" depends="init,compile,JavaInc,JavaBridgeProperties">
 		<jar jarfile="${distDir}/JavaBridge.jar" manifest="${javaSourceDir}/META-INF/MANIFEST.MF" compress="true">
 			<fileset dir="${javaClassDir}">
 				<include name="php/java/bridge/*.class" />
@@ -125,25 +123,6 @@
 			</fileset>
 		</apply>
 	</target>
-	<target name="JavaProxyPhp" depends="JavaInc,init">
-		<apply executable="php" failonerror="true" dir="${webContentDir}" parallel="true">
-			<arg value="${javaBaseDir}/buildJavaProxy.php" />
-			<arg value="${webContentDir}/META-INF/java/JavaProxy.php" />
-			<fileset dir="${webContentDir}">
-				<include name="META-INF/java/Java.inc" />
-			</fileset>
-		</apply>
-	</target>
-	<target name="JavaProxyPhpJava" depends="JavaProxyPhp,init">
-		<apply executable="php" failonerror="true" dir="${webContentDir}" parallel="true">
-			<arg value="${javaBaseDir}/buildClassFromTextFile.php" />
-			<arg value="${javaBaseDir}/php/java/bridge/generated/JavaProxy.java" />
-			<arg value="JavaProxy" />
-			<fileset dir="${webContentDir}">
-				<include name="META-INF/java/JavaProxy.php" />
-			</fileset>
-		</apply>
-	</target>
 	<target name="PhpDebuggerPHPJava" depends="init">
 		<apply executable="php" failonerror="true" dir="${webContentDir}" parallel="true">
 			<arg value="${javaBaseDir}/buildClassFromTextFile.php" />
@@ -182,7 +161,7 @@
 		</apply>
 		<move file="${javaBaseDir}/php/java/bridge/global.properties" tofile="${javaClassDir}/php/java/bridge/global.properties" />
 	</target>
-	<target name="JavaBridgeTemplateWar" depends="JavaBridgeJar,PhpServletJar,JavaInc,JavaProxyPhp,init">
+	<target name="JavaBridgeTemplateWar" depends="JavaBridgeJar,PhpServletJar,JavaInc,init">
 		<copy file="${sampleWebDir}/settings.php" tofile="./index.php" />
 		<war destfile="${distDir}/JavaBridgeTemplate.war" webxml="${javaBaseDir}/example-web.xml">
 			<fileset dir=".">
@@ -211,13 +190,12 @@
 				<include name="META-INF/java/Parser.inc" />
 				<include name="META-INF/java/Protocol.inc" />
 				<include name="META-INF/java/SimpleParser.inc" />
-				<include name="META-INF/java/JavaProxy.inc" />
 				<include name="META-INF/java/PHPDebugger.php" />
 			</fileset>
 		</apply>
 		<delete file="documentation/API/errors.html" />
 	</target>
-	<target name="JavaBridgeWar" depends="JavaBridgeJar,PhpServletJar,JavaInc,JavaProxyPhp,init">
+	<target name="JavaBridgeWar" depends="JavaBridgeJar,PhpServletJar,JavaInc,init">
 		<war destfile="${distDir}/JavaBridge.war" webxml="${webContentDir}/WEB-INF/web.xml">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
