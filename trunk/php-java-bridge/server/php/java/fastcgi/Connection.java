@@ -74,7 +74,7 @@ public abstract class Connection {
     public abstract void closeConnection();
 
     protected InputStream getInputStream(InputStream in) {
-	return new FCGIInputStream(this, in);
+	return new FCGIInputStream(in);
     }
 
     protected OutputStream getOutputStream(OutputStream out) {
