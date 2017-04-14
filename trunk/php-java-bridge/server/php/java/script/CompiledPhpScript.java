@@ -28,15 +28,13 @@ import javax.script.ScriptException;
  * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-/**
- * A cloneable CompiledScript
- */
+
 public class CompiledPhpScript extends CompiledScript {
 
-    private final PhpScriptEngineCompilable scriptEngine;
+    private final CompiledPhpScriptEngine scriptEngine;
 
     protected CompiledPhpScript(
-	    PhpScriptEngineCompilable scriptEngine) {
+	    CompiledPhpScriptEngine scriptEngine) {
 	super();
 	this.scriptEngine = scriptEngine;
     }
