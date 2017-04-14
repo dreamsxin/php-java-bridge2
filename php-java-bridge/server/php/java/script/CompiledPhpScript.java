@@ -33,10 +33,10 @@ import javax.script.ScriptException;
  */
 public class CompiledPhpScript extends CompiledScript {
 
-    private final CompileablePhpScriptEngine scriptEngine;
+    private final PhpScriptEngineCompilable scriptEngine;
 
     protected CompiledPhpScript(
-	    CompileablePhpScriptEngine scriptEngine) {
+	    PhpScriptEngineCompilable scriptEngine) {
 	super();
 	this.scriptEngine = scriptEngine;
     }

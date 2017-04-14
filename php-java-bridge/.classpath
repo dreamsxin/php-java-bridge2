@@ -7,7 +7,6 @@
 	<classpathentry kind="lib" path="unsupported/servlet-api.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="unsupported/mockito-all-1.10.19.jar"/>
-	<classpathentry kind="lib" path="examples/php+jsp/numberGuess.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v7.0">
@@ -16,5 +15,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="unsupported/numberGuess.jar"/>
+	<classpathentry kind="lib" path="unsupported/birtEngine.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

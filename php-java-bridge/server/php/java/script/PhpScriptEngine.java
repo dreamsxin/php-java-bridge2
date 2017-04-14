@@ -68,7 +68,7 @@ public abstract class PhpScriptEngine extends AbstractScriptEngine
 
     protected ScriptEngineFactory factory = null;
 
-    private File scriptFile;
+    protected File scriptFile;
     protected Reader localReader;
     protected ResultProxy resultProxy;
 
@@ -455,7 +455,7 @@ public abstract class PhpScriptEngine extends AbstractScriptEngine
 				            PhpScriptEngine e = (PhpScriptEngine) ii
 				                    .next();
 				            e.releaseInternal(true);
-				            ctx.destroy(); // FIXME: necessary?
+				            if (ctx!=null) ctx.destroy(); // FIXME: necessary?
 				                           // shut down the
 				                           // SocketContextServer
 				        }

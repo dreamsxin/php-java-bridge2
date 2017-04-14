@@ -1,7 +1,6 @@
 package php.java.test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -81,19 +80,41 @@ public class TestPhpScriptEngine {
 	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 
 	e.getContext().setWriter(writer);
-	CompiledScript s = ((Compilable) e).compile("<?php echo 1+2;?>");
-
-	s.eval();
+	
 	long t1 = System.currentTimeMillis();
 	for (int i = 0; i < 100; i++) {
-	    s.eval();
+	    e.eval("<?php echo 1+2;?>");
 	}
-	long t2 = System.currentTimeMillis();
-	assertTrue((t2 - t1)<100);
 	((Closeable)e).close();
-	assertTrue("3".equals(out.toString()));
+	StringBuilder buf = new StringBuilder();
+	for(int i=0; i<100; i++) {
+	    buf.append("3");
+	}
+	assertEquals(buf.toString(), out.toString());
 
+	long t2 = System.currentTimeMillis();
+	long timeNonCompiled = t2-t1;
 
+	 out = new ByteArrayOutputStream();
+	 writer = new OutputStreamWriter(out);
+	 e = ScriptEngineHelper.getPhpScriptEngine4Test();
+		e.getContext().setWriter(writer);
+
+	
+	CompiledScript s = ((Compilable) e).compile("<?php echo 1+2;?>");
+
+	t1 = System.currentTimeMillis();
+	for (int i = 0; i < 100; i++) {
+	    s.eval();
+
+	}
+	((Closeable)e).close();
+
+	t2 = System.currentTimeMillis();
+	long timeCompiled = t2-t1;
+	assertEquals(buf.toString(), out.toString());
+
+//	System.out.println(timeNonCompiled - timeCompiled);
+	assertTrue((timeNonCompiled - timeCompiled)>100);
     }
-
 }

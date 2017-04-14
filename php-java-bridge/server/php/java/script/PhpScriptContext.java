@@ -266,7 +266,7 @@ public final class PhpScriptContext extends AbstractPhpScriptContext {
 
     @Override
     public File compile(Reader reader) throws IOException {
-	File scriptFile = File.createTempFile("tmp", ".php")
+	File scriptFile = File.createTempFile("pjbtmp", ".php")
 	        .getAbsoluteFile();
 	FileWriter writer = new FileWriter(scriptFile);
 	int count;
