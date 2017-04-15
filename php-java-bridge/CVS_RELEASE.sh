@@ -14,6 +14,7 @@ find . -print0 | xargs -0 touch
 dirs=`ls -l | grep '^d' | fgrep -v CVS | awk '{print $9}'`
 find $dirs -name "CVS" -print | xargs rm -rf
 
+cp WebContent/test.php .
 version=`cat VERSION`
 ln -s `pwd` php-java-bridge-${version}
 
@@ -36,8 +37,7 @@ cp JavaBridge.war JavaBridgeTemplate.war
 for i in 'META-INF/*' 'WEB-INF/lib/[^pJ]*.jar' 'WEB-INF/lib/poi.jar' 'WEB-INF/cgi/*' 'WEB-INF/web.xml' 'WEB-INF/platform/*' 'locale/*' '*.class' '*.jsp' '*.rpt*' '*.php'; do
   zip -d JavaBridgeTemplate.war "$i"; 
 done
-cat examples/php+jsp/settings.php >./index.php
-echo '<?php phpinfo();?>' >test.php
+cat WebContent/settings.php >./index.php
 rm -rf WEB-INF; mkdir WEB-INF
 cp server/example-web.xml WEB-INF/web.xml
 zip JavaBridgeTemplate.war index.php test.php
