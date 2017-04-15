@@ -3,6 +3,7 @@ package php.java.test.php5;
 public class TestException {
 
     public class Ex extends java.lang.Exception {
+	private static final long serialVersionUID = 1L;
 	int id;
 	public Ex(int id) {
 	    this.id = id;

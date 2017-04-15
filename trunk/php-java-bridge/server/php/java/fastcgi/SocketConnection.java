@@ -2,7 +2,6 @@
 
 package php.java.fastcgi;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 
 /*
@@ -46,7 +45,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import php.java.bridge.Util;
 import php.java.bridge.util.Logger;
 
 class SocketConnection extends Connection {

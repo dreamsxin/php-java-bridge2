@@ -54,8 +54,6 @@ public class TestConnectionPool {
 	}
     }
 
-    // FIXME do not create a new PHP file for each request => use Compilable
-    // instead of ScriptEngine
     private void testfunc2() throws Exception {
 	ScriptEngine e = ScriptEngineHelper.getPhpScriptEngine4Test();
 	OutputStream out = new ByteArrayOutputStream();

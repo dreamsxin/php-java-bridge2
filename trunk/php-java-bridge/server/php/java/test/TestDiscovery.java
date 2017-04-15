@@ -1,10 +1,6 @@
 package php.java.test;
 
-import static org.junit.Assert.*;
-
-import java.io.Closeable;
-
-import javax.script.ScriptEngine;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 

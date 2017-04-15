@@ -48,8 +48,13 @@ public class FCGIHelper {
     }
 
     public boolean isExternalFCGIPool() {
-        return socketPort!=null;
+        return socketPort!=null && !"true".equalsIgnoreCase(socketPort);
     }
+
+    public boolean isInternalDefaultPort() {
+        return socketPort!=null && "true".equalsIgnoreCase(socketPort);
+    }
+
 
     public int getPhpFcgiConnectionPoolSize() {
 	return phpFcgiConnectionPoolSize;
@@ -155,6 +160,7 @@ public class FCGIHelper {
     public void setWebInfDir(String webInfDir) {
 	this.webInfDir = webInfDir;
     }
+
 
 
 }

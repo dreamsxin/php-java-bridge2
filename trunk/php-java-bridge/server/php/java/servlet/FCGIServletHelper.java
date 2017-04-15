@@ -19,7 +19,7 @@ public class FCGIServletHelper extends FCGIHelper {
     public static final String PEAR_DIR = "/WEB-INF/pear";
     public static final String CGI_DIR = "/WEB-INF/cgi";
     public static final String WEB_INF_DIR = "/WEB-INF";
-    
+
     
     private HashMap processEnvironment = new HashMap(Util.COMMON_ENVIRONMENT);
 

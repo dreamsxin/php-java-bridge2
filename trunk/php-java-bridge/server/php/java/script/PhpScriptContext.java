@@ -44,12 +44,12 @@ import php.java.bridge.http.IContext;
 import php.java.bridge.http.JavaBridgeRunner;
 import php.java.bridge.util.Logger;
 import php.java.bridge.util.NotImplementedException;
-import php.java.fastcgi.FCGIProcessException;
 import php.java.fastcgi.ConnectionException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIConnectionPool;
 import php.java.fastcgi.FCGIHeaderParser;
 import php.java.fastcgi.FCGIHelper;
+import php.java.fastcgi.FCGIProcessException;
 import php.java.fastcgi.FCGIProxy;
 
 /**
@@ -142,25 +142,26 @@ public final class PhpScriptContext extends AbstractPhpScriptContext {
     
     private static final Object globalCtxLock = new Object();
     private static FCGIConnectionPool fcgiConnectionPool = null;
-    protected void setupFastCGIServer(String[] args, Map env) throws FCGIProcessException, ConnectionException {
-	synchronized(globalCtxLock) { //FIXME refactor
-	    if(null == fcgiConnectionPool) {
-		fcgiConnectionPool = FCGIConnectionPool.createConnectionPool(args, env, helper);
-	    }
-	}
-
-    }
  
+    private FCGIConnectionPool getConnectionPool(String[] args, Map env)
+            throws FCGIProcessException, ConnectionException {
+	
+	synchronized (globalCtxLock) {
+	    if (fcgiConnectionPool != null)
+		return fcgiConnectionPool;
+	    return fcgiConnectionPool = FCGIConnectionPool
+	            .createConnectionPool(args, env, helper);
 
+	}
+    }
+
+    
     /**{@inheritDoc}
      * @throws ConnectionException */
     public Continuation createContinuation(String[] args, Map env,
             OutputStream out, OutputStream err, FCGIHeaderParser headerParser) throws FCGIProcessException, ConnectionException {
 
-	if (args!=null) 
-	    setupFastCGIServer(args, env); 
-	
-	return new FCGIProxy(env, out,  err, headerParser, fcgiConnectionPool); 
+	return new FCGIProxy(env, out,  err, headerParser, args==null?fcgiConnectionPool:getConnectionPool(args, env)); 
     }
     private static JavaBridgeRunner httpServer;
     private static synchronized final JavaBridgeRunner getHttpServer() {
@@ -194,7 +195,7 @@ public final class PhpScriptContext extends AbstractPhpScriptContext {
     }
     @Override
     public void destroy() {
-	synchronized(globalCtxLock) { //FIXME clean this up!
+	synchronized(globalCtxLock) { 
 	    if (fcgiConnectionPool!=null)
 		fcgiConnectionPool.destroy();
 	    fcgiConnectionPool=null;

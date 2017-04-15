@@ -24,7 +24,6 @@ import java.util.Vector;
 import java.util.WeakHashMap;
 //* <p>Title: php-java-bridge</p>
 
-import php.java.bridge.Util;
 import php.java.bridge.http.SessionFactory;
 import php.java.bridge.util.Logger;
 

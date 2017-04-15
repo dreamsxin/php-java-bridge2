@@ -3,14 +3,12 @@
 package php.java.script;
 
 import java.io.OutputStream;
-import java.io.Reader;
 import java.util.Map;
 
 import javax.script.ScriptContext;
 
 import php.java.bridge.http.ContextServer;
 import php.java.bridge.http.JavaBridgeRunner;
-import php.java.bridge.util.ILogger;
 import php.java.bridge.util.NotImplementedException;
 import php.java.fastcgi.Continuation;
 import php.java.fastcgi.FCGIHeaderParser;

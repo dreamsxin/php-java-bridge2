@@ -613,9 +613,8 @@ public class JavaBridge implements Runnable {
 	if (methods.size() == 1) return methods.getFirst();
 	Object similar = null, selected = null;
 	int best = Integer.MAX_VALUE;
-	int n = 0;
 	
-	for (Iterator e = methods.iterator(); e.hasNext(); n++) {
+	for (Iterator e = methods.iterator(); e.hasNext(); ) {
 	    Object element = e.next();
 	    int w=0;
 

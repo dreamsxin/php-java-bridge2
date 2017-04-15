@@ -1,12 +1,8 @@
 package php.java.test;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.File;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringReader;
 

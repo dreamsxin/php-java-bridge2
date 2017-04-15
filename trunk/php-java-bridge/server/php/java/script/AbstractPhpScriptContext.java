@@ -111,7 +111,6 @@ public abstract class AbstractPhpScriptContext extends ScriptContextDecorator im
 
     /**
      * Sets the <code>Writer</code> for scripts to use when displaying output.
-     *TODO: test
      * @param writer The new <code>Writer</code>.
      */
     public void setWriter(Writer writer) {

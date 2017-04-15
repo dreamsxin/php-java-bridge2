@@ -61,7 +61,7 @@ class SocketFactory extends FCGIFactory {
 	super(args, env, fcgiConnectionPool, helper);
     }
     @Override
-    public void test() throws FCGIProcessException, ConnectionException {
+    public void test(String errorMessage) throws FCGIProcessException, ConnectionException {
         Socket testSocket;
 	try {
 	    testSocket = new Socket(InetAddress.getByName(getName()), port);
@@ -70,7 +70,7 @@ class SocketFactory extends FCGIFactory {
 	    if (fcgiProcessStartException != null) {
 		throw new FCGIProcessException(fcgiProcessStartException);
 	    }
-	    throw new ConnectionException(e);
+	    throw new ConnectionException(errorMessage, e);
 	}
     }
     /**

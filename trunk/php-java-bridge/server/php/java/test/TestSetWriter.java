@@ -1,13 +1,12 @@
 package php.java.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 
 import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
 
 import org.junit.Test;
 
