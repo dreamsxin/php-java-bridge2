@@ -105,7 +105,7 @@ public class FCGIUtil {
      * Default is 5. The value should be less than THREAD_POOL_MAX_SIZE
      * @see php.java.bridge.util.Util#THREAD_POOL_MAX_SIZE
      */
-    public static final String PHP_FCGI_CONNECTION_POOL_SIZE = "2"; // FIXME should be less than Util.THREAD_POOL_MAX_SIZE;
+    public static final String PHP_FCGI_CONNECTION_POOL_SIZE = "1"; // FIXME should be less than Util.THREAD_POOL_MAX_SIZE;
 
     /**
      * This controls how long the pool waits for a PHP script to terminate.

@@ -147,13 +147,13 @@ class SocketFactory extends FCGIFactory {
 	return LOCAL_HOST;
     }
     @Override
-    public String getFcgiStartCommand(String base, String php_fcgi_max_requests) {
+    public String getFcgiStartCommand(String base, int php_fcgi_max_requests) {
 	String msg=
 	    "cd " + base + File.separator + Util.osArch + "-" + Util.osName+ "\n" + 
 	    "REDIRECT_STATUS=200 " +
 	    "X_JAVABRIDGE_OVERRIDE_HOSTS=\"/\" " +
 	    "PHP_FCGI_CHILDREN=\"5\" " +
-	    "PHP_FCGI_MAX_REQUESTS=\""+php_fcgi_max_requests+"\" /usr/bin/php-cgi -b 127.0.0.1:" +
+	    "PHP_FCGI_MAX_REQUESTS=\""+php_fcgi_max_requests+"\" php-cgi -b 127.0.0.1:" +
 	    getPort()+"\n\n";
 	return msg;
     }

@@ -89,15 +89,23 @@ public abstract class FCGIFactory {
     }
 
     public void startFCGIServer() throws FCGIProcessException, ConnectionException {
-
+	
 	findFreePort(!helper.isExternalFCGIPool());
-	initialize();
+	initialize(helper.isExternalFCGIPool());
 
 	File cgiOsDir = Util.TMPDIR;
 	helper.createLauncher(cgiOsDir);
-
-	startServer();
-	test();
+//FIXME cleaup
+	if (!helper.isExternalFCGIPool()) startServer();
+	try {
+	    test();
+	} catch (ConnectionException e) {
+	    if (helper.isExternalFCGIPool()) {
+		throw new FCGIProcessException("Could not connect to server. Please start it with: "+
+			getFcgiStartCommand(helper.getCgiDir(), helper.getPhpFcgiMaxRequests()), e);
+	    }
+	    throw e;
+	}
 
     }
 
@@ -220,9 +228,13 @@ public abstract class FCGIFactory {
     /**
      * For backward compatibility the "JavaBridge" context uses the port 9667
      * (Linux/Unix) or <code>\\.\pipe\JavaBridge@9667</code> (Windogs).
+     * @param externalPool 
      */
-    public void initialize() {
-	setDynamicPort();
+    public void initialize(boolean externalPool) {
+	if (externalPool)
+	    setDefaultPort();
+	else
+	    setDynamicPort();
     }
 
     protected abstract void setDynamicPort();
@@ -240,7 +252,7 @@ public abstract class FCGIFactory {
      * @return A command string
      */
     public abstract String getFcgiStartCommand(String base,
-            String php_fcgi_max_requests);
+            int php_fcgi_max_requests);
 
     /**
      * Find a free port or pipe name.
@@ -275,7 +287,7 @@ public abstract class FCGIFactory {
 	    env.put("PHP_FCGI_CHILDREN",
 	            FCGIUtil.PHP_FCGI_CONNECTION_POOL_SIZE);
 	}
-	return new FCGIProcess.Builder().withArgs(args).withEnv(env).build();
+	return new FCGIProcess.Builder().withArgs(args).withEnv(env).withHelper(helper).build();
     }
 
 }

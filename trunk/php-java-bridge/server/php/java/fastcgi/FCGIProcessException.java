@@ -49,4 +49,7 @@ public class FCGIProcessException extends IOException {
     protected FCGIProcessException(String reason) {
         super("Could not run PHP: "+reason);
     }
+    protected FCGIProcessException(String reason, Exception ex) {
+        super(reason, ex);
+    }
 }

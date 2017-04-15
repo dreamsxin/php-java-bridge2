@@ -73,7 +73,7 @@ public abstract class PhpScriptEngine extends AbstractScriptEngine
     protected ResultProxy resultProxy;
 
     static HashMap getProcessEnvironment() {
-	return Util.COMMON_ENVIRONMENT;
+	return new HashMap();
     }
 
     protected void setStandardBindings() {

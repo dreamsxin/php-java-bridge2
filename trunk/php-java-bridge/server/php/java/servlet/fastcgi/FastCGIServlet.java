@@ -215,7 +215,7 @@ public class FastCGIServlet extends HttpServlet {
 
     protected void setupCGIEnvironment(HttpServletRequest req,
             HttpServletResponse res, Environment env) throws ServletException {
-	HashMap envp = (HashMap) Util.COMMON_ENVIRONMENT.clone();
+	HashMap envp = new HashMap();
 
 	envp.put("SERVER_SOFTWARE", serverInfo);
 	envp.put("SERVER_NAME", ServletUtil.nullsToBlanks(req.getServerName()));
@@ -376,6 +376,8 @@ public class FastCGIServlet extends HttpServlet {
 	    // send the FCGI header
 	    natOut.writeBegin(connection.isLast());
 	    natOut.writeParams(env.environment);
+	    natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
+
 	    int n;
 
 	    // the post variables
