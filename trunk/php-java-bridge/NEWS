@@ -3,6 +3,58 @@ php-java-bridge NEWS -- history of user-visible changes.
 Please send bug reports, questions and suggestions to
 <php-java-bridge-users@lists.sourceforge.net>.
 
+Version 7.1.2
+
+* Fixed a POST problem that occured in 7.1.1: Version 7.1.1 did not send a dummy
+  INPUT PARAM, so PHP mixed up the header with the following POST data, detected the
+  problem and shut down the output while still reading (and discarding) input data. 
+  After that, the following request crashed with a closed output stream.
+  
+* The JSR223 servlet demos have been rewritten. PHP script engines cannot
+  be clone()'d anymore, so please use the pattern as shown in jsr223.php demo.
+
+* The CompiledPhpScriptEngine has been rewritten to "compile" a PHP script.
+  This means that a) the given script is tokenized and any exit() and die() is 
+  replaced by an exit call which notifies java about the PHP exit code, b) a 
+  thread pool and fastcgi pool is started and waits for connections. The following
+  eval() calls all use the temporary file until the fastcgi pool shuts down.
+  
+* There are two separate fastcgi and thread pools for servlet- and standalone
+  environments. The servlet thread/fastcgi pool is started from the 
+  ContextLoaderListener and shut down when the servlet listener dies. The 
+  standalone pools however shut down only when the JVM dies. 
+  
+  So please make sure to use the appropriate ScriptContexts; use the 
+  default ScriptContext for the standalone environment and the 
+  PhpServletScriptContext for the servlet environment (see jsr223.jsp for an
+  example).
+  
+  There's a third ScriptContext for the JavaBridgeRunner ("JavaBridgeRunnerScriptContext")
+  which is used by the simple HTTP server included with the bridge. You can ignore that,
+  it simply throws a NotImplementedException. Use a Servlet environment in tomcat or send a 
+  patch, if you need this.
+  
+* The ContextLoaderListener doesn't start a PHP FastCGI server anymore. The thread and fastcgi
+  pools are created when the first request for the "PhpCGIServlet" comes in. (By the way, the word 
+  "PhpCGIServlet" is misleading, the bridge handles FastCGI requests, it cannot handle CGI anymore).
+
+* The PHPDebugger is currently switched off. It will be re-enabled in one of the next releases.
+
+* By setting php_fcgi_external_socket_pool context ini parameter (or the 
+  php.java.bridge.php_fcgi_external_socket_pool system property) to "true", the bridge
+  starts the internal FastCGI server on the fixed port 9667 (FCGI_PORT). This is
+  useful for debugging.
+  
+  By setting the php_fcgi_external_socket_pool context ini parameter (or the 
+  php.java.bridge.php_fcgi_external_socket_pool system property) to an integer value, the bridge
+  tries to connect to the external fastcgi pool listening on the given port number.
+  
+  For example to connect the bridge to a running fpm (see: http://php.net/manual/de/install.fpm.php),
+  configure the manager to listen on a port and then set the external_socket_pool parameter
+  to that port number. Example setting system property for standalone:
+  java -Dphp.java.bridge.php_fcgi_external_socket_pool=<your fpm-pool port number> -jar JavaBridge.jar
+   
+   
 Version 7.1.1
 
 * On windows PHP >= 7 is now required to run the bridge in FastCGI mode. The "named pipe"
