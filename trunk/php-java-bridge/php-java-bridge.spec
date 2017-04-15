@@ -118,7 +118,6 @@ if test X$java_dir = X; then echo "ERROR: java not installed" >2; exit 1; fi
 
 ant clean &&
 ant PhpDoc 2>/dev/null >/dev/null && 
-ant JavaDoc &&
 ant && 
 ant SrcZip
 
@@ -127,20 +126,20 @@ ant SrcZip
 %endif
 
 %install
-rm -rf $RPM_BUILD_ROOT
+#rm -rf $RPM_BUILD_ROOT
 echo >filelist
 echo >filelist-devel
 
 mod_dir=`pwd`/dist
-
+mkdir -p $RPM_BUILD_ROOT/%{shared_java}
 cp $mod_dir/JavaBridge.jar $RPM_BUILD_ROOT/%{shared_java}/JavaBridge-%{version}.jar; 
 (cd $RPM_BUILD_ROOT/%{shared_java}; ln -fs JavaBridge-%{version}.jar JavaBridge.jar); 
 echo %{shared_java}/JavaBridge.jar >>filelist-devel
 
-files="PHPDebugger.php Client.inc GlobalRef.inc Java.inc JavaBridge.inc JavaProxy.inc NativeParser.inc Options.inc Parser.inc Protocol.inc SimpleParser.inc JavaProxy.php"
+files="PHPDebugger.php Client.inc GlobalRef.inc Java.inc JavaBridge.inc JavaProxy.inc NativeParser.inc Options.inc Parser.inc Protocol.inc SimpleParser.inc"
 mkdir -p $RPM_BUILD_ROOT/%{shared_pear}/java
 for i in $files; 
-  do cp server/META-INF/java/$i $RPM_BUILD_ROOT/%{shared_pear}/java/$i; 
+  do cp WebContent/META-INF/java/$i $RPM_BUILD_ROOT/%{shared_pear}/java/$i; 
   echo %{shared_pear}/java/$i >>filelist
 done
 
@@ -154,7 +153,6 @@ done
 # server also contains the server documentation
 mv server server.backup
 mkdir server
-cp -r server.backup/documentation server
 (cd server.backup; find php -name "*.java" -print | cpio -dp ../server)
 cp dist/src.zip server
 
