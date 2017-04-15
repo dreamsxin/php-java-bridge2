@@ -1,3 +1,16 @@
+2017-04-15  <jostb@intern>
+
+    * build.xml, server/php/java/bridge/Util.java : Removed proxy
+    
+    * server/php/java/bridge/generated/JavaProxy.java: Removed
+    
+    * unsupported/eclipse.birt.lib: Updated to latest version
+    
+    * server/php/java/servlet/fastcgi/FastCGIServlet.java, server/php/java/fastcgi/FCGIProxy.java:  Send an FCGIUtil.FCGI_EMPTY_RECORD, required
+      by FastCGI spec. The previous refactoring in Version 7.1.1 destroyed PHP POST requests.
+    
+    * VERSION, php-java-bridge.spec: Version 7.1.2 released.
+    
 2017-04-10  <jostb@intern>
 
     * jar-in-jar-loader.zip: moved to unsupported
