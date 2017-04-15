@@ -26,7 +26,6 @@ mv ~/rpmbuild/RPMS/i386/php-java-bridge-devel-${version}-1.i386.rpm "./php-java-
 
 ant clean &&
 ant PhpDoc 2>/dev/null >/dev/null && 
-ant JavaDoc &&
 ant && 
 ant SrcZip
 
@@ -49,7 +48,7 @@ rm -f test.php
 cp  src.zip README FAQ.html PROTOCOL.TXT INSTALL.STANDALONE INSTALL.J2EE INSTALL.J2SE NEWS documentation
 mv examples documentation
 mv server documentation
-list="documentation/API documentation/examples documentation/README documentation/FAQ.html documentation/PROTOCOL.TXT documentation/INSTALL.J2EE documentation/INSTALL.J2SE documentation/INSTALL.STANDALONE documentation/src.zip documentation/NEWS JavaBridge.war documentation/server/documentation documentation/server/php_java_lib documentation/server/tests.jsr223 documentation/server/tests.php5"
+list="documentation/examples documentation/README documentation/FAQ.html documentation/PROTOCOL.TXT documentation/INSTALL.J2EE documentation/INSTALL.J2SE documentation/INSTALL.STANDALONE documentation/src.zip documentation/NEWS JavaBridge.war documentation/server/php_java_lib documentation/server/php/java/test"
 find $list -type d -name "CVS" -print | xargs rm -rf
 
 
