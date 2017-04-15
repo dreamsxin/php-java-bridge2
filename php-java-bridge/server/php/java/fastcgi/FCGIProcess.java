@@ -287,7 +287,11 @@ public class FCGIProcess extends java.lang.Process {
 
     protected String[] getArgumentArray(String[] php, String[] args) {
 	String realPath = new File(args[0]).getParent();
-	if (realPath==null) realPath=Util.TMPDIR.getAbsolutePath(); // if not in cgi/version-arch/, use tmpdir to create launcher
+	if (realPath == null)
+	    realPath = Util.TMPDIR.getAbsolutePath(); // if not in
+	                                              // cgi/version-arch/, use
+	                                              // tmpdir to create
+	                                              // launcher
 	LinkedList buf = new LinkedList();
 	if (Util.USE_SH_WRAPPER) {
 	    buf.add("/bin/sh");
@@ -299,7 +303,7 @@ public class FCGIProcess extends java.lang.Process {
 	    buf.addAll(java.util.Arrays.asList(Util.ALLOW_URL_INCLUDE));
 	} else {
 	    buf.add(realPath + File.separator + "launcher.exe");
-	    buf.add(Util.LAUNCHER_FLAGS); //CREATE_BREAKAWAY_FROM_JOB 
+	    buf.add(Util.LAUNCHER_FLAGS); // CREATE_BREAKAWAY_FROM_JOB
 	    buf.addAll(java.util.Arrays.asList(php));
 	    for (int i = 1; i < args.length; i++) {
 		buf.add(args[i]);
@@ -358,15 +362,21 @@ public class FCGIProcess extends java.lang.Process {
 	    php[0] = Util.PHP_EXEC;
 	if (php[0] == null && phpExec != null && (new File(phpExec).exists()))
 	    php[0] = phpExec;
-	
+
 	String workspace;
-	if (php[0] == null && (workspace = Util.canonicalPath(new File("WebContent/WEB-INF/cgi").getAbsolutePath(), "php-cgi").toString()) !=null && (new File(workspace).exists() || new File(workspace+".exe").exists()))
+	if (php[0] == null
+	        && (workspace = Util
+	                .canonicalPath(new File("WebContent/WEB-INF/cgi")
+	                        .getAbsolutePath(), "php-cgi")
+	                .toString()) != null
+	        && (new File(workspace).exists()
+	                || new File(workspace + ".exe").exists()))
 	    php[0] = workspace;
-	
+
 	// give up, use standard php-cgi anywhere in the path
 	if (php[0] == null)
 	    php[0] = "php-cgi";
-	
+
 	if (Logger.getLogLevel() > 3)
 	    Logger.logDebug(
 	            "Using php binary: " + java.util.Arrays.asList(php));
@@ -391,56 +401,6 @@ public class FCGIProcess extends java.lang.Process {
 	                            getTestArgumentArray(php, args))
 	                    + " ");
     }
-
-    // protected Process(String[] args, boolean includeJava,
-    // boolean includeDebugger, String cgiDir, String pearDir,
-    // String webInfDir, File homeDir, Map env, boolean tryOtherLocations,
-    // boolean preferSystemPhp) {
-    // this.args = args;
-    // this.homeDir = homeDir;
-    // this.env = env;
-    // this.tryOtherLocations = tryOtherLocations;
-    // this.preferSystemPhp = preferSystemPhp;
-    // this.includeJava = includeJava;
-    // this.includeJava = includeDebugger;
-    // this.cgiDir = cgiDir;
-    // this.pearDir = pearDir;
-    // this.webInfDir = webInfDir;
-    // }
-
-    /**
-     * Starts a CGI process and returns the process handle.
-     * 
-     * @param args
-     *            The args array, e.g.: new String[]{null, "-b", ...};. If args
-     *            is null or if args[0] is null, the function looks for the
-     *            system property "php.java.bridge.php_exec".
-     * @param homeDir
-     *            The home directory. If null, the current working directory is
-     *            used.
-     * @param env
-     *            The CGI environment. If null, Util.DEFAULT_CGI_ENVIRONMENT is
-     *            used.
-     * @param tryOtherLocations
-     *            true if we should check the DEFAULT_CGI_LOCATIONS first
-     * @param preferSystemPhp
-     * @param err
-     * @return The process handle.
-     * @throws IOException
-     * @throws NullPointerException
-     * @throws IOException
-     * @see Util#checkCgiBinary(String)
-     */
-    // public static Process start(String[] args, boolean includeJava,
-    // boolean includeDebugger, String cgiDir, String pearDir,
-    // String webInfDir, File homeDir, Map env, boolean tryOtherLocations,
-    // boolean preferSystemPhp, OutputStream err) throws IOException {
-    // Process proc = new Process(args, includeJava, includeDebugger, cgiDir,
-    // pearDir, webInfDir, homeDir, env, tryOtherLocations,
-    // preferSystemPhp);
-    // proc.start();
-    // return proc;
-    // }
 
     /**
      * Check for a PHP fatal error and throw a PHP exception if necessary.
@@ -572,6 +532,18 @@ public class FCGIProcess extends java.lang.Process {
 
 	public Builder withWebInfDir(String webInfDir) {
 	    this.webInfDir = webInfDir;
+	    return this;
+	}
+
+	public Builder withHelper(FCGIHelper helper) {
+	    tryOtherLocations = helper.isPhpTryOtherLocations();
+	    preferSystemPhp = helper.isPreferSystemPhp();
+	    isOldPhpVersion = false;
+	    includeJava = helper.isPhpIncludeJava();
+	    includeDebugger = helper.isPhpIncludeDebugger();
+	    cgiDir = helper.getCgiDir();
+	    pearDir = helper.getPearDir();
+	    webInfDir = helper.getWebInfDir();
 	    return this;
 	}
 

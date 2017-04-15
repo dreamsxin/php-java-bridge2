@@ -89,6 +89,7 @@ public class FCGIProxy extends Continuation {
 
 	    natOut.writeBegin(connection.isLast());
 	    natOut.writeParams(env);
+	    natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
 
 	    natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
 	    natOut.close();

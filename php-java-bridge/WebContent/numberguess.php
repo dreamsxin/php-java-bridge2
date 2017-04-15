@@ -5,9 +5,9 @@
 
 var_dump($_POST);
 
-if($_POST['guess']) {
-  echo "POST!!!";
-}
+/* if($_POST['guess']) { */
+/*   echo "POST!!!"; */
+/* } */
 ?>
 
 

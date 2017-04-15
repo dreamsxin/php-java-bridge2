@@ -19,6 +19,9 @@ public class FCGIServletHelper extends FCGIHelper {
     public static final String PEAR_DIR = "/WEB-INF/pear";
     public static final String CGI_DIR = "/WEB-INF/cgi";
     public static final String WEB_INF_DIR = "/WEB-INF";
+    
+    
+    private HashMap processEnvironment = new HashMap(Util.COMMON_ENVIRONMENT);
 
     public FCGIServletHelper() {
 	super();
@@ -66,7 +69,10 @@ public class FCGIServletHelper extends FCGIHelper {
 		e.printStackTrace();
 	    }
 	}
-	String pearDir = getRealPath(context, PEAR_DIR);
+	
+	webInfDir = getRealPath(context, WEB_INF_DIR);
+
+	pearDir = getRealPath(context, PEAR_DIR);
 	if (pearDir != null) {
 	    File pearDirFile = new File(pearDir);
 	    try {
@@ -77,11 +83,11 @@ public class FCGIServletHelper extends FCGIHelper {
 		e.printStackTrace();
 	    }
 	}
-	String cgiDir = getRealPath(context, CGI_DIR);
-	File cgiOsDir = new File(cgiDir, Util.osArch + "-" + Util.osName);
+	cgiDir = getRealPath(context, CGI_DIR);
+	File cgiOsDir = new File(getCgiDir(), Util.osArch + "-" + Util.osName);
 	File conf = new File(cgiOsDir, "conf.d");
 	File ext = new File(cgiOsDir, "ext");
-	File cgiDirFile = new File(cgiDir);
+	File cgiDirFile = new File(getCgiDir());
 	try {
 	    if (!cgiDirFile.exists()) {
 		cgiDirFile.mkdirs();
@@ -113,14 +119,10 @@ public class FCGIServletHelper extends FCGIHelper {
 	    try {
 		File phpCgi = new File(cgiOsDir, "php-cgi");
 		if (!useSystemPhp(phpCgi)) {
-		    new FCGIServletHelper().updateProcessEnvironment(conf);
+		    updateProcessEnvironment(conf);
 		    File wrapper = new File(cgiOsDir, "php-cgi.sh");
 		    if (!wrapper.exists()) {
-			byte[] data = ("#!/bin/sh\nchmod +x ./" + Util.osArch
-			        + "-" + Util.osName + "/php-cgi\n" + "exec ./"
-			        + Util.osArch + "-" + Util.osName
-			        + "/php-cgi -c ./" + Util.osArch + "-"
-			        + Util.osName + "/php-cgi.ini \"$@\"")
+			byte[] data = ("#!/bin/sh\nchmod +x ./php-cgi\n" + "exec ./php-cgi \"$@\"")
 			                .getBytes();
 			OutputStream out = new FileOutputStream(wrapper);
 			out.write(data);
@@ -141,7 +143,7 @@ public class FCGIServletHelper extends FCGIHelper {
 			out.write(data);
 			out.close();
 		    }
-		} else {
+		} else if (!phpCgi.exists()) {
 		    exeExists = false;
 		    File readme = new File(cgiOsDir,
 		            "php-cgi.MISSING.README.txt");
@@ -176,7 +178,7 @@ public class FCGIServletHelper extends FCGIHelper {
 			out.write(data);
 			out.close();
 		    }
-		} else {
+		} else if (!phpCgi.exists()) {
 		    exeExists = false;
 		    File readme = new File(cgiOsDir,
 		            "php-cgi.exe.MISSING.README.txt");
@@ -218,13 +220,13 @@ public class FCGIServletHelper extends FCGIHelper {
 	}
     }
 
-    public void updateProcessEnvironment(File conf) {
+    private void updateProcessEnvironment(File conf) {
 	try {
-	    PROCESS_ENVIRONMENT.put("PHP_INI_SCAN_DIR",
+	    processEnvironment.put("PHP_INI_SCAN_DIR",
 	            conf.getCanonicalPath());
 	} catch (IOException e) {
 	    e.printStackTrace();
-	    PROCESS_ENVIRONMENT.put("PHP_INI_SCAN_DIR", conf.getAbsolutePath());
+	    processEnvironment.put("PHP_INI_SCAN_DIR", conf.getAbsolutePath());
 	}
     }
 
@@ -251,13 +253,6 @@ public class FCGIServletHelper extends FCGIHelper {
 
 	return false;
     }
-
-    private static HashMap getProcessEnvironment() {
-	HashMap map = new HashMap(Util.COMMON_ENVIRONMENT);
-	return map;
-    }
-
-    static final HashMap PROCESS_ENVIRONMENT = getProcessEnvironment();
 
     private void checkCgiBinary(ServletContext context) {
 	String value;
@@ -294,8 +289,8 @@ public class FCGIServletHelper extends FCGIHelper {
 		value = "";
 	    value = value.trim();
 	    value = value.toLowerCase();
-	    if (value.equals("on") || value.equals("true"))
-		preferSystemPhp = true;
+	    if (value.equals("off") || value.equals("false"))
+		preferSystemPhp = false;
 	} catch (Throwable t) {
 	    t.printStackTrace();
 	}

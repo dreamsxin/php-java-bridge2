@@ -19,6 +19,9 @@ public class FCGIHelper {
     protected int phpFcgiMaxRequests;
     protected boolean promiscuous;
     protected String socketPort;
+    protected String cgiDir;
+    protected String pearDir;
+    protected String webInfDir;
 
     protected String php;
 
@@ -28,11 +31,13 @@ public class FCGIHelper {
 	phpFcgiConnectionPoolTimeout = Integer.parseInt(System.getProperty("php.java.bridge.php_fcgi_connection_pool_timeout", FCGIUtil.PHP_FCGI_CONNECTION_POOL_TIMEOUT));
 	phpFcgiMaxRequests = Integer.parseInt(System.getProperty("php.java.bridge.php_fcgi_max_requests",FCGIUtil.PHP_FCGI_MAX_REQUESTS));
 	phpTryOtherLocations = Util.PHP_EXEC == null;
-	preferSystemPhp = "true".equalsIgnoreCase(System.getProperty("php.java.bridge.prefer_system_php_exec", "false"));
+	preferSystemPhp = "true".equalsIgnoreCase(System.getProperty("php.java.bridge.prefer_system_php_exec", "true"));
 	php = Util.PHP_EXEC == null?"php-cgi":Util.PHP_EXEC;
 	phpIncludeJava = "true".equalsIgnoreCase(System.getProperty("php.java.bridge.php_include_java", "true"));
 	phpIncludeDebugger = "true".equalsIgnoreCase(System.getProperty("php.java.bridge.php_include_debugger", "false"));
 	promiscuous = Util.JAVABRIDGE_PROMISCUOUS;
+	cgiDir = Util.DEFAULT_CGI_LOCATIONS[0];
+	pearDir = webInfDir = null;
 	
 	socketPort= System.getProperty("php.java.bridge.php_fcgi_external_socket_pool");
     }
@@ -119,6 +124,36 @@ public class FCGIHelper {
 		Logger.printStackTrace(e);
 	    }
 	}
+    }
+
+
+    public String getCgiDir() {
+	return cgiDir;
+    }
+
+
+    public void setCgiDir(String cgiDir) {
+	this.cgiDir = cgiDir;
+    }
+
+
+    public String getPearDir() {
+	return pearDir;
+    }
+
+
+    public void setPearDir(String pearDir) {
+	this.pearDir = pearDir;
+    }
+
+
+    public String getWebInfDir() {
+	return webInfDir;
+    }
+
+
+    public void setWebInfDir(String webInfDir) {
+	this.webInfDir = webInfDir;
     }
 
 
