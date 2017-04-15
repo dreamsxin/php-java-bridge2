@@ -42,7 +42,7 @@ public class TestCGI  {
     private static final Object globalCtxLock = new Object();
     private static FCGIConnectionPool fcgiConnectionPool = null;
     protected void setupFastCGIServer(String[] args, Map env) throws FCGIProcessException, ConnectionException {
-	synchronized(globalCtxLock) { //FIXME refactor
+	synchronized(globalCtxLock) { 
 	    if(null == fcgiConnectionPool) {
 		fcgiConnectionPool = FCGIConnectionPool.createConnectionPool(args, env, new FCGIHelper());
 	    }

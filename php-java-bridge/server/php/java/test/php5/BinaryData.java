@@ -52,7 +52,6 @@ public class BinaryData extends ScriptEngineTestBase {
 	try {
 	    return new String(b, "ASCII");
 	} catch (UnsupportedEncodingException e) {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
 	return null;

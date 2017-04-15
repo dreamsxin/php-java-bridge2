@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import php.java.bridge.JavaBridge;
-import php.java.bridge.Util;
 import php.java.bridge.util.Logger;
 
 class Session implements ISession {

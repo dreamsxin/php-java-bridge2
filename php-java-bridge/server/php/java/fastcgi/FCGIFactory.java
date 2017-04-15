@@ -2,11 +2,9 @@
 package php.java.fastcgi;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
@@ -90,22 +88,17 @@ public abstract class FCGIFactory {
 
     public void startFCGIServer() throws FCGIProcessException, ConnectionException {
 	
-	findFreePort(!helper.isExternalFCGIPool());
+	findFreePort(!helper.isInternalDefaultPort());
 	initialize(helper.isExternalFCGIPool());
 
 	File cgiOsDir = Util.TMPDIR;
 	helper.createLauncher(cgiOsDir);
-//FIXME cleaup
+
 	if (!helper.isExternalFCGIPool()) startServer();
-	try {
-	    test();
-	} catch (ConnectionException e) {
-	    if (helper.isExternalFCGIPool()) {
-		throw new FCGIProcessException("Could not connect to server. Please start it with: "+
-			getFcgiStartCommand(helper.getCgiDir(), helper.getPhpFcgiMaxRequests()), e);
-	    }
-	    throw e;
-	}
+	
+	test("Could not connect to server. Please start it with: "+
+		    getFcgiStartCommand(helper.getCgiDir(), helper.getPhpFcgiMaxRequests()));
+	
 
     }
 
@@ -135,12 +128,13 @@ public abstract class FCGIFactory {
 
     /**
      * Test the FastCGI server.
+     * @param string 
      * 
      * @throws FCGIProcessException
      *             thrown if a IOException occured.
      * @throws ConnectionException 
      */
-    public abstract void test() throws FCGIProcessException, ConnectionException;
+    public abstract void test(String string) throws FCGIProcessException, ConnectionException;
 
     protected abstract void waitForDaemon()
             throws UnknownHostException, InterruptedException;

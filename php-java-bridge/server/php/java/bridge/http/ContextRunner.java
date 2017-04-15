@@ -31,7 +31,6 @@ import java.io.OutputStream;
 import php.java.bridge.JavaBridge;
 import php.java.bridge.Util;
 import php.java.bridge.parser.Request;
-import php.java.bridge.util.ILogger;
 import php.java.bridge.util.Logger;
 
 /**

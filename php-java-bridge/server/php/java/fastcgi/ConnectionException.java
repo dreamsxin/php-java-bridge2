@@ -48,4 +48,7 @@ public class ConnectionException extends IOException {
     protected ConnectionException(String ex) {
 	super(ex);
     }
+    protected ConnectionException(String errorMessage, IOException e) {
+	super(errorMessage, e);
+    }
 }

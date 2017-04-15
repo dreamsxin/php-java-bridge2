@@ -114,7 +114,7 @@ public class ContextLoaderListener
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
-
+	
 	if (contextServer != null)
 	    contextServer.destroy();
 	synchronized (globalCtxLock) {
@@ -122,7 +122,10 @@ public class ContextLoaderListener
 		fcgiConnectionPool.destroy();
 	    fcgiConnectionPool = null;
 	}
-
+	if (fcgiThreadPool!=null) {
+	    fcgiThreadPool.destroy();
+	    fcgiThreadPool = null;
+	}
     }
 
     /** {@inheritDoc} */
@@ -170,12 +173,7 @@ public class ContextLoaderListener
 	    servletContextName = "";
 	contextServer = new ContextServer(servletContextName, promiscuous);
 
-	fcgiThreadPool = createThreadPool(
-	        helper.getPhpFcgiConnectionPoolSize());
-    }
-
-    private ThreadPool createThreadPool(int children) {
-	return new ThreadPool("JavaBridgeServletScriptEngineProxy", children);
+	fcgiThreadPool = new ThreadPool("JavaBridgeServletScriptEngineProxy", helper.getPhpFcgiConnectionPoolSize());
     }
 
     public ThreadPool getThreadPool() {

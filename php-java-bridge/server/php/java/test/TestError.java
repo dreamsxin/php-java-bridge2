@@ -7,8 +7,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import javax.script.ScriptEngine;
-
 import org.junit.Test;
 
 public class TestError extends ScriptEngineTestBase {

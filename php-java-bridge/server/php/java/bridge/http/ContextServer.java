@@ -4,7 +4,6 @@ package php.java.bridge.http;
 
 import php.java.bridge.Util;
 import php.java.bridge.util.AppThreadPool;
-import php.java.bridge.util.ILogger;
 
 public final class ContextServer {
     private String contextName;

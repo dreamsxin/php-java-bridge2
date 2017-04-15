@@ -56,7 +56,7 @@ public class ResultProxy extends Number {
 	try {
 	    close();
 	} catch (IOException e) {
-	    Logger.printStackTrace(e); //FIXME
+	    Logger.printStackTrace(e);
 	}
 	return result;
     }

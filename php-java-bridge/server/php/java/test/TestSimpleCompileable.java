@@ -58,7 +58,7 @@ public class TestSimpleCompileable {
 	script.getEngine().getContext().setWriter(new OutputStreamWriter(out));
 	script.eval();
 	
-	((Invocable)(script.getEngine())).invokeFunction("phpinfo", new String[]{});
+	((Invocable)(script.getEngine())).invokeFunction("phpinfo");
 	((Closeable) script.getEngine()).close();
 	String res = out.toString();
 	if (res.length()<=20) {
@@ -87,84 +87,46 @@ public class TestSimpleCompileable {
 	ScriptContext ctx = new ScriptContext() {
 	    
 	    @Override
-	    public void setWriter(Writer arg0) {
-		// TODO Auto-generated method stub
-		
-	    }
+	    public void setWriter(Writer arg0) {}
 	    
 	    @Override
-	    public void setReader(Reader arg0) {
-		// TODO Auto-generated method stub
-		
-	    }
+	    public void setReader(Reader arg0) {}
 	    
 	    @Override
-	    public void setErrorWriter(Writer arg0) {
-		// TODO Auto-generated method stub
-		
-	    }
+	    public void setErrorWriter(Writer arg0) {}
 	    
 	    @Override
-	    public void setBindings(Bindings arg0, int arg1) {
-		// TODO Auto-generated method stub
-		
-	    }
+	    public void setBindings(Bindings arg0, int arg1) {}
 	    
 	    @Override
-	    public void setAttribute(String arg0, Object arg1, int arg2) {
-		// TODO Auto-generated method stub
-		
-	    }
+	    public void setAttribute(String arg0, Object arg1, int arg2) {}
 	    
 	    @Override
-	    public Object removeAttribute(String arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	    }
+	    public Object removeAttribute(String arg0, int arg1) { return null; }
 	    
 	    @Override
-	    public Writer getWriter() {
-		return writer;
-	    }
+	    public Writer getWriter() {return writer;}
 	    
 	    @Override
-	    public List<Integer> getScopes() {
-		// TODO Auto-generated method stub
-		return null;
-	    }
+	    public List<Integer> getScopes() {return null;}
 	    
 	    @Override
-	    public Reader getReader() {
-return null;
-}
+	    public Reader getReader() {return null;}
 	    
 	    @Override
-	    public Writer getErrorWriter() {
-		return writer;
-	    }
+	    public Writer getErrorWriter() {return writer;}
 	    
 	    @Override
-	    public Bindings getBindings(int arg0) {
-		return b;
-	    }
+	    public Bindings getBindings(int arg0) {return b;}
 	    
 	    @Override
-	    public int getAttributesScope(String arg0) {
-		// TODO Auto-generated method stub
-		return 0;
-	    }
+	    public int getAttributesScope(String arg0) {return 0;}
 	    
 	    @Override
-	    public Object getAttribute(String arg0, int arg1) {
-		// TODO Auto-generated method stub
-		return null;
-	    }
+	    public Object getAttribute(String arg0, int arg1) {return null;}
 	    
 	    @Override
-	    public Object getAttribute(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	    }
+	    public Object getAttribute(String arg0) {return null;}
 	};
 	b.put("param", "8");
 	script.eval(ctx);

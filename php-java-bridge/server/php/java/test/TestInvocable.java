@@ -1,9 +1,9 @@
 package php.java.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import javax.script.Invocable;
-import javax.script.ScriptEngine;
 
 import org.junit.Test;
 

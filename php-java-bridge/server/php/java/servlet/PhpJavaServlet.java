@@ -98,7 +98,7 @@ public /*singleton*/ class PhpJavaServlet extends HttpServlet {
     	 
     	super.init(config);
        
-	String name = ctx.getServerInfo();
+//	String name = ctx.getServerInfo();
     	
 	if(Util.VERSION!=null)
     	    log("PHP/Java Bridge servlet "+servletContextName+" version "+Util.VERSION+" ready.");

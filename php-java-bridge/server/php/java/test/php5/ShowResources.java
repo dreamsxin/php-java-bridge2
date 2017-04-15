@@ -72,6 +72,7 @@ public class ShowResources extends ScriptEngineTestBase {
     } 
  
  
+    @SuppressWarnings("deprecation")
     private static void listDirResources(File dir, List resources)
 	throws MalformedURLException {
 	File[] files = dir.listFiles(); 
