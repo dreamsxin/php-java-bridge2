@@ -18,7 +18,7 @@
 		<delete file="server/php/java/bridge/generated/LauncherWindows7.java" />
 	</target>
 
-	<target name="init" depends="clean" >
+	<target name="init" >
 		<property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter" />
 		<property name="javaBaseDir" value="${basedir}/server" />
 		<property name="webContentDir" value="${basedir}/WebContent" />
