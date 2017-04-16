@@ -1,17 +1,8 @@
 <?php include_once("java/Java.inc");
 
-  /* 
-   * Use the new style which works with PHP 5 and above only. This
-   * code makes use of the new PHP 5 features try/catch, the PHP
-   * standard library and the automatic __toString() conversion. 
-   *
-   * See the test.php4 if you still use PHP 4.
-   */
-
 phpinfo();
 
 try {
-
   /* invoke java.lang.System.getProperties() */
   $props = java("java.lang.System")->getProperties();
   
