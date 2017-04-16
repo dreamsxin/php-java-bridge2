@@ -43,10 +43,12 @@ find $list -type d -name "CVS" -print | xargs rm -rf
 chmod +x JavaBridge.war
 
 # create j2ee download
+zip -q -r php-java-bridge_${version}_documentation.zip $list
 mv JavaBridgeTemplate.war "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war"
 
 ssh -p $port "jost_boekemeier@${host}.sourceforge.net" mkdir -p "/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/exploded/ /home/frs/project/php-java-bridge/src/php-java-bridge_`cat VERSION`/"
-scp -P $port  "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war" "jost_boekemeier@${host}.sourceforge.net:/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/"
+
+scp -P $port "php-java-bridge_`cat VERSION`_documentation.zip" "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war" "jost_boekemeier@${host}.sourceforge.net:/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/"
 
 scp -P $port  dist/Java.inc dist/JavaBridge.jar dist/php-servlet.jar "jost_boekemeier@${host}.sourceforge.net:/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/exploded/"
 
