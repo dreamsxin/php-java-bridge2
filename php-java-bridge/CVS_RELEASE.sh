@@ -46,7 +46,7 @@ chmod +x JavaBridge.war
 mv JavaBridgeTemplate.war "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war"
 
 ssh -p $port "jost_boekemeier@${host}.sourceforge.net" mkdir -p "/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/exploded/ /home/frs/project/php-java-bridge/src/php-java-bridge_`cat VERSION`/"
-scp -P $port  "JavaBridge.war" "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war" "jost_boekemeier@${host}.sourceforge.net:/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/"
+scp -P $port  "JavaBridgeTemplate`echo ${version}|sed 's/\.//g'`.war" "jost_boekemeier@${host}.sourceforge.net:/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/"
 
 scp -P $port  dist/Java.inc dist/JavaBridge.jar dist/php-servlet.jar "jost_boekemeier@${host}.sourceforge.net:/home/frs/project/php-java-bridge/Binary\ package/php-java-bridge_`cat VERSION`/exploded/"
 
