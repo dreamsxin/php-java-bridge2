@@ -215,9 +215,6 @@
 			<lib dir="${libDir}/eclipse.birt.lib">
 				<include name="*" />
 			</lib>
-			<lib dir="${distDir}">
-				<include name="php-servlet.jar" />
-			</lib>
 			<lib dir="${sampleWebDir}">
 				<include name="*.jar" />
 			</lib>
