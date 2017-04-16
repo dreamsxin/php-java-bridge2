@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <project name="JavaBridge" basedir="." default="JavaBridgeWar">
 	<target name="clean">
-		<delete dir="server/documentation" />
+		<delete dir="documentation/API" />
+		<delete dir="documentation/server" />
 		<delete dir="dist" />
 		<delete dir="bin" />
 		<delete file="WebContent/META-INF/java/Java.inc" />
@@ -175,22 +176,9 @@
 		<delete file="./index.php" />
 	</target>
 	<target name="PhpDoc" depends="init">
-		<apply executable="phpdoc" failonerror="true" dir="${webContentDir}" parallel="true">
-			<arg value="-c" />
-			<arg value="PHPDocConfig.ini" />
-			<fileset dir="${webContentDir}">
-				<include name="META-INF/java/JavaBridge.inc" />
-				<include name="META-INF/java/Options.inc" />
-				<include name="META-INF/java/Client.inc" />
-				<include name="META-INF/java/GlobalRef.inc" />
-				<include name="META-INF/java/NativeParser.inc" />
-				<include name="META-INF/java/Parser.inc" />
-				<include name="META-INF/java/Protocol.inc" />
-				<include name="META-INF/java/SimpleParser.inc" />
-				<include name="META-INF/java/PHPDebugger.php" />
-			</fileset>
-		</apply>
-		<delete file="documentation/API/errors.html" />
+		<exec executable="apigen" failonerror="true" dir="${basedir}">
+			<arg value="generate" />
+		</exec>
 	</target>
 	<target name="JavaBridgeWar" depends="JavaBridgeJar,PhpServletJar,JavaInc,init">
 		<war destfile="${distDir}/JavaBridge.war" webxml="${webContentDir}/WEB-INF/web.xml">
@@ -198,7 +186,7 @@
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
                 <attribute name="Rsrc-Main-Class" value="php.java.bridge.TestInstallation"/>
                 <attribute name="Class-Path" value="."/>
-                <attribute name="Rsrc-Class-Path" value="./ JavaBridge.jar"/>
+                <attribute name="Rsrc-Class-Path" value="./ WEB-INF/lib/JavaBridge.jar"/>
             </manifest>
             <zipfileset src="unsupported/jar-in-jar-loader.zip"/>
 			<zipfileset prefix="WEB-INF/lib" dir="${distDir}" />
@@ -228,7 +216,6 @@
 				<include name="*" />
 			</lib>
 			<lib dir="${distDir}">
-				<include name="JavaBridge.jar" />
 				<include name="php-servlet.jar" />
 			</lib>
 			<lib dir="${sampleWebDir}">

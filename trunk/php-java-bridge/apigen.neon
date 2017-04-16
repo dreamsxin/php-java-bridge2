@@ -1,0 +1,8 @@
+source: WebContent/META-INF/java/
+destination: documentation/API/
+visibilityLevels: [public, protected]
+annotationGroups: [todo, deprecated]
+title: VM Bridge
+baseUrl: http://php-java-bridge.sf.net/pjb/docs/php-api
+extensions: [inc]
+exclude: [Java.inc]

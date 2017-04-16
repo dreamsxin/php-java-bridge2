@@ -25,24 +25,13 @@ tar czhf php-java-bridge_${version}.tar.gz --exclude "php-java-bridge-${version}
 rpmbuild -tb php-java-bridge_${version}.tar.gz
 
 ant clean
-#ant PhpDoc 2>/dev/null >/dev/null && 
+ant PhpDoc
 ant 
 ant SrcZip
+ant JavaBridgeTemplateWar
 
 cp dist/*.war dist/src.zip .
 cp -r php_java_lib tests.php5 tests.jsr223 server
-
-cp JavaBridge.war JavaBridgeTemplate.war
-for i in 'org/' 'META-INF/*' 'WEB-INF/lib/[^pJ]*.jar' 'WEB-INF/lib/poi.jar' 'WEB-INF/cgi/*' 'WEB-INF/web.xml' 'WEB-INF/platform/*' 'locale/*' '*.class' '*.jsp' '*.rpt*' '*.php'; do
-  zip -d JavaBridgeTemplate.war "$i"; 
-done
-cat WebContent/settings.php >./index.php
-rm -rf WEB-INF; mkdir WEB-INF
-cp server/example-web.xml WEB-INF/web.xml
-zip JavaBridgeTemplate.war index.php test.php
-zip JavaBridgeTemplate.war WEB-INF/web.xml
-zip -d JavaBridgeTemplate.war birtreportlib/
-rm -f test.php
 
 cp  src.zip README FAQ.html PROTOCOL.TXT INSTALL.STANDALONE INSTALL.J2EE INSTALL.J2SE NEWS documentation
 mv examples documentation
