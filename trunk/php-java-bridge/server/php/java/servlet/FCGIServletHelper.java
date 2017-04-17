@@ -352,7 +352,7 @@ public class FCGIServletHelper extends FCGIHelper {
 	    /* ignore */}
 
 	val = null;
-	phpIncludeDebugger = false;
+	phpIncludeDebugger = true;
 	try {
 	    val = context.getInitParameter("php_include_debugger");
 	    if (val == null)
@@ -360,9 +360,9 @@ public class FCGIServletHelper extends FCGIHelper {
 	    if (val == null)
 		val = System
 		        .getProperty("php.java.bridge.php_include_debugger");
-	    if (val != null && (val.equalsIgnoreCase("on")
-	            || val.equalsIgnoreCase("true")))
-		phpIncludeDebugger = true;
+	    if (val != null && (val.equalsIgnoreCase("off")
+	            || val.equalsIgnoreCase("false")))
+		phpIncludeDebugger = false;
 	} catch (Throwable t) {
 	    /* ignore */}
 

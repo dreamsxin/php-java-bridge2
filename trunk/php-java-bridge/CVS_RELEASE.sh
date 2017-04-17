@@ -36,7 +36,8 @@ cp -r php_java_lib tests.php5 tests.jsr223 server
 cp  src.zip README FAQ.html PROTOCOL.TXT INSTALL.STANDALONE INSTALL.J2EE INSTALL.J2SE NEWS documentation
 mv examples documentation
 mv server documentation
-list="documentation/examples documentation/README documentation/FAQ.html documentation/PROTOCOL.TXT documentation/INSTALL.J2EE documentation/INSTALL.J2SE documentation/INSTALL.STANDALONE documentation/src.zip documentation/NEWS JavaBridge.war documentation/server/php_java_lib documentation/server/php/java/test"
+cp COPYING documentation/GPL
+list="documentation/examples documentation/README documentation/API documentation/FAQ.html documentation/PROTOCOL.TXT documentation/INSTALL.J2EE documentation/INSTALL.J2SE documentation/INSTALL.STANDALONE documentation/src.zip documentation/NEWS JavaBridge.war documentation/server/php_java_lib documentation/server/php/java/test"
 find $list -type d -name "CVS" -print | xargs rm -rf
 
 
