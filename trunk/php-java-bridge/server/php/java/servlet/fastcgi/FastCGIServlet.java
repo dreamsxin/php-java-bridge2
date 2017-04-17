@@ -24,6 +24,33 @@ package php.java.servlet.fastcgi;
  */
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import php.java.bridge.Util;
+import php.java.bridge.http.AbstractChannelName;
+import php.java.bridge.http.IContextFactory;
+import php.java.bridge.util.Logger;
+import php.java.bridge.util.NotImplementedException;
+import php.java.fastcgi.Connection;
+import php.java.fastcgi.FCGIHeaderParser;
+import php.java.fastcgi.FCGIInputStream;
+import php.java.fastcgi.FCGIOutputStream;
+import php.java.fastcgi.FCGIUtil;
+import php.java.servlet.ContextLoaderListener;
+import php.java.servlet.PhpJavaServlet;
+import php.java.servlet.ServletContextFactory;
+import php.java.servlet.ServletUtil;
 
 /**
  * A CGI Servlet which connects to a FastCGI server. If allowed by the
@@ -436,7 +463,7 @@ public class FastCGIServlet extends HttpServlet {
 	Environment env = getEnvironment();
 	setupRequestVariables(req, env);
 	setupCGIEnvironment(req, res, env);
-
+//req.getParameter("hugo");
 	try {
 	    doExecute(req, res, env);
 	} finally {
