@@ -209,8 +209,23 @@ public class FastCGIServlet extends HttpServlet {
 	    envp.put("PATH_TRANSLATED", documentRoot + pathInfo);
 	}
 
-	envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, env.servletPath));
-
+	boolean includeDebugger = env.includedDebugger &&"1".equals(req.getParameter("start_debug")) && null != req.getParameter("debug_port") && null != req.getParameter("original_url");
+	boolean includeJavaInc = env.includedJava;
+	if (includeDebugger && includeJavaInc) {
+	    envp.put("X_JAVABRIDGE_INCLUDE_ONLY", "@");
+	    envp.put("X_JAVABRIDGE_INCLUDE", ServletUtil.getRealPath(context, env.servletPath));
+	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
+	} else if (includeDebugger && !includeJavaInc) {
+	    envp.put("X_JAVABRIDGE_INCLUDE", ServletUtil.getRealPath(context, env.servletPath));
+	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
+	} else if (!includeDebugger && includeJavaInc) {
+	    envp.put("X_JAVABRIDGE_INCLUDE_ONLY", ServletUtil.getRealPath(context, "java/Java.inc"));
+	    envp.put("X_JAVABRIDGE_INCLUDE", ServletUtil.getRealPath(context, env.servletPath));
+	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
+	} else {
+	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, env.servletPath));
+	}
+	
     }
 
     protected void setupCGIEnvironment(HttpServletRequest req,
@@ -273,13 +288,6 @@ public class FastCGIServlet extends HttpServlet {
 
 	env.environment = envp;
 
-	if (env.includedJava || env.includedDebugger) {
-	    env.environment.put("X_JAVABRIDGE_INCLUDE_ONLY",
-	            String.valueOf((env.includedJava ? 10 : 0)
-	                    + (env.includedDebugger ? 1 : 0)));
-	    env.environment.put("X_JAVABRIDGE_INCLUDE", ServletUtil
-	            .getRealPath(getServletContext(), env.servletPath));
-	}
 	env.environment.put("REDIRECT_STATUS", "200");
 	env.environment.put("SERVER_SOFTWARE", Util.EXTENSION_NAME);
 
