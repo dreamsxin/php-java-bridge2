@@ -4,5 +4,5 @@ visibilityLevels: [public, protected]
 annotationGroups: [todo, deprecated]
 title: VM Bridge
 baseUrl: http://php-java-bridge.sf.net/pjb/docs/php-api
-extensions: [inc]
+extensions: [inc, php]
 exclude: [Java.inc]
