@@ -24,33 +24,6 @@ package php.java.servlet.fastcgi;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import php.java.bridge.Util;
-import php.java.bridge.http.AbstractChannelName;
-import php.java.bridge.http.IContextFactory;
-import php.java.bridge.util.Logger;
-import php.java.bridge.util.NotImplementedException;
-import php.java.fastcgi.Connection;
-import php.java.fastcgi.FCGIHeaderParser;
-import php.java.fastcgi.FCGIInputStream;
-import php.java.fastcgi.FCGIOutputStream;
-import php.java.fastcgi.FCGIUtil;
-import php.java.servlet.ContextLoaderListener;
-import php.java.servlet.PhpJavaServlet;
-import php.java.servlet.ServletContextFactory;
-import php.java.servlet.ServletUtil;
 
 /**
  * A CGI Servlet which connects to a FastCGI server. If allowed by the
@@ -208,8 +181,10 @@ public class FastCGIServlet extends HttpServlet {
 	    envp.put("PATH_INFO", pathInfo);
 	    envp.put("PATH_TRANSLATED", documentRoot + pathInfo);
 	}
-
-	boolean includeDebugger = env.includedDebugger &&"1".equals(req.getParameter("start_debug")) && null != req.getParameter("debug_port") && null != req.getParameter("original_url");
+    }
+    private void setScriptName(HttpServletRequest activeReq, Environment env) {
+	HashMap envp = env.environment;
+	boolean includeDebugger = env.includedDebugger &&"1".equals(activeReq.getParameter("start_debug")) && null != activeReq.getParameter("debug_port") && null != activeReq.getParameter("original_url");
 	boolean includeJavaInc = env.includedJava;
 	if (includeDebugger && includeJavaInc) {
 	    envp.put("X_JAVABRIDGE_INCLUDE_ONLY", "@");
@@ -222,12 +197,13 @@ public class FastCGIServlet extends HttpServlet {
 	    envp.put("X_JAVABRIDGE_INCLUDE_ONLY", ServletUtil.getRealPath(context, "java/Java.inc"));
 	    envp.put("X_JAVABRIDGE_INCLUDE", ServletUtil.getRealPath(context, env.servletPath));
 	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
-	} else {
+	} else 
+	{
 	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, env.servletPath));
 	}
 	
-    }
 
+    }
     protected void setupCGIEnvironment(HttpServletRequest req,
             HttpServletResponse res, Environment env) throws ServletException {
 	HashMap envp = new HashMap();
@@ -381,6 +357,9 @@ public class FastCGIServlet extends HttpServlet {
 	                               // a closed input stream
 	    out = ServletUtil.getServletOutputStream(res);
 
+	    // update the env after fetching the inputstream
+	    setScriptName(req, env);
+	    
 	    // send the FCGI header
 	    natOut.writeBegin(connection.isLast());
 	    natOut.writeParams(env.environment);

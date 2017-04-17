@@ -147,7 +147,7 @@ public class JavaInc {
 "}\n"+
 "return false;\n"+
 "}\n"+
-"define(\"JAVA_PEAR_VERSION\",\"7.1.1\");\n"+
+"define(\"JAVA_PEAR_VERSION\",\"7.1.3\");\n"+
 "if(!defined(\"JAVA_SEND_SIZE\"))\n"+
 "define(\"JAVA_SEND_SIZE\",8192);\n"+
 "if(!defined(\"JAVA_RECV_SIZE\"))\n"+
