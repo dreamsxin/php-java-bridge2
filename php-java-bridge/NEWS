@@ -3,6 +3,47 @@ php-java-bridge NEWS -- history of user-visible changes.
 Please send bug reports, questions and suggestions to
 <php-java-bridge-users@lists.sourceforge.net>.
 
+Version 7.1.4
+
+* A PHP class can now override Java methods. Example:
+
+  <?php
+  use php\java\test\php5\TestExtends$TestClass as TestClass; // see Java class below
+
+  class PhpTestClass extends TestClass {
+  function func ($s, $val) {
+    $res = parent::func($s, val);
+    $res->append($val+10);
+    return $res;
+  }
+  function func2 ($s, $val) {
+    $res = func3($s, val);
+    $res->append($val+20);
+    return $res;
+  }
+ }
+  
+ $te = new PhpTestClass();
+ echo $te->runTest();
+ ?>
+ 
+ package php.java.test.php5;
+ public class TestExtends extends ScriptEngineTestBase {
+    public static abstract class TestClass {
+	    public void runTest() {
+        ...
+		func(b, val); // calls php func(), which calls java func()
+
+		func2(b, val); // calls php func2(), which calls java func3()
+	    }
+	    
+	    public abstract StringBuilder func2(StringBuilder s, int val);
+	    public StringBuilder func(StringBuilder s, int val) { ... }
+	    public StringBuilder func3(StringBuilder s, int val) { ... }
+    }
+ }
+
+
 Version 7.1.3
 
 * PHPDebugger re-enabled.
