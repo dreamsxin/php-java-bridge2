@@ -55,6 +55,60 @@ public class TestExtends extends ScriptEngineTestBase {
 	}
     }
     
+    @Test
+    public void testInvocationHandler() throws Exception {
+	OutputStream out = new ByteArrayOutputStream();
+	OutputStream err = new ByteArrayOutputStream();
+	Writer ou = new OutputStreamWriter(out);
+	Writer er = new OutputStreamWriter(err);
+	e.getContext().setWriter(ou);
+	e.getContext().setErrorWriter(er);
+
+	// the following code is wrong/bad style, but works. For a better example see testJavaEvalWithCleanEnv() below
+	String.valueOf(e.eval("function func2($b) {echo 'func2:'.$b;};"
+		+ "function func1($a){echo 'func1:'.$a;};"
+		+ "$cc = java_closure();"
+		+ "$ih=$cc->getInvocationHandler($cc);"
+		+ "/*echo java_inspect($ih);*/"
+		+ "$ih->invoke($cc,'func1', array(5));"
+		+ "echo ',';"
+		+ "$ih->invoke($cc,'func2', array(6));"
+		+ ""
+		));
+	assertEquals("func1:5,func2:6", out.toString());
+	if (!err.toString().isEmpty()) {
+	    System.err.println(err.toString());
+	}
+	assertTrue(err.toString().isEmpty());
+	
+    }
+    
+    // FIXME Bug in java_eval($code): crashes in 6.1.4 with a noSuchMethod exception: setExitCode(). 
+    @Ignore
+    @Test
+    public void testJavaEvalWithCleanEnv() throws Exception {
+	OutputStream out = new ByteArrayOutputStream();
+	OutputStream err = new ByteArrayOutputStream();
+	Writer ou = new OutputStreamWriter(out);
+	Writer er = new OutputStreamWriter(err);
+	e.getContext().setWriter(ou);
+	e.getContext().setErrorWriter(er);
+
+	String.valueOf(e.eval(""
+		+ "function func2($b){echo 'func2:'.$b;};"
+		+ "function func1($a){echo 'func1:'.$a;};"
+		+ "$c = java_closure();"
+		+ "java('java.lang.reflect.Proxy')->getInvocationHandler($c)->invoke($c,'func1', array(5));"
+		+ "echo ',';"
+		+ "java('java.lang.reflect.Proxy')->getInvocationHandler($c)->invoke($c,'func2', array(6));"
+		+ "/*exit(0);*/"
+		));
+	if (!err.toString().isEmpty()) {
+	    System.err.println(err.toString());
+	}
+	assertTrue(err.toString().isEmpty());
+	assertEquals("func1:5,func2:6", out.toString());
+    }
     @Ignore //FIXME
     @Test
     public void testExtendsFromCustomClass() throws Exception {
