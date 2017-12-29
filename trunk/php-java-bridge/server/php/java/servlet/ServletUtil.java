@@ -11,7 +11,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -52,33 +54,46 @@ import php.java.bridge.util.Logger;
 public class ServletUtil {
     private ServletUtil() {}
     
-   /**
-     * Identical to context2.getRealPath(pathInfoCGI). On BEA
-     * WebLogic, which has a broken getRealPath() implementation, we
-     * use context2.getResource(pathInfoCGI)) instead.
-     * @param context2 The servlet context.
+    private static final Map<String,String> pathInfoToRealPathCache = new HashMap<String,String>();
+    /**
+     * Identical to context2.getRealPath(pathInfoCGI), but does not fail if
+     * a resource does not exist.
+     * @param ctx The servlet context.
      * @param pathInfoCGI  may be "" or "/" for example.
      * @return a valid path or null
      */
-    public static String getRealPath(ServletContext context2, String pathInfoCGI) {
-        String ret = context2.getRealPath(pathInfoCGI);
-        if(ret!=null) return ret;
-    
-        // The following is the workaround for BEA WebLogic
-        if(!pathInfoCGI.startsWith("/")) {
-            pathInfoCGI = "/"+pathInfoCGI;
+    public static String getRealPath(ServletContext ctx, String pathInfoCGI) {
+        String ret = pathInfoToRealPathCache.get(pathInfoCGI);
+        if (ret!=null) {
+            return ret;
         }
+        
+        ret = ctx.getRealPath(pathInfoCGI);
+        if(ret!=null) {
+            pathInfoToRealPathCache.put(pathInfoCGI, ret);
+            return ret;
+        }
+    
+        // try resolve non-existing resource
         URL url = null;
         try { 
-            url = context2.getResource(pathInfoCGI);
+            StringBuilder b = new StringBuilder();
+            url = ctx.getResource("/");
+            String path = url.getPath();
+            b.append(path);
+            if (!path.endsWith("/")) {
+        	b.append("/");
+            }
+            b.append(pathInfoCGI.startsWith("/")?pathInfoCGI.substring(1):pathInfoCGI);
+            ret = b.toString().replace('/', File.separatorChar);
         } catch (MalformedURLException e) {
             Logger.printStackTrace(e);
         }
-        if(url != null && !"file".equals(url.getProtocol())) url = null;
-        if (url == null) throw new IllegalStateException("Cannot access "+pathInfoCGI+" within the current web application. Please explode it: Unzip the application .war file into a directory and deploy the directory instead.");
-        
-        ret = url.getPath();
-        return ret.replace('/', File.separatorChar);
+        if(url == null || !"file".equals(url.getProtocol())) {
+            throw new IllegalStateException("Cannot access "+pathInfoCGI+" within the current web application. Please explode it: Unzip the application .war file into a directory and deploy the directory instead.");
+        }
+        pathInfoToRealPathCache.put(pathInfoCGI, ret);
+        return ret;
     }
 
     /**
