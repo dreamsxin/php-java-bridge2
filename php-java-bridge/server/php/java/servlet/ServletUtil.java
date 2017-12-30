@@ -56,7 +56,7 @@ public class ServletUtil {
     
     private static final Map<String,String> pathInfoToRealPathCache = new HashMap<String,String>();
     /**
-     * Identical to context2.getRealPath(pathInfoCGI), but does not fail if
+     * Identical to ctx.getRealPath(pathInfoCGI), but does not fail if
      * a resource does not exist.
      * @param ctx The servlet context.
      * @param pathInfoCGI  may be "" or "/" for example.
@@ -75,20 +75,23 @@ public class ServletUtil {
         }
     
         // try resolve non-existing resource
-        URL url = null;
-        try { 
-            StringBuilder b = new StringBuilder();
-            url = ctx.getResource("/");
-            String path = url.getPath();
-            b.append(path);
-            if (!path.endsWith("/")) {
-        	b.append("/");
-            }
-            b.append(pathInfoCGI.startsWith("/")?pathInfoCGI.substring(1):pathInfoCGI);
-            ret = b.toString().replace('/', File.separatorChar);
-        } catch (MalformedURLException e) {
-            Logger.printStackTrace(e);
-        }
+	URL url = null;
+	try {
+	    StringBuilder b = new StringBuilder();
+	    url = ctx.getResource("/");
+	    if (url != null) {
+		String path = url.getPath();
+		b.append(path);
+		if (!path.endsWith("/")) {
+		    b.append("/");
+		}
+		b.append(pathInfoCGI.startsWith("/") ? pathInfoCGI.substring(1)
+		        : pathInfoCGI);
+		ret = b.toString().replace('/', File.separatorChar);
+	    }
+	} catch (MalformedURLException e) {
+	    Logger.printStackTrace(e);
+	}
         if(url == null || !"file".equals(url.getProtocol())) {
             throw new IllegalStateException("Cannot access "+pathInfoCGI+" within the current web application. Please explode it: Unzip the application .war file into a directory and deploy the directory instead.");
         }
