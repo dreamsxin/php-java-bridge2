@@ -107,6 +107,7 @@ if(!function_exists("java_get_base")) {
    */
   function java_eval($code) {
     $newCode = '';
+    $ignore = false;
     foreach (token_get_all($code) as $item)
     {
         if (is_array($item))
@@ -114,7 +115,13 @@ if(!function_exists("java_get_base")) {
             switch ($item[0])
             {
                 case T_EXIT :
-                    $item[1] = 'return';
+                    if (!$ignore) $item[1] = 'return';
+                    break;
+                case T_PAAMAYIM_NEKUDOTAYIM	:
+                    $ignore = true;
+                    break;
+                default:
+                    $ignore = false;
                     break;
             }
             $item = $item[1];

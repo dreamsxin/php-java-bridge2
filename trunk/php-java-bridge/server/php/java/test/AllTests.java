@@ -13,7 +13,7 @@ import php.java.test.php5.TestExtends;
         TestInvocable.class, TestInvocablePhpScriptEngine.class,
         TestPhpScriptEngine.class, TestScript.class, TestSetWriter.class,
         TestSimpleCompileable.class, TestSimpleInvocation.class,
-        TestExtends.class, InterfaceWithDefaultMethod.class,
+        TestExtends.class, InterfaceWithDefaultMethod.class, TestSystemExit.class,
         TestConnectionPool.class })
 public class AllTests {
 

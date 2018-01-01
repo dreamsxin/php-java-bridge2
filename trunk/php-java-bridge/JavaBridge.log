@@ -1,0 +1,9 @@
+Jan 01 15:55:03 JavaBridge ERROR: An exception occured: php.java.bridge.util.NoSuchProcedureException: static return([o:PhpExactNumber]). Candidates: []
+php.java.bridge.util.NoSuchProcedureException: static return([o:PhpExactNumber]). Candidates: []
+	at php.java.bridge.JavaBridge.checkM(JavaBridge.java:1109)
+	at php.java.bridge.JavaBridge.Invoke(JavaBridge.java:1048)
+	at php.java.bridge.parser.Request.handleRequest(Request.java:426)
+	at php.java.bridge.parser.Request.handleRequests(Request.java:509)
+	at php.java.bridge.http.ContextRunner.run(ContextRunner.java:143)
+	at php.java.bridge.util.ThreadPool$Delegate.run(ThreadPool.java:60)
+	at php.java.bridge.util.AppThreadPool$Delegate.run(AppThreadPool.java:1)
