@@ -12,9 +12,9 @@ import org.junit.Test;
 public class InterfaceWithDefaultMethod extends ScriptEngineTestBase {
  
     public interface IWithDefaultMethod {
-	public String getString1();
-	default public String getString2() {
-	    return "defaultMethod";
+	public String getString1(String arg);
+	default public String getString2(String arg) {
+	    return arg;
 	}
     }
     
@@ -23,9 +23,9 @@ public class InterfaceWithDefaultMethod extends ScriptEngineTestBase {
 	ByteArrayOutputStream out = new ByteArrayOutputStream();
 	e.getContext().setWriter(new OutputStreamWriter(out));
 	
-	e.eval(new StringReader("<?php function getString1() { return 'phpMethod'; }\n"+
+	e.eval(new StringReader("<?php function getString1($arg) { return $arg; }\n"+
 	"$cc=java_closure(null, null, array(java('php.java.test.InterfaceWithDefaultMethod$IWithDefaultMethod')));\n"+
-	"echo $cc->getString1();echo '\n'; echo $cc->getString2(); "));
+	"echo $cc->getString1('phpMethod');echo '\n'; echo $cc->getString2('defaultMethod'); "));
 	
 	((Closeable)e).close();
 	
