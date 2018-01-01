@@ -14,7 +14,7 @@ public class InterfaceWithDefaultMethod extends ScriptEngineTestBase {
     public interface IWithDefaultMethod {
 	public String getString1(String arg);
 	default public String getString2(String arg) {
-	    return arg;
+	    return "default"+arg;
 	}
     }
     
@@ -25,7 +25,7 @@ public class InterfaceWithDefaultMethod extends ScriptEngineTestBase {
 	
 	e.eval(new StringReader("<?php function getString1($arg) { return $arg; }\n"+
 	"$cc=java_closure(null, null, array(java('php.java.test.InterfaceWithDefaultMethod$IWithDefaultMethod')));\n"+
-	"echo $cc->getString1('phpMethod');echo '\n'; echo $cc->getString2('defaultMethod'); "));
+	"echo $cc->getString1('phpMethod');echo '\n'; echo $cc->getString2('Method'); "));
 	
 	((Closeable)e).close();
 	
