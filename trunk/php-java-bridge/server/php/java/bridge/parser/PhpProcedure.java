@@ -2,6 +2,9 @@
 
 package php.java.bridge.parser;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
+
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier
  *
@@ -39,7 +42,20 @@ import php.java.bridge.Util;
  * proxy for calling PHP code.
  */
 public final class PhpProcedure implements InvocationHandler {
-	
+
+    // interface default methods since java 1.8
+    private final static Constructor<MethodHandles.Lookup> LOOKUP_CONSTRUCTOR;
+    static {
+        try {
+            LOOKUP_CONSTRUCTOR = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
+            if (!LOOKUP_CONSTRUCTOR.isAccessible()) {
+                LOOKUP_CONSTRUCTOR.setAccessible(true);
+            }
+        }
+        catch (NoSuchMethodException exp) {
+            throw new IllegalStateException(exp);
+        }
+    }
     private IJavaBridgeFactory bridge;
     private long object;
     private Map names;
@@ -115,9 +131,17 @@ public final class PhpProcedure implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 	checkPhpContinuation ();
 	
-	return invoke(proxy, method.getName(), method.getReturnType(), args);
+	return method.isDefault() ? invokeDefaultMethod(proxy, method, args) : invoke(proxy, method.getName(), method.getReturnType(), args);
     }
-    
+
+    private Object invokeDefaultMethod(Object proxy, Method method,
+            Object[] args) throws Throwable {
+	
+	Class<?> declaringClass = method.getDeclaringClass();
+	
+	return LOOKUP_CONSTRUCTOR.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE).unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
+    }
+
     public static long unwrap (Object ob) {
 	InvocationHandler handler = Proxy.getInvocationHandler(ob);
 	PhpProcedure proc = (PhpProcedure)handler;
