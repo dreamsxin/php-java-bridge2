@@ -42,6 +42,7 @@ public class JavaInc {
 "};\n"+
 "function java_eval($code) {\n"+
 "$newCode='';\n"+
+"$ignore = false;\n"+
 "foreach (token_get_all($code) as $item)\n"+
 "{\n"+
 "if (is_array($item))\n"+
@@ -49,7 +50,13 @@ public class JavaInc {
 "switch ($item[0])\n"+
 "{\n"+
 "case T_EXIT :\n"+
-"$item[1]='return';\n"+
+"if (!$ignore) $item[1]='return';\n"+
+"break;\n"+
+"case T_PAAMAYIM_NEKUDOTAYIM :\n"+
+"$ignore = true;\n"+
+"break;\n"+
+"default:\n"+
+"$ignore = false;\n"+
 "break;\n"+
 "}\n"+
 "$item=$item[1];\n"+
