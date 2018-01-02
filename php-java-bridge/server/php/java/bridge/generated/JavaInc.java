@@ -40,33 +40,33 @@ public class JavaInc {
 "parent::__construct(\"illegal argument: \".gettype($ob));\n"+
 "}\n"+
 "};\n"+
-"function java_eval($code) {\n"+
-"$newCode='';\n"+
-"$ignore = false;\n"+
-"foreach (token_get_all($code) as $item)\n"+
+"function java_eval($__code) {\n"+
+"$__newCode='';\n"+
+"$__ignore = false;\n"+
+"foreach (token_get_all($__code) as $__item)\n"+
 "{\n"+
-"if (is_array($item))\n"+
+"if (is_array($__item))\n"+
 "{\n"+
-"switch ($item[0])\n"+
+"switch ($__item[0])\n"+
 "{\n"+
 "case T_EXIT :\n"+
-"if (!$ignore) $item[1]='return';\n"+
+"if (!$__ignore) $__item[1]='return';\n"+
 "break;\n"+
 "case T_PAAMAYIM_NEKUDOTAYIM :\n"+
-"$ignore = true;\n"+
+"$__ignore = true;\n"+
 "break;\n"+
 "default:\n"+
-"$ignore = false;\n"+
+"$__ignore = false;\n"+
 "break;\n"+
 "}\n"+
-"$item=$item[1];\n"+
+"$__item=$__item[1];\n"+
 "}\n"+
-"$newCode.=$item;\n"+
+"$__newCode.=$__item;\n"+
 "}\n"+
-"$c=__javaproxy_Client_getClient();\n"+
-"$exitCode=eval((substr($newCode,0,2)=='<'.'?'?'?'.'>':'').$newCode);\n"+
-"$c->setExitCode($exitCode);\n"+
-"return $exitCode;\n"+
+"$__c=__javaproxy_Client_getClient();\n"+
+"$__exitCode=eval((substr($__newCode,0,2)=='<'.'?'?'?'.'>':'').$__newCode);\n"+
+"$__c->setExitCode($__exitCode);\n"+
+"return $__exitCode;\n"+
 "}\n"+
 "function java_autoload_function5($x) {\n"+
 "$s=str_replace(\"_\",\".\",$x);\n"+
