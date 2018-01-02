@@ -45,7 +45,7 @@ public class CompiledPhpScriptEngine extends PhpScriptEngine
 	setStandardBindings();
     }
 
-    public Object evalCompiled(ScriptContext context) throws ScriptException {
+    public synchronized Object evalCompiled(ScriptContext context) throws ScriptException {
 	ScriptContext current = getContext();
 	if (current != context)
 	    try {
@@ -138,7 +138,7 @@ public class CompiledPhpScriptEngine extends PhpScriptEngine
 	}
     }
 
-    public void close() throws IOException {
+    public synchronized void close() throws IOException {
 	if (!compiled)
 	    release();
 	else
