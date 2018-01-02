@@ -105,33 +105,33 @@ if(!function_exists("java_get_base")) {
   /**
    * @access private
    */
-  function java_eval($code) {
-    $newCode = '';
-    $ignore = false;
-    foreach (token_get_all($code) as $item)
+  function java_eval($__code) {
+    $__newCode = '';
+    $__ignore = false;
+    foreach (token_get_all($__code) as $__item)
     {
-        if (is_array($item))
+        if (is_array($__item))
         {
-            switch ($item[0])
+            switch ($__item[0])
             {
                 case T_EXIT :
-                    if (!$ignore) $item[1] = 'return';
+                    if (!$__ignore) $__item[1] = 'return';
                     break;
                 case T_PAAMAYIM_NEKUDOTAYIM	:
-                    $ignore = true;
+                    $__ignore = true;
                     break;
                 default:
-                    $ignore = false;
+                    $__ignore = false;
                     break;
             }
-            $item = $item[1];
+            $__item = $__item[1];
         }
-        $newCode.= $item;
+        $__newCode.= $__item;
     }
-    $c=__javaproxy_Client_getClient();
-	$exitCode=eval((substr($newCode,0,2)=='<'.'?'?'?'.'>':'').$newCode);
-	$c->setExitCode($exitCode);
-	return $exitCode;
+    $__c=__javaproxy_Client_getClient();
+	$__exitCode=eval((substr($__newCode,0,2)=='<'.'?'?'?'.'>':'').$__newCode);
+	$__c->setExitCode($__exitCode);
+	return $__exitCode;
   }
 
   /**

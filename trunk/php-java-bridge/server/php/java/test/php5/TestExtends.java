@@ -83,8 +83,6 @@ public class TestExtends extends ScriptEngineTestBase {
 	
     }
     
-    // FIXME Bug in java_eval($code): crashes in 6.1.4 with a noSuchMethod exception: setExitCode(). 
-    @Ignore
     @Test
     public void testJavaEvalWithCleanEnv() throws Exception {
 	OutputStream out = new ByteArrayOutputStream();
