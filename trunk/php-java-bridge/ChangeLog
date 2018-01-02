@@ -11,6 +11,9 @@
     * WebContent/jsp+php.jsp (getScript): Rewritten to properly cache generated script
 
     * WebContent/jsr223.jsp (getScript): Rewritten to properly cache generated script
+    
+    * WebContent/virtual.php: Refuse to run from the back-end.
+    
  
 2017-04-17  <jostb@intern>
 

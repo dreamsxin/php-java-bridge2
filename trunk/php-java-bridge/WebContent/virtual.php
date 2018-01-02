@@ -1,5 +1,10 @@
 <?php require_once("java/Java.inc");
 
+if (substr(php_sapi_name(), 0, 3) == 'cgi') {
+    echo "This example cannot be run from the back-end. Please copy ".java_values(java('php.java.servlet.ServletUtil')->getRealPath(java_context()->getAttribute( "php.java.servlet.ServletContext", 100), '/'))." to your Apache/IIS htdocs directory and try again!\n";
+	die(1);
+}
+
 java_session();
 
 echo "jsp says: ".java_virtual("/jsr223.jsp", true);
