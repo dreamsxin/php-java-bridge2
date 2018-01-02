@@ -4,16 +4,19 @@
 <%!
 private static CompiledScript scriptCached;
 private static synchronized CompiledScript getScript(Servlet servlet, ServletContext application, HttpServletRequest request, HttpServletResponse response) throws ScriptException {
-	if (scriptCached!=null) return scriptCached;
 	
-	// get a script engine  
-	ScriptEngine engine = new ScriptEngineManager().getEngineByName("php");
+	// create or re-use a php script engine
+	ScriptEngine engine = (scriptCached!=null) ? scriptCached.getEngine() : new ScriptEngineManager().getEngineByName("php"); 
 	
-	// set the servlet environment. This is important, otherwise we would not attach to the servlet context.
+	// attach the current servlet context to it
 	engine.setContext(new PhpServletScriptContext(engine.getContext(),servlet,application,request,response));
 	
-	// compile and return a handle to it
-	return ((Compilable)engine).compile("<?php echo 'Hello '.java_context()->get('hello').'!<br>\n'; ?>");
+	// create a script file, if necessary.
+	if (scriptCached==null) {
+		scriptCached = ((Compilable)engine).compile("<?php echo 'Hello '.java_context()->get('hello').'!<br>\n'; ?>");
+	} 
+	
+	return scriptCached;
 }
 %>
 

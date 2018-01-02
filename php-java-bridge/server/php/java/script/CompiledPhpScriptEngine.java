@@ -16,6 +16,19 @@ import php.java.bridge.util.Logger;
 public class CompiledPhpScriptEngine extends PhpScriptEngine
         implements Compilable {
 
+    private boolean compiled;
+    private boolean compile;
+ 
+    private static final File emptyScriptFile;
+    static {
+	 try {
+	    emptyScriptFile = File.createTempFile("pjbempty", ".php");
+	} catch (IOException e) {
+	    throw new IllegalStateException(e);
+	}
+	 emptyScriptFile.deleteOnExit();
+    }
+
     public CompiledPhpScriptEngine(Bindings n) {
 	this();
 	setBindings(n, ScriptContext.ENGINE_SCOPE);
@@ -86,10 +99,6 @@ public class CompiledPhpScriptEngine extends PhpScriptEngine
 	return resultProxy;
     }
 
-    private boolean compiled;
-    private boolean compile;
-    private File emptyScriptFile;
-
     public boolean isCompiled() {
 	return compiled && continuation != null;
     }
@@ -104,12 +113,6 @@ public class CompiledPhpScriptEngine extends PhpScriptEngine
     protected void compileScript(Reader reader) throws ScriptException {
 	super.compileScript(reader);
 	if (compile) {
-	    try {
-		emptyScriptFile = File.createTempFile("pjbempty", ".php");
-	    } catch (IOException e) {
-		throw new ScriptException(e);
-	    }
-
 	    env.put("SCRIPT_FILENAME", emptyScriptFile.getAbsolutePath());
 	}
     }
@@ -127,22 +130,11 @@ public class CompiledPhpScriptEngine extends PhpScriptEngine
 	}
     }
 
-    protected void deleteScript() {
-	super.deleteScript();
-	if (emptyScriptFile != null) {
-	    try {
-		emptyScriptFile.delete();
-	    } catch (Exception e) {
-		Logger.printStackTrace(e);
-	    }
-	    emptyScriptFile = null;
-	}
-    }
 
     protected void releaseCompiled() {
 	synchronized (engines) {
 	    releaseInternal(false);
-	    engines.remove(this);
+	    // keep the empty script file in shutdown-list, as the generated script file may be re-used
 	}
     }
 

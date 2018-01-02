@@ -2,7 +2,15 @@
 
     * server/php/java/servlet/ServletUtil.java (getRealPath): Do not fail if resource "java" does not yet exist. Tested with WAS liberty.   
  
-    * WebContent/virtual.php: Fail, if not executed from Apache.
+    * server/php/java/scipt/CompiledPhpScriptEngine.java (releaseCompiled,compileScript,emptyScriptFile): Moved here.
+    
+    * server/php/java/script/PhpScriptEngine.java (releaseInternal): Prevent resource leak.
+    
+    * server/php/java/test/TestCGI.java (tearDown): Prevent resource leak.
+    
+    * WebContent/jsp+php.jsp (getScript): Rewritten to properly cache generated script
+
+    * WebContent/jsr223.jsp (getScript): Rewritten to properly cache generated script
  
 2017-04-17  <jostb@intern>
 
