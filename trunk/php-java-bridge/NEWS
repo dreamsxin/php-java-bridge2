@@ -5,6 +5,9 @@ Please send bug reports, questions and suggestions to
 
 Version 7.1.5
 
+* Fixed a bug in the jsp+php.jsp and jsr223.jsp examples, which leaked a file handle
+  per call.
+
 * Fixed a problem in ServletUtil.getRealPath(), which did not work if a resource does not 
   (yet) exist. 
 

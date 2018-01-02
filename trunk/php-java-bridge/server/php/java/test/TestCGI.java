@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,6 +24,7 @@ public class TestCGI  {
 
     private String[] args;
     private HashMap env;
+    private File scriptFile;
 
     @Before
     public void setup() throws IOException {
@@ -31,14 +33,18 @@ public class TestCGI  {
 	                .getAbsolutePath() };
 	env = new HashMap();
 	env.put("REDIRECT_STATUS", "200");
-	File scriptFile = File.createTempFile("pjb_test_tmp", "php").getAbsoluteFile();
+	scriptFile = File.createTempFile("pjb_test_tmp", "php").getAbsoluteFile();
 	FileOutputStream fos = new FileOutputStream(scriptFile);
 	fos.write(CODE.getBytes());
 	fos.close();
 	env.put("SCRIPT_FILENAME", scriptFile.getAbsolutePath());
 
     }
-
+    @After
+    public void tearDown() throws Exception {
+	scriptFile.delete();
+    }
+    
     private static final Object globalCtxLock = new Object();
     private static FCGIConnectionPool fcgiConnectionPool = null;
     protected void setupFastCGIServer(String[] args, Map env) throws FCGIProcessException, ConnectionException {

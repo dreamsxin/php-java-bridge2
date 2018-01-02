@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.script.AbstractScriptEngine;
 import javax.script.Bindings;
@@ -44,7 +45,7 @@ import php.java.fastcgi.FCGIHeaderParser;
 public abstract class PhpScriptEngine extends AbstractScriptEngine
         implements IPhpScriptEngine, java.io.Closeable, Invocable {
 
-    protected static final HashSet engines = new HashSet();
+    protected static final Set engines = new HashSet();
     private static boolean registeredHook = false;
     private static final String PHP_EMPTY_SCRIPT = "<?php ?>";
 
@@ -493,7 +494,7 @@ public abstract class PhpScriptEngine extends AbstractScriptEngine
     }
 
     /**
-     * Release the continuation
+     * Release the continuation and delete script file
      */
     protected void releaseInternal(boolean deleteScript) {
 	if (continuation != null) {
@@ -521,8 +522,8 @@ public abstract class PhpScriptEngine extends AbstractScriptEngine
 	    } catch (Exception e) {
 		Logger.printStackTrace(e);
 	    }
-	    if (deleteScript)
-		deleteScript();
 	}
+	if (deleteScript)
+	    deleteScript();
     }
 }
