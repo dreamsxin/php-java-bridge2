@@ -283,7 +283,7 @@ public abstract class PhpScriptEngine extends AbstractScriptEngine
 	}
     }
 
-    public synchronized Object eval(Reader reader, ScriptContext context)
+    public Object eval(Reader reader, ScriptContext context)
             throws ScriptException {
 
 	ScriptContext current = getContext();
@@ -365,7 +365,7 @@ public abstract class PhpScriptEngine extends AbstractScriptEngine
 	return continuation.getPhpScript();
     }
 
-    public synchronized Object eval(String script, ScriptContext context)
+    public Object eval(String script, ScriptContext context)
             throws ScriptException {
 	if (script == null)
 	    return evalPhp(null);

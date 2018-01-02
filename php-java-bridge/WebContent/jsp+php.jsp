@@ -2,21 +2,22 @@
 <%@page import="php.java.script.servlet.PhpServletScriptContext" %>
 
 <%!
-private static CompiledScript scriptCached;
-private static synchronized CompiledScript getScript(Servlet servlet, ServletContext application, HttpServletRequest request, HttpServletResponse response) throws ScriptException {
+//use one engine per thread
+private ThreadLocal<CompiledScript> scriptCached = new ThreadLocal<CompiledScript>();
+private CompiledScript getScript(Servlet servlet, ServletContext application, HttpServletRequest request, HttpServletResponse response) throws ScriptException {
 	
 	// create or re-use a php script engine
-	ScriptEngine engine = (scriptCached!=null) ? scriptCached.getEngine() : new ScriptEngineManager().getEngineByName("php"); 
+	ScriptEngine engine = (scriptCached.get()!=null) ? scriptCached.get().getEngine() : new ScriptEngineManager().getEngineByName("php"); 
 	
 	// attach the current servlet context to it
 	engine.setContext(new PhpServletScriptContext(engine.getContext(),servlet,application,request,response));
 	
 	// create a script file, if necessary.
-	if (scriptCached==null) {
-		scriptCached = ((Compilable)engine).compile("<?php echo 'Hello '.java_context()->get('hello').'!<br>\n'; function f($v){return (string)$v+1;};?>");
+	if (scriptCached.get()==null) {
+		scriptCached.set(((Compilable)engine).compile("<?php echo 'Hello '.java_context()->get('hello').'!<br>\n'; function f($v){return (string)$v+1;};?>"));
 	} 
 	
-	return scriptCached;
+	return scriptCached.get();
 }
 %>
 
