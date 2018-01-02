@@ -1,6 +1,6 @@
 <?php require_once("java/Java.inc");
 
-if (substr(php_sapi_name(), 0, 3) == 'cgi') {
+if (java_instanceof (java_context()->getAttribute( "php.java.servlet.Servlet", 100), java('php.java.servlet.fastcgi.FastCGIServlet'))) {
     echo "This example cannot be run from the back-end. Please copy ".java_values(java('php.java.servlet.ServletUtil')->getRealPath(java_context()->getAttribute( "php.java.servlet.ServletContext", 100), '/'))." to your Apache/IIS htdocs directory and try again!\n";
 	die(1);
 }
