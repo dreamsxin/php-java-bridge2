@@ -463,7 +463,7 @@ public class FastCGIServlet extends HttpServlet {
 	Environment env = getEnvironment();
 	setupRequestVariables(req, env);
 	setupCGIEnvironment(req, res, env);
-//req.getParameter("hugo");
+
 	try {
 	    doExecute(req, res, env);
 	} finally {

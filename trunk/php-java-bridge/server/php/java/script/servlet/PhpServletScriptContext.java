@@ -93,6 +93,11 @@ public class PhpServletScriptContext extends PhpScriptContextDecorator {
             throws FCGIProcessException, ConnectionException {
 	ContextLoaderListener listener = ContextLoaderListener
 	        .getContextLoaderListener((ServletContext) getServletContext());
+	
+	
+	// discard default args for standalone and run with the args from the servlet
+	args = null;
+	listener.getConnectionPool();
 	return listener.createContinuation(args, env, out, err, headerParser);
     }
 
