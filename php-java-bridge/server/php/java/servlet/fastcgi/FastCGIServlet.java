@@ -393,45 +393,13 @@ public class FastCGIServlet extends HttpServlet {
 	    natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
 
 	    int n;
-
-	    // the post variables
-	    if (isWebSocketRequest(req)) {
-		// write the post data while reading the response
-		// used by either http/1.1 chunked connections or "WebSockets",
-		// see
-		// http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-70
-		final InputStream inputStream = in;
-		in = null;
-		final FCGIOutputStream natOutputStream = natOut;
-		natOut = null;
-		(new Thread() {
-		    public void run() {
-			int n;
-			try {
-			    while ((n = inputStream.read(buf)) != -1) {
-				natOutputStream.write(FCGIUtil.FCGI_STDIN, buf,
-				        n);
-			    }
-			    natOutputStream.write(FCGIUtil.FCGI_STDIN,
-			            FCGIUtil.FCGI_EMPTY_RECORD);
-			} catch (IOException e) {
-			    e.printStackTrace();
-			} finally {
-			    try {
-				natOutputStream.close();
-			    } catch (IOException e) {
-			    }
-			}
-		    }
-		}).start();
-	    } else {
-		// write the post data before reading the response
-		while ((n = in.read(buf)) != -1) {
-		    natOut.write(FCGIUtil.FCGI_STDIN, buf, n);
-		}
-		natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
-		natOut.close(); natOut = null;
+	    // write the post data before reading the response
+	    while ((n = in.read(buf)) != -1) {
+		natOut.write(FCGIUtil.FCGI_STDIN, buf, n);
 	    }
+	    natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
+	    natOut.close();
+	    natOut = null;
 
 	    headerParser.setEnv(env);
 	    headerParser.setResponse(res);
@@ -448,15 +416,6 @@ public class FastCGIServlet extends HttpServlet {
 		contextLoaderListener.getConnectionPool().closeConnection(connection);
 	}
 
-    }
-
-    private boolean isWebSocketRequest(HttpServletRequest req) {
-	return req.getContentType()!=null && 
-	    req.getContentType().startsWith("text/html") && 
-	    (("chunked".equalsIgnoreCase(
-	        PhpJavaServlet.getHeader("Transfer-Encoding", req)))
-	        || ("upgrade".equalsIgnoreCase(
-	                PhpJavaServlet.getHeader("Connection", req))));
     }
 
     protected Environment getEnvironment() {
