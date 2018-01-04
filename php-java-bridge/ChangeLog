@@ -13,6 +13,8 @@
     * WebContent/jsr223.jsp (getScript): Rewritten to properly cache generated script
     
     * WebContent/virtual.php: Refuse to run from the back-end.
+
+    * VERSION, php-java-bridge.spec: Version 7.1.5 released.
     
  
 2017-04-17  <jostb@intern>
