@@ -453,10 +453,10 @@ public class FastCGIServlet extends HttpServlet {
     private boolean isWebSocketRequest(HttpServletRequest req) {
 	return req.getContentType()!=null && 
 	    req.getContentType().startsWith("text/html") && 
-	    ("chunked".equalsIgnoreCase(
+	    (("chunked".equalsIgnoreCase(
 	        PhpJavaServlet.getHeader("Transfer-Encoding", req)))
 	        || ("upgrade".equalsIgnoreCase(
-	                PhpJavaServlet.getHeader("Connection", req)));
+	                PhpJavaServlet.getHeader("Connection", req))));
     }
 
     protected Environment getEnvironment() {
