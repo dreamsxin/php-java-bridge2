@@ -10,8 +10,9 @@ read host
 
 version=`cat VERSION`
 
-rm -rf .??* *~
 ( cd ..; tar czf php-java-bridge_${version}.tar.gz php-java-bridge )
+
+rm -rf .??* *~
 find . -print0 | xargs -0 touch
 dirs=`ls -l | grep '^d' | fgrep -v CVS | awk '{print $9}'`
 find $dirs -name "CVS" -print | xargs rm -rf
