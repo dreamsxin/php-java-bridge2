@@ -213,9 +213,9 @@ public class FastCGIServlet extends HttpServlet {
 	    envp.put("PATH_TRANSLATED", documentRoot + pathInfo);
 	}
     }
-    private void setScriptName(HttpServletRequest activeReq, Environment env) {
+    private void setScriptName(HttpServletRequest activeReq, Environment env, boolean hasPostData) {
 	HashMap envp = env.environment;
-	boolean includeDebugger = env.includedDebugger &&"1".equals(activeReq.getParameter("start_debug")) && null != activeReq.getParameter("debug_port") && null != activeReq.getParameter("original_url");
+	boolean includeDebugger = env.includedDebugger &&"1".equals(getParameter(activeReq, "start_debug", hasPostData)) && null != getParameter(activeReq, "debug_port", hasPostData) && null != getParameter(activeReq, "original_url", hasPostData);
 	boolean includeJavaInc = env.includedJava;
 	if (includeDebugger && includeJavaInc) {
 	    envp.put("X_JAVABRIDGE_INCLUDE_ONLY", "@");
@@ -234,6 +234,10 @@ public class FastCGIServlet extends HttpServlet {
 	}
 	
 
+    }
+
+    private String getParameter(HttpServletRequest activeReq, String str, boolean postData) {
+	return postData ? null : activeReq.getParameter(str);
     }
     protected void setupCGIEnvironment(HttpServletRequest req,
             HttpServletResponse res, Environment env) throws ServletException {
@@ -388,28 +392,20 @@ public class FastCGIServlet extends HttpServlet {
 	                               // a closed input stream
 	    out = ServletUtil.getServletOutputStream(res);
 
-	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-	    int n;
-	    // write the post data before reading the response
-	    while ((n = in.read(buf)) != -1) {
-		buffer.write(buf, 0, n);
-	    }
+	    byte[] postData = readPostData(buf, in);
+	    boolean hasPostData = postData != null && postData.length > 0;
 	    
 	    // update the env after fetching the inputstream
-	    setScriptName(req, env);
+	    setScriptName(req, env, hasPostData);
 	    
 	    // send the FCGI header
 	    sendFcgiHeader(env, natOut, connection);
 
-	    if (isWebSocketRequest(req)) {
-		// write the post data while reading the response
-		// used by either http/1.1 chunked connections or "WebSockets",
-		// see
-		// http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-70
-		handleWebSocketRequest(buffer.toByteArray(), natOut);
+	    if (isWebSocketRequest(req, hasPostData)) {
+		handleWebSocketRequest(buf, postData, hasPostData, in, natOut);
 	    } else {
 		// write the post data before reading the response
-		writePostData(natOut, buffer.toByteArray());
+		writePostData(natOut, postData, hasPostData);
 	    }
 	    natOut = null;
 
@@ -430,11 +426,22 @@ public class FastCGIServlet extends HttpServlet {
 
     }
 
-    private void writePostData(FCGIOutputStream natOut, final byte[] b)
+    private byte[] readPostData(final byte[] buf, InputStream in)
+            throws IOException {
+	ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+	int n;
+	// write the post data before reading the response
+	while ((n = in.read(buf)) != -1) {
+	    buffer.write(buf, 0, n);
+	}
+	return buffer.toByteArray();
+    }
+
+    private void writePostData(FCGIOutputStream natOut, final byte[] postData, final boolean hasPostData)
             throws ConnectionException {
 
-	if (b != null && b.length > 0) {
-	    natOut.write(FCGIUtil.FCGI_STDIN, b, b.length);
+	if (hasPostData) {
+	    natOut.write(FCGIUtil.FCGI_STDIN, postData, postData.length);
 	}
 	natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
 	natOut.close();
@@ -447,13 +454,24 @@ public class FastCGIServlet extends HttpServlet {
 	natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
     }
 
-    private void handleWebSocketRequest(final byte[] buf, final FCGIOutputStream natOutputStream) {
+    private void handleWebSocketRequest(final byte[] buf, final byte[] postData, boolean hasPostData,
+            final InputStream inputStream, FCGIOutputStream natOutputStream)
+            throws ConnectionException {
+		
+	if (hasPostData) {
+	    natOutputStream.write(FCGIUtil.FCGI_STDIN, postData, postData.length);
+	}
+
+	// write the post data while reading the response
+	// used by either http/1.1 chunked connections or "WebSockets",
+	// see
+	// http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-70
 	(new Thread() {
 	    public void run() {
 		try {
-		    if (buf != null && buf.length > 0) {
-			natOutputStream.write(FCGIUtil.FCGI_STDIN, buf,
-			        buf.length);
+		    int n;
+		    while ((n = inputStream.read(buf)) != -1) {
+			natOutputStream.write(FCGIUtil.FCGI_STDIN, buf, n);
 		    }
 		    natOutputStream.write(FCGIUtil.FCGI_STDIN,
 		            FCGIUtil.FCGI_EMPTY_RECORD);
@@ -463,17 +481,18 @@ public class FastCGIServlet extends HttpServlet {
 		    try {
 			natOutputStream.close();
 		    } catch (IOException e) {
+			// ignore
 		    }
 		}
 	    }
 	}).start();
     }
 
-    private boolean isWebSocketRequest(HttpServletRequest req) {
-	return ("chunked".equalsIgnoreCase(
+    private boolean isWebSocketRequest(HttpServletRequest req, boolean hasPostData) {
+	return hasPostData && (("chunked".equalsIgnoreCase(
 	        PhpJavaServlet.getHeader("Transfer-Encoding", req)))
 	        || ("upgrade".equalsIgnoreCase(
-	                PhpJavaServlet.getHeader("Connection", req)));
+	                PhpJavaServlet.getHeader("Connection", req))));
     }
 
     protected Environment getEnvironment() {
