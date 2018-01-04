@@ -395,10 +395,7 @@ public class FastCGIServlet extends HttpServlet {
 	    int n;
 
 	    // the post variables
-	    if (("chunked".equalsIgnoreCase(
-	            PhpJavaServlet.getHeader("Transfer-Encoding", req)))
-	            || ("upgrade".equalsIgnoreCase(
-	                    PhpJavaServlet.getHeader("Connection", req)))) {
+	    if (isWebSocketRequest(req)) {
 		// write the post data while reading the response
 		// used by either http/1.1 chunked connections or "WebSockets",
 		// see
@@ -451,6 +448,15 @@ public class FastCGIServlet extends HttpServlet {
 		contextLoaderListener.getConnectionPool().closeConnection(connection);
 	}
 
+    }
+
+    private boolean isWebSocketRequest(HttpServletRequest req) {
+	return req.getContentType()!=null && 
+	    req.getContentType().startsWith("text/html") && 
+	    ("chunked".equalsIgnoreCase(
+	        PhpJavaServlet.getHeader("Transfer-Encoding", req)))
+	        || ("upgrade".equalsIgnoreCase(
+	                PhpJavaServlet.getHeader("Connection", req)));
     }
 
     protected Environment getEnvironment() {
