@@ -454,8 +454,8 @@ public class FastCGIServlet extends HttpServlet {
 	natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
     }
 
-    private void handleWebSocketRequest(final byte[] buf, final byte[] postData, boolean hasPostData,
-            final InputStream inputStream, FCGIOutputStream natOutputStream)
+    private void handleWebSocketRequest(final byte[] buf, final byte[] postData, final boolean hasPostData,
+            final InputStream inputStream, final FCGIOutputStream natOutputStream)
             throws ConnectionException {
 		
 	if (hasPostData) {
