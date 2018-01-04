@@ -447,7 +447,7 @@ public class FastCGIServlet extends HttpServlet {
 	natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
     }
 
-    private void handleWebSocketRequest(final byte[] buf, FCGIOutputStream natOutputStream) {
+    private void handleWebSocketRequest(final byte[] buf, final FCGIOutputStream natOutputStream) {
 	(new Thread() {
 	    public void run() {
 		try {
