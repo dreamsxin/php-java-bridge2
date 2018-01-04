@@ -1,6 +1,9 @@
 /*-*- mode: Java; tab-width:8 -*-*/
 package php.java.servlet.fastcgi;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+
 /*
  * Copyright (C) 2003-2007 Jost Boekemeier
  *
@@ -43,6 +46,7 @@ import php.java.bridge.http.IContextFactory;
 import php.java.bridge.util.Logger;
 import php.java.bridge.util.NotImplementedException;
 import php.java.fastcgi.Connection;
+import php.java.fastcgi.ConnectionException;
 import php.java.fastcgi.FCGIHeaderParser;
 import php.java.fastcgi.FCGIInputStream;
 import php.java.fastcgi.FCGIOutputStream;
@@ -384,21 +388,29 @@ public class FastCGIServlet extends HttpServlet {
 	                               // a closed input stream
 	    out = ServletUtil.getServletOutputStream(res);
 
+	    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+	    int n;
+	    // write the post data before reading the response
+	    while ((n = in.read(buf)) != -1) {
+		buffer.write(buf, 0, n);
+	    }
+	    
 	    // update the env after fetching the inputstream
 	    setScriptName(req, env);
 	    
 	    // send the FCGI header
-	    natOut.writeBegin(connection.isLast());
-	    natOut.writeParams(env.environment);
-	    natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
+	    sendFcgiHeader(env, natOut, connection);
 
-	    int n;
-	    // write the post data before reading the response
-	    while ((n = in.read(buf)) != -1) {
-		natOut.write(FCGIUtil.FCGI_STDIN, buf, n);
+	    if (isWebSocketRequest(req)) {
+		// write the post data while reading the response
+		// used by either http/1.1 chunked connections or "WebSockets",
+		// see
+		// http://tools.ietf.org/html/draft-hixie-thewebsocketprotocol-70
+		handleWebSocketRequest(buffer.toByteArray(), natOut);
+	    } else {
+		// write the post data before reading the response
+		writePostData(natOut, buffer.toByteArray());
 	    }
-	    natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
-	    natOut.close();
 	    natOut = null;
 
 	    headerParser.setEnv(env);
@@ -416,6 +428,52 @@ public class FastCGIServlet extends HttpServlet {
 		contextLoaderListener.getConnectionPool().closeConnection(connection);
 	}
 
+    }
+
+    private void writePostData(FCGIOutputStream natOut, final byte[] b)
+            throws ConnectionException {
+
+	if (b != null && b.length > 0) {
+	    natOut.write(FCGIUtil.FCGI_STDIN, b, b.length);
+	}
+	natOut.write(FCGIUtil.FCGI_STDIN, FCGIUtil.FCGI_EMPTY_RECORD);
+	natOut.close();
+    }
+
+    private void sendFcgiHeader(Environment env, FCGIOutputStream natOut,
+            Connection connection) throws ConnectionException {
+	natOut.writeBegin(connection.isLast());
+	natOut.writeParams(env.environment);
+	natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
+    }
+
+    private void handleWebSocketRequest(final byte[] buf, FCGIOutputStream natOutputStream) {
+	(new Thread() {
+	    public void run() {
+		try {
+		    if (buf != null && buf.length > 0) {
+			natOutputStream.write(FCGIUtil.FCGI_STDIN, buf,
+			        buf.length);
+		    }
+		    natOutputStream.write(FCGIUtil.FCGI_STDIN,
+		            FCGIUtil.FCGI_EMPTY_RECORD);
+		} catch (IOException e) {
+		    e.printStackTrace();
+		} finally {
+		    try {
+			natOutputStream.close();
+		    } catch (IOException e) {
+		    }
+		}
+	    }
+	}).start();
+    }
+
+    private boolean isWebSocketRequest(HttpServletRequest req) {
+	return ("chunked".equalsIgnoreCase(
+	        PhpJavaServlet.getHeader("Transfer-Encoding", req)))
+	        || ("upgrade".equalsIgnoreCase(
+	                PhpJavaServlet.getHeader("Connection", req)));
     }
 
     protected Environment getEnvironment() {
