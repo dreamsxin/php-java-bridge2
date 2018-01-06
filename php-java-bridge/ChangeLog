@@ -1,3 +1,7 @@
+2017-01-06  <jostb@intern>
+
+    * server/php/java/fastcgi/FastCGIServlet.java (doExecute): Rewritten.
+    
 2017-12-29  <jostb@intern>
 
     * server/php/java/servlet/ServletUtil.java (getRealPath): Do not fail if resource "java" does not yet exist. Tested with WAS liberty.   

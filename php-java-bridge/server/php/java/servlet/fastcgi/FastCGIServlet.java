@@ -1,7 +1,6 @@
 /*-*- mode: Java; tab-width:8 -*-*/
 package php.java.servlet.fastcgi;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 
 /*
@@ -213,32 +212,46 @@ public class FastCGIServlet extends HttpServlet {
 	    envp.put("PATH_TRANSLATED", documentRoot + pathInfo);
 	}
     }
-    private void setScriptName(HttpServletRequest activeReq, Environment env, boolean hasPostData) {
+
+    private void setScriptName(HttpServletRequest activeReq, Environment env,
+            boolean hasPostData) {
 	HashMap envp = env.environment;
-	boolean includeDebugger = env.includedDebugger &&"1".equals(getParameter(activeReq, "start_debug", hasPostData)) && null != getParameter(activeReq, "debug_port", hasPostData) && null != getParameter(activeReq, "original_url", hasPostData);
+	boolean includeDebugger = env.includedDebugger
+	        && "1".equals(
+	                getParameter(activeReq, "start_debug", hasPostData))
+	        && null != getParameter(activeReq, "debug_port", hasPostData)
+	        && null != getParameter(activeReq, "original_url", hasPostData);
 	boolean includeJavaInc = env.includedJava;
 	if (includeDebugger && includeJavaInc) {
 	    envp.put("X_JAVABRIDGE_INCLUDE_ONLY", "@");
-	    envp.put("X_JAVABRIDGE_INCLUDE", ServletUtil.getRealPath(context, env.servletPath));
-	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
+	    envp.put("X_JAVABRIDGE_INCLUDE",
+	            ServletUtil.getRealPath(context, env.servletPath));
+	    envp.put("SCRIPT_FILENAME",
+	            ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
 	} else if (includeDebugger && !includeJavaInc) {
-	    envp.put("X_JAVABRIDGE_INCLUDE", ServletUtil.getRealPath(context, env.servletPath));
-	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
+	    envp.put("X_JAVABRIDGE_INCLUDE",
+	            ServletUtil.getRealPath(context, env.servletPath));
+	    envp.put("SCRIPT_FILENAME",
+	            ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
 	} else if (!includeDebugger && includeJavaInc) {
-	    envp.put("X_JAVABRIDGE_INCLUDE_ONLY", ServletUtil.getRealPath(context, "java/Java.inc"));
-	    envp.put("X_JAVABRIDGE_INCLUDE", ServletUtil.getRealPath(context, env.servletPath));
-	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
-	} else 
-	{
-	    envp.put("SCRIPT_FILENAME", ServletUtil.getRealPath(context, env.servletPath));
+	    envp.put("X_JAVABRIDGE_INCLUDE_ONLY",
+	            ServletUtil.getRealPath(context, "java/Java.inc"));
+	    envp.put("X_JAVABRIDGE_INCLUDE",
+	            ServletUtil.getRealPath(context, env.servletPath));
+	    envp.put("SCRIPT_FILENAME",
+	            ServletUtil.getRealPath(context, "java/PHPDebugger.php"));
+	} else {
+	    envp.put("SCRIPT_FILENAME",
+	            ServletUtil.getRealPath(context, env.servletPath));
 	}
-	
 
     }
 
-    private String getParameter(HttpServletRequest activeReq, String str, boolean postData) {
+    private String getParameter(HttpServletRequest activeReq, String str,
+            boolean postData) {
 	return postData ? null : activeReq.getParameter(str);
     }
+
     protected void setupCGIEnvironment(HttpServletRequest req,
             HttpServletResponse res, Environment env) throws ServletException {
 	HashMap envp = new HashMap();
@@ -381,7 +394,7 @@ public class FastCGIServlet extends HttpServlet {
 	try {
 	    connection = contextLoaderListener.getConnectionPool()
 	            .openConnection();
-	    
+
 	    natIn = (FCGIInputStream) connection.getInputStream();
 	    natOut = (FCGIOutputStream) connection.getOutputStream();
 	    natOut.setId(connection.getId());
@@ -394,34 +407,33 @@ public class FastCGIServlet extends HttpServlet {
 
 	    byte[] postData = readPostData(buf, in);
 	    boolean hasPostData = postData != null && postData.length > 0;
-	    
+
 	    // update the env after fetching the inputstream
 	    setScriptName(req, env, hasPostData);
-	    
+
 	    // send the FCGI header
 	    sendFcgiHeader(env, natOut, connection);
 
-	    if (isWebSocketRequest(req, hasPostData)) {
-		handleWebSocketRequest(buf, postData, hasPostData, in, natOut);
-	    } else {
-		// write the post data before reading the response
-		writePostData(natOut, postData, hasPostData);
-	    }
+	    // write the post data before reading the response
+	    writePostData(natOut, postData, hasPostData);
 	    natOut = null;
 
 	    headerParser.setEnv(env);
 	    headerParser.setResponse(res);
 
 	    headerParser.parseBody(buf, natIn, out, err);
-	    
-	    natIn.close(); natIn = null;
+
+	    natIn.close();
+	    natIn = null;
 	} finally {
 	    // Destroy physical connection if exception occured,
 	    // so that the PHP side doesn't keep unsent data
 	    // A more elegant approach would be to use the FCGI ABORT request.
-	    if (natIn != null) connection.setIsClosed();
-	    if (connection!=null)
-		contextLoaderListener.getConnectionPool().closeConnection(connection);
+	    if (natIn != null)
+		connection.setIsClosed();
+	    if (connection != null)
+		contextLoaderListener.getConnectionPool()
+		        .closeConnection(connection);
 	}
 
     }
@@ -437,8 +449,8 @@ public class FastCGIServlet extends HttpServlet {
 	return buffer.toByteArray();
     }
 
-    private void writePostData(FCGIOutputStream natOut, final byte[] postData, final boolean hasPostData)
-            throws ConnectionException {
+    private void writePostData(FCGIOutputStream natOut, final byte[] postData,
+            final boolean hasPostData) throws ConnectionException {
 
 	if (hasPostData) {
 	    natOut.write(FCGIUtil.FCGI_STDIN, postData, postData.length);
@@ -454,12 +466,13 @@ public class FastCGIServlet extends HttpServlet {
 	natOut.write(FCGIUtil.FCGI_PARAMS, FCGIUtil.FCGI_EMPTY_RECORD);
     }
 
-    private void handleWebSocketRequest(final byte[] buf, final byte[] postData, final boolean hasPostData,
-            final InputStream inputStream, final FCGIOutputStream natOutputStream)
-            throws ConnectionException {
-		
+    private void handleWebSocketRequest(final byte[] buf, final byte[] postData,
+            final boolean hasPostData, final InputStream inputStream,
+            final FCGIOutputStream natOutputStream) throws ConnectionException {
+
 	if (hasPostData) {
-	    natOutputStream.write(FCGIUtil.FCGI_STDIN, postData, postData.length);
+	    natOutputStream.write(FCGIUtil.FCGI_STDIN, postData,
+	            postData.length);
 	}
 
 	// write the post data while reading the response
@@ -486,13 +499,6 @@ public class FastCGIServlet extends HttpServlet {
 		}
 	    }
 	}).start();
-    }
-
-    private boolean isWebSocketRequest(HttpServletRequest req, boolean hasPostData) {
-	return hasPostData && (("chunked".equalsIgnoreCase(
-	        PhpJavaServlet.getHeader("Transfer-Encoding", req)))
-	        || ("upgrade".equalsIgnoreCase(
-	                PhpJavaServlet.getHeader("Connection", req))));
     }
 
     protected Environment getEnvironment() {
