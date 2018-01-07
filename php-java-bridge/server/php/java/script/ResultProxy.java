@@ -36,6 +36,7 @@ import php.java.bridge.util.Logger;
  */
 public class ResultProxy extends Number {
     private static final long serialVersionUID = 9126953496638654790L;
+    private static final String EMPTY_STRING = "";
     private int result;
     private IPhpScriptEngine engine;
     public ResultProxy(IPhpScriptEngine engine) {
@@ -66,7 +67,8 @@ public class ResultProxy extends Number {
      */
     public String toString() {
 	if (Logger.getLogLevel()>3) return "DEBUG WARNING: toString() did not terminate script because logLevel > 3!";
-	return String.valueOf(getResult());
+	int result = getResult();
+	return result==0?EMPTY_STRING:String.valueOf(result);
     }
 
     /**

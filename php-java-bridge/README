@@ -36,12 +36,11 @@ Overview
 Build and execution instructions:
 ---------------------------------
 
-  Type java -classpath JavaBridge.war TestInstallation to extract the
-  JavaBridge.jar from the web archive. The command extracts
-  ext/JavaBridge.jar and java/Java.inc from the web archive.
+  Type java -jar JavaBridge.war to test the download. This command
+  extracts JavaBridge.jar from the archive.
 
   Double-click on JavaBridge.jar and select SERVLET_LOCAL:8080 to
-  start a local HTTP server. Type java -jar ext/JavaBridge.jar --help
+  start a local HTTP server. Type java -jar JavaBridge.jar --help
   to see the list of available options.
 
   Use the following code to access Java from your PHP scripts:
@@ -79,16 +78,16 @@ Build and execution instructions:
   Installation for standalone Java J2SE applications:
   ---------------------------------------------------
 
-  Copy the JavaBridge.jar, php-script.jar and script-api.jar to
+  Copy the JavaBridge.jar to
   the java.ext.dirs. Example for JDK1.6 on Linux:
 
-    cp ext/*.jar /usr/java/packages/lib/ext/
+    cp JavaBridge.jar /usr/java/packages/lib/ext/
 
   Type
 
-    /usr/java/default/bin/jrunscript -l php-interactive
+    /usr/java/default/bin/jrunscript -l php YOURSCRIPT.php
 
-  to start an interactive PHP session.
+  to run PHP scripts from Java.
 
 ---------------------------------------------
   Starting the VM Bridge automatically
@@ -108,7 +107,7 @@ Build and execution instructions:
   No installation necessary; the bridge starts automatically when the
   JSR 223 context is accessed. Example:
 
-    jrunscript -classpath JavaBridge.jar -l php-interactive 
+    jrunscript -cp JavaBridge.jar -l php
 
   automatically starts a "php-cgi" executable from the path. Please
   see the INSTALL.J2SE document for details how to access persistent
@@ -203,18 +202,6 @@ Build and execution instructions:
   either start apache or IIS or start a fast CGI server on port 9667
   as a separate process, for example from a service script. 
 
-  If the directory "/dev/shm" exists, or if the Java.inc option 
-  JAVA_PIPE_DIR points to an existing directory, the bridge uses 
-  named pipes. On Windows, where standard named pipes are not available, 
-  the bridge uses TCP sockets. If your application server denies socket 
-  accept/resolve, please either run the AS on a Unix operating system or 
-  add the following lines to your AS policy file (for 
-  example ...\domains\domain1\config\server.policy):
-
-    grant {
-      permission java.net.SocketPermission  "*", "accept,resolve";
-    };
-
 ------------------------------------
   Log level
   ---------
@@ -236,19 +223,9 @@ Build and execution instructions:
    6: Reserved for internal use. Log messages which may be useful
       to debug certain parts of the bridge.
 
-  The default log level is 2.  If java.log_level is missing, the
+  The default log level is 3.  If java.log_level is missing, the
   back end uses the "default" log level supplied when the back end was
   started (the second argument after java -jar JavaBridge.jar ...).
-
-  The log4j viewer "Chainsaw" can be used to automatically capture the
-  log from the bridge, regardless in which environment it is
-  running. log4j.jar must be in the Java VM's java.ext.dirs (usually
-  jre/lib/ext), Chainsaw must be running and the back end must have
-  been started without a log file argument or with the .ini option
-  java.log_file="@127.0.0.1:4445". Chainsaw can be started with e.g.:
-
-   /opt/jdk1.5/bin/java -cp /opt/jdk1.5/jre/lib/ext/log4j.jar \
-                                               org.apache.log4j.chainsaw.Main
 
    Example which starts tomcat with a full debug log:
 
@@ -278,18 +255,6 @@ Build and execution instructions:
 
   The "php-java-bridge.fc" contains the file contexts for the PHP/Java
   Bridge and the log.
-
-  Installation instructions for RHEL 4 and Fedora Core 4:
-  -------------------------------------------------------
-
-   1. Install selinux-policy-targeted-sources-*.rpm, for example with
-      the command:
-
-        rpm -i selinux-policy-targeted-sources-1.17.30-2.19.noarch.rpm
-
-   2. Update the policy files with the VM Bridge policy:
-
-        su -c "sh security/update_policy.sh /etc/selinux/targeted/src/policy"
 
   Installation instructions for RHEL 5, Fedora Core 5 or above:
   -------------------------------------------------------------
@@ -404,17 +369,6 @@ Build and execution instructions:
     * the library may only work within a J2EE environment from a
       certain vendor, for example the WebSphere Application server or
       the Sun Java Application server.
-
----------------------------------------------
-  FreeBSD issues
-  --------------
- 
-  FreeBSD is not directly supported. Please use the FreeBSD
-  PHP/Java Bridge port instead. 
-
-  In order to use unix domain sockets on FreeBSD, compile java.so,
-  libnatcJavaBridge.so and start JavaBridge.jar with the argument
-  LOCAL:/path/to/your/socket/file.
 
 ------------------------------------
   UTF-8

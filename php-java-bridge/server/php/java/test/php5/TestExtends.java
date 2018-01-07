@@ -45,7 +45,7 @@ public class TestExtends extends ScriptEngineTestBase {
 	e.getContext().setErrorWriter(er);
 
 	String res = String.valueOf(e.eval(new FileReader(new File("server/php/java/test/php5/script","TestExtends.php"))));
-	assertEquals("0", res);
+	assertEquals("", res);
 	assertEquals("hello Java<br>\n" + 
 		"from PHP<br>\n" + 
 		"", out.toString());

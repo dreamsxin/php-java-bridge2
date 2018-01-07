@@ -12,6 +12,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -97,6 +99,8 @@ public final class Util {
     public static final String X_JAVABRIDGE_INCLUDE_ONLY = "X_JAVABRIDGE_INCLUDE_ONLY";
     
     private Util() {}
+    
+    private static DateFormat formatter;
     
     /** 
      * The default PHP arguments. Can be passed via -Dphp.java.bridge.php_exec_args=list of urlencoded strings separated by space
@@ -234,6 +238,10 @@ public final class Util {
     public static String sessionSavePath;
 
     private static void initGlobals() {
+	
+	formatter = SimpleDateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.LONG, Locale.ENGLISH);
+	formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
+
 
 	try {
 	    JAVA_INC = Class.forName("php.java.bridge.generated.JavaInc");
@@ -746,18 +754,13 @@ public final class Util {
         return s;
     }
 
-
     /**
      * Return the time in GMT
      * @param ms the time in milliseconds
      * @return The formatted date string
      */
     public static String formatDateTime(long ms) {
-	java.sql.Timestamp t = new java.sql.Timestamp(ms);
-	DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.LONG, Locale.ENGLISH);
-	formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-	String str =  formatter.format(t);
-	return str;
+	return formatter.format(new Date(ms));
     }
     static final boolean checkVM() {
 	try {

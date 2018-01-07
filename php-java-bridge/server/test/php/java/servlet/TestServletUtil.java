@@ -6,6 +6,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.net.URL;
 
 import javax.servlet.ServletContext;
@@ -40,19 +41,19 @@ public class TestServletUtil {
 	when(ctx.getRealPath(anyString())).thenReturn(null);
 	when(ctx.getResource(anyString())).thenReturn(new URL("file:c:/foo"));
 	
-	assertThat(ServletUtil.getRealPath(ctx, ""), is("c:\\foo\\"));
-	assertThat(ServletUtil.getRealPath(ctx, "/bar"), is("c:\\foo\\bar"));
-	assertThat(ServletUtil.getRealPath(ctx, "bar"), is("c:\\foo\\bar"));
+	assertThat(ServletUtil.getRealPath(ctx, ""), is("c:/foo/".replace('/', File.separatorChar)));
+	assertThat(ServletUtil.getRealPath(ctx, "/bar"), is("c:/foo/bar".replace('/', File.separatorChar)));
+	assertThat(ServletUtil.getRealPath(ctx, "bar"), is("c:/foo/bar".replace('/', File.separatorChar)));
     }
      
     @Test
     public void testGetRealPathCached() throws Exception {
 	when(ctx.getRealPath(anyString())).thenReturn(null);
 	when(ctx.getResource(anyString())).thenReturn(new URL("file:c:/foo"));
-	assertThat(ServletUtil.getRealPath(ctx, ""), is("c:\\foo\\"));
+	assertThat(ServletUtil.getRealPath(ctx, ""), is("c:/foo/".replace('/', File.separatorChar)));
 
 	when(ctx.getResource(anyString())).thenReturn(null);
-	assertThat(ServletUtil.getRealPath(ctx, ""), is("c:\\foo\\"));
+	assertThat(ServletUtil.getRealPath(ctx, ""), is("c:/foo/".replace('/', File.separatorChar)));
 
     }
 
