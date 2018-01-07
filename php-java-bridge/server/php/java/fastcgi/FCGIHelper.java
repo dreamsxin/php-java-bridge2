@@ -36,7 +36,7 @@ public class FCGIHelper {
 	phpIncludeJava = "true".equalsIgnoreCase(System.getProperty("php.java.bridge.php_include_java", "true"));
 	phpIncludeDebugger = "true".equalsIgnoreCase(System.getProperty("php.java.bridge.php_include_debugger", "false"));
 	promiscuous = Util.JAVABRIDGE_PROMISCUOUS;
-	cgiDir = Util.DEFAULT_CGI_LOCATIONS[0];
+	cgiDir = null;
 	pearDir = webInfDir = null;
 	
 	socketPort= System.getProperty("php.java.bridge.php_fcgi_external_socket_pool");
