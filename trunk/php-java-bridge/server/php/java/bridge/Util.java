@@ -275,7 +275,7 @@ public final class Util {
 	COMMON_ENVIRONMENT = getCommonEnvironment(ENVIRONMENT_BLACKLIST);
 	DEFAULT_CGI_LOCATIONS = new String[] {"/usr/bin/php-cgi", "c:/Program Files/PHP/php-cgi.exe"};
 	try {
-	    if (!new File(DEFAULT_CGI_LOCATIONS[0]).exists() && !new File(DEFAULT_CGI_LOCATIONS[0]).exists())
+	    if (!new File(DEFAULT_CGI_LOCATIONS[0]).exists() && !new File(DEFAULT_CGI_LOCATIONS[1]).exists())
 		try {
 		    File filePath = null;
 		    boolean found = false;

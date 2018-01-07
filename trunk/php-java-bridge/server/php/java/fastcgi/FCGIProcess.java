@@ -473,7 +473,7 @@ public class FCGIProcess extends java.lang.Process {
 	private boolean isOldPhpVersion = false; // php < 5.3
 	private boolean includeJava = false;
 	private boolean includeDebugger = false;
-	private String cgiDir = Util.DEFAULT_CGI_LOCATIONS[0];
+	private String cgiDir = null;
 	private String pearDir = null;
 	private String webInfDir = null;
 
