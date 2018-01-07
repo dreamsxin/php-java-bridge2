@@ -21,7 +21,7 @@ public class TestError extends ScriptEngineTestBase {
 	e.getContext().setErrorWriter(er);
 	Object result = e
 	        .eval("<?php error_log('bleh'); echo 1+2; error_log('blah'); error_log('blub');?>");
-	assertEquals("0", result.toString());
+	assertEquals("", result.toString());
 	assertEquals("bleh\nblah\nblub\n", err.toString());
 	assertEquals("3", out.toString());
 

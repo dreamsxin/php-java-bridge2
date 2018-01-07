@@ -1,7 +1,16 @@
 2017-01-06  <jostb@intern>
 
-    * server/php/java/fastcgi/FastCGIServlet.java (doExecute): Rewritten.
-    
+	* server/php/java/script/PhpScriptEngine.java (getArgs): Fake a php-cgi argument, if ARGV doesn't report it.
+	
+	* server/php/java/script/ResultProxy.java (toString): Return "" if there is no meaningful result, otherwise the result code.
+	
+	* unsupported/jar-in-jar-loader.zip: Use latest version for Java 9
+	
+	* server/php/java/bridge/TestInstallation.java: Rewritten for Java 9
+	
+	* server/php/java/bridge/Util.java (formatDateTime): Do not reference denied package (for Java 9).
+	
+
 2017-12-29  <jostb@intern>
 
     * server/php/java/servlet/ServletUtil.java (getRealPath): Do not fail if resource "java" does not yet exist. Tested with WAS liberty.   

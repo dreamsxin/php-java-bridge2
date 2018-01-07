@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<!-- Download php, php-cgi and php7.dll to c:\windows or /usr/bin to run this ant build -->
+
 <project name="JavaBridge" basedir="." default="JavaBridgeWar">
 	<target name="clean">
 		<delete dir="documentation/API" />

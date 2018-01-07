@@ -235,6 +235,10 @@ public abstract class PhpScriptEngine extends AbstractScriptEngine
 	if (args == null)
 	    throw new NullPointerException(
 	            "ScriptEngine.ARGV must not be null");
+	
+	if (args.length == 0) {
+	    args = new String[] {Util.PHP_EXEC == null ? "php-cgi" : Util.PHP_EXEC};
+	}
 	return args;
     }
 
