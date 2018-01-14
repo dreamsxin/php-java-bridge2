@@ -149,7 +149,7 @@ class SocketFactory extends FCGIFactory {
     @Override
     public String getFcgiStartCommand(String base, int php_fcgi_max_requests) {
 	String msg=
-	    base==null ? "" : "cd " + base + File.separator + Util.osArch + "-" + Util.osName+ "\n" + 
+	    (base==null ? "" : "cd " + base + File.separator + Util.osArch + "-" + Util.osName+ "\n") + 
 	    "REDIRECT_STATUS=200 " +
 	    "X_JAVABRIDGE_OVERRIDE_HOSTS=\"/\" " +
 	    "PHP_FCGI_CHILDREN=\"5\" " +

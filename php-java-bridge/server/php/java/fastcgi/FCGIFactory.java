@@ -271,7 +271,7 @@ public abstract class FCGIFactory {
     protected FCGIProcess createFCGIProcess(String[] args, Map env)
             throws IOException {
 	env = new HashMap(env);
-	env.put("PHP_FCGI_MAX_REQUESTS", helper.getPhpFcgiMaxRequests());
+	env.put("PHP_FCGI_MAX_REQUESTS", String.valueOf(helper.getPhpFcgiMaxRequests()));
 	Object children = env.get("PHP_FCGI_CHILDREN");
 	if (children == null) {
 	    env.put("PHP_FCGI_CHILDREN",

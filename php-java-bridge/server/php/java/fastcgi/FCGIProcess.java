@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -162,7 +163,6 @@ public class FCGIProcess extends java.lang.Process {
     }
 
     protected boolean testPhp(String[] php, String[] args) {
-	Runtime rt = Runtime.getRuntime();
 	String[] s = quoteArgs(getTestArgumentArray(php, args));
 	byte[] buf = new byte[Util.BUF_SIZE];
 	int c, result, errCode;
@@ -171,7 +171,13 @@ public class FCGIProcess extends java.lang.Process {
 	InputStream err = null;
 
 	try {
-	    proc = rt.exec(s, hashToStringArray(env), homeDir);
+	    ProcessBuilder builder = new ProcessBuilder();
+	    builder.command(Arrays.asList(s));
+	    builder.directory(homeDir);
+	    builder.environment().putAll(env);
+
+	    proc = builder.start();
+
 	    in = proc.getInputStream();
 	    err = proc.getErrorStream();
 	    out = proc.getOutputStream();
@@ -269,10 +275,14 @@ public class FCGIProcess extends java.lang.Process {
     }
 
     protected void runPhp(String[] php, String[] args) throws IOException {
-	Runtime rt = Runtime.getRuntime();
 	String[] s = quoteArgs(getArgumentArray(php, args));
+	ProcessBuilder builder = new ProcessBuilder();
+	builder.command(Arrays.asList(s));
+	builder.directory(homeDir);
+	builder.environment().putAll(env);
 
-	proc = rt.exec(s, hashToStringArray(env), homeDir);
+	proc = builder.start();
+
 	if (Logger.getLogLevel() > 3)
 	    Logger.logDebug("Started " + java.util.Arrays.asList(s));
     }
@@ -375,7 +385,7 @@ public class FCGIProcess extends java.lang.Process {
 
 	// give up, use standard php-cgi anywhere in the path
 	if (php[0] == null)
-	    php[0] = "php-cgi";
+	    php[0] = new File("php-cgi").getAbsolutePath();
 
 	if (Logger.getLogLevel() > 3)
 	    Logger.logDebug(
