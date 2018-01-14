@@ -1,8 +1,8 @@
 /*-*- mode: Java; tab-width:8 -*-*/
 
 package php.java.bridge.parser;
-
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 
 /*
@@ -43,19 +43,26 @@ import php.java.bridge.Util;
  */
 public final class PhpProcedure implements InvocationHandler {
 
-    // interface default methods since java 1.8
-    private final static Constructor<MethodHandles.Lookup> LOOKUP_CONSTRUCTOR;
-    static {
-        try {
-            LOOKUP_CONSTRUCTOR = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);
-            if (!LOOKUP_CONSTRUCTOR.isAccessible()) {
-                LOOKUP_CONSTRUCTOR.setAccessible(true);
-            }
-        }
-        catch (NoSuchMethodException exp) {
-            throw new IllegalStateException(exp);
-        }
+    // interface default methods in java 1.8
+    private static Constructor<MethodHandles.Lookup> LOOKUP_CONSTRUCTOR;
+    private static final Object lockObject = new Object();
+    private static Constructor<MethodHandles.Lookup> getLookupConstructorForJava8() {
+	synchronized (lockObject) {
+	    if (LOOKUP_CONSTRUCTOR == null) {
+		try {
+		    LOOKUP_CONSTRUCTOR = MethodHandles.Lookup.class
+		            .getDeclaredConstructor(Class.class, Integer.TYPE);
+		    if (!LOOKUP_CONSTRUCTOR.isAccessible()) {
+			LOOKUP_CONSTRUCTOR.setAccessible(true);
+		    }
+		} catch (NoSuchMethodException exp) {
+		    throw new IllegalStateException(exp);
+		}
+	    }
+	}
+	return LOOKUP_CONSTRUCTOR;
     }
+
     private IJavaBridgeFactory bridge;
     private long object;
     private Map names;
@@ -136,10 +143,22 @@ public final class PhpProcedure implements InvocationHandler {
 
     private Object invokeDefaultMethod(Object proxy, Method method,
             Object[] args) throws Throwable {
-	
+
 	Class<?> declaringClass = method.getDeclaringClass();
-	
-	return LOOKUP_CONSTRUCTOR.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE).unreflectSpecial(method, declaringClass).bindTo(proxy).invokeWithArguments(args);
+	try { // jdk 1.9
+	    MethodType rt = MethodType.methodType(method.getReturnType(),
+	            method.getParameterTypes());
+	    return MethodHandles.lookup()
+	            .findSpecial(declaringClass, method.getName(), rt,
+	                    declaringClass)
+	            .bindTo(proxy).invokeWithArguments(args);
+	} catch (IllegalAccessException t) {
+	    // jdk 1.8
+	    return getLookupConstructorForJava8()
+	            .newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
+	            .unreflectSpecial(method, declaringClass).bindTo(proxy)
+	            .invokeWithArguments(args);
+	}
     }
 
     public static long unwrap (Object ob) {
