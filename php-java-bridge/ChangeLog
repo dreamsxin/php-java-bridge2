@@ -1,4 +1,10 @@
-2017-01-14  <jostb@intern>
+2018-02-02  <jostb@intern>
+
+  * server/php/java/fastcgi/FCGIProcess.java (testPhp, runPhp): Revert last change.
+
+  * VERSION, php-java-bridge.spec: Version 7.2.1 released.
+
+2018-01-14  <jostb@intern>
 
     * server/php/java/fastcgi/FCGIFactory.java: Use ProcessBuilder instead of runtime.exec().
 
