@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -66,6 +65,7 @@ public class FCGIProcess extends java.lang.Process {
     private String cgiDir;
     private String pearDir;
     private String webInfDir;
+    private final Runtime rt = Runtime.getRuntime();
 
     private FCGIProcess(Builder builder) {
 	this.args = builder.args;
@@ -171,13 +171,7 @@ public class FCGIProcess extends java.lang.Process {
 	InputStream err = null;
 
 	try {
-	    ProcessBuilder builder = new ProcessBuilder();
-	    builder.command(Arrays.asList(s));
-	    builder.directory(homeDir);
-	    builder.environment().putAll(env);
-
-	    proc = builder.start();
-
+	    proc = rt.exec(s, hashToStringArray(env), homeDir);
 	    in = proc.getInputStream();
 	    err = proc.getErrorStream();
 	    out = proc.getOutputStream();
@@ -276,13 +270,8 @@ public class FCGIProcess extends java.lang.Process {
 
     protected void runPhp(String[] php, String[] args) throws IOException {
 	String[] s = quoteArgs(getArgumentArray(php, args));
-	ProcessBuilder builder = new ProcessBuilder();
-	builder.command(Arrays.asList(s));
-	builder.directory(homeDir);
-	builder.environment().putAll(env);
 
-	proc = builder.start();
-
+	proc = rt.exec(s, hashToStringArray(env), homeDir);
 	if (Logger.getLogLevel() > 3)
 	    Logger.logDebug("Started " + java.util.Arrays.asList(s));
     }
